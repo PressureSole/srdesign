@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-git init
-git remote add origin https://github.com/jakewang21/srdesign.git
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +7,17 @@ git remote add origin https://github.com/jakewang21/srdesign.git
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
     <style>
         body {
+            height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
+            overflow-x: hidden; /* Prevents horizontal scrolling */
         }
 
         .navbar {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            background-color: #333;
+            background-color: #bbb;
             padding: 10px 0;
             position: fixed;
             top: 0;
@@ -28,7 +26,7 @@ git remote add origin https://github.com/jakewang21/srdesign.git
 
         .tab {
             text-align: center;
-            color: white;
+            color: black;
             padding: 10px;
             flex-grow: 1;
             cursor: pointer;
@@ -36,7 +34,7 @@ git remote add origin https://github.com/jakewang21/srdesign.git
         }
 
         .tab:hover {
-            background-color: #555;
+            background-color: #777;
         }
 
         .tab i {
@@ -60,16 +58,264 @@ git remote add origin https://github.com/jakewang21/srdesign.git
             height: auto;   /* Keep the aspect ratio intact */
             margin: 20px 0; /* Add top and bottom margins */
         }
+
+        .logo-tab {
+            padding: 0; /* Remove extra padding */
+        }       
+
+        .logo-image {
+            height: 40px; /* Adjust size as needed */
+            width: auto;
+        }
+
+        /* Home Page */
+
+        .container {
+            display: flex;
+            width: 100vw; /* Full width of the viewport */
+            height: 100%; /* Adjust height to account for navbar */
+            padding: 0; /* Remove default padding */
+            margin: 0;  /* Remove default margin */
+            box-sizing: border-box; /* Ensure padding does not affect width */
+        }
+
+        .left-half {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            padding: 20px;
+            box-sizing: border-box;
+        }   
+
+        .right-half {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* This centers the content vertically */
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: white; /* White background for the right half */
+            /*border: 1px solid red;*/
+        }
+
+        .left-half h1 {
+            font-size: 42px;
+            color: #333;
+        }
+
+        .left-half p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            background-color: #ff5500; /* Strava's signature orange */
+            color: white;
+            padding: 15px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        /* Right Half - Run Stats */
+        .stats-box {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .stats-box h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item span {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+        }
+            
+        /* Scores tab styling */
+        .scores-container {
+            display: flex;
+            justify-content: space-evenly;  /* Distribute circles evenly */
+            width: 100%;                    /* Full width */
+            margin: 50px 20px 0;            /* Increased top margin to move the circles down */
+            align-items: center;            /* Vertically center the circles */
+        }
+
+        .score-circle {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #eaeaea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .score-circle .label {
+            position: absolute;
+            top: -25px; /* Position the label above the circle */
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .score-circle .circle-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-circle .number {
+            position: absolute;
+            font-size: 36px;
+            font-weight: bold;
+            z-index: 2; /* Ensure number stays on top of the bar */
+        }
+
+        .score-circle svg .foreground {
+            transform: rotate(0deg); /*-90deg*/
+            transform-origin: 50% 50%;
+        }
+
+        /*
+        .score-circle .bar {
+            transform: rotate(-90deg);
+            transition: stroke-dasharray 0.5s ease;
+            position: absolute; 
+            top: 0;
+            left: 0;
+            z-index: 1; /
+        } */
+
+        /* General styling for the bars */
+        .score-circle .bar {
+            transition: stroke-dasharray 0.5s ease;
+            transform: rotate(0deg); /* Start from the top */
+        }
+
+
+        /* Updated Stress, Symmetry, Fatigue Bar Color Styling */
+        .score-circle.stress .bar {
+            stroke-dasharray: 6, 440; /* Example calculation for 6% */
+            stroke: green;
+        }
+
+        .score-circle.symmetry .bar {
+            stroke-dasharray: 85, 440; /* Example calculation for 85% */
+            stroke: green;
+        }
+
+        .score-circle.fatigue .bar {
+            stroke-dasharray: 31, 440; /* Example calculation for 31% */
+            stroke: green;
+        }
+
+        /* Ensure the correct colors and values are applied */
+        .score-circle.stress[data-value="6"] .bar {
+            stroke: green;
+            stroke-dasharray: 26, 440;
+        }
+
+        .score-circle.symmetry[data-value="85"] .bar {
+            stroke: green;
+            stroke-dasharray: 374, 440;
+        }
+
+        .score-circle.fatigue[data-value="31"] .bar {
+            stroke: green;
+            stroke-dasharray: 136, 440;
+        }
+
+        /* Styling for the numbers in the center */
+        .score-circle .number {
+            font-size: 36px;
+            font-weight: bold;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Details Button styling */
+        /* Container for each score item */
+        .score-item {
+            position: relative; /* Makes it the reference for absolute positioning */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        /* Details Button styling (remains similar) */
+        .details-btn {
+            background-color: #eaeaea;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover state for the Details button */
+        .details-btn:hover {
+            background-color: #ccc;
+        }
+
+        /* Details Box styling - now absolutely positioned so it doesn't shift other elements */
+        .details-box {
+            position: absolute;
+            top: 100%;  /* Position immediately below the score-item content */
+            left: 0;
+            width: 100%;
+            background-color: #eaeaea;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 16px;
+            display: none; /* Hidden by default */
+            z-index: 10; /* Ensures it overlays content if needed */
+        }
+
     </style>
 </head>
-
 
 <body>
     <!-- Nav Bar -->
     <div class="navbar">
-        <div class="tab" onclick="showPage('home')">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
+        <div class="tab logo-tab" onclick="showPage('home')">
+            <img src="PressureSoleLogo_FullTransp.png" alt="PressureSole Logo" class="logo-image"/>
         </div>
         <div class="tab" onclick="showPage('data')">
             <i class="fas fa-chart-line"></i>
@@ -84,19 +330,50 @@ git remote add origin https://github.com/jakewang21/srdesign.git
             <span>Profile</span>
         </div>
     </div>
-
+    
     <!-- Home tab -->
+    <div id="home" class="content active">
+        <div class="container">
+            <!-- Left Half - Branding & Features -->
+            <div class="left-half">
+                <h1>Welcome to PressureSole</h1>
+                <h2>Real-time Gait Tracking</h2>
+                <p>Monitor your running mechanics with live feedback and optimize your performance.</p>
+                <a href="#" class="cta-button">View Your Scores</a>
+            </div>
+            <!-- Right Half - "Your Last Run" Stats -->
+            <div class="right-half">
+                <div class="stats-box">
+                    <h2>Your Last Run</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span>5.2</span> Miles
+                        </div>
+                        <div class="stat-item">
+                            <span>7:45</span> Min/Mile
+                        </div>
+                        <div class="stat-item">
+                            <span>153</span> Avg BPM
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMMENT OUT FOR NOW
     <div id="home" class="content active">
         <h1>Welcome to PressureSole</h1>
         <h2>Real-time Gait Tracking</h2>
         <p>See your latest run and feedback here.</p>
-        <img src="srdesign2/srdesign/PressureSoleLogo_Full.jpg" alt="logo full" class="resized-image"/>
+        <img src="PressureSoleLogo_Full.jpg" alt="logo full" class="resized-image"/>
     </div>
+    -->
 
     <!-- Data tab -->
     <div id="data" class="content">
         <h1>Data</h1>
-        <p>View and analyze your gait tracking data here.</p>
+        <p>Below are the pressure distribution stats from your last run on 02/12/2025:</p>
         
         <!-- Embed the video -->
         <video controls width="640" height="360">
@@ -108,10 +385,81 @@ git remote add origin https://github.com/jakewang21/srdesign.git
     <!-- Scores tab -->
     <div id="scores" class="content">
         <h1>Scores</h1>
-        <p>Adjust your preferences and configurations.</p>
-        <p>Second test woohoo!</p>
-        <p>third test woohoo!</p>
-        <p>test 4</p>
+        
+        <div class="scores-container">
+            <!-- Stress Score -->
+            <div class="score-item">
+                <div class="score-circle stress" data-color="green"> <!-- Added the "stress" class -->
+                    <div class="label">Stress</div>
+                    <div class="circle-content">
+                        <svg width="200" height="200" viewBox="0 0 100 100">
+                            <!-- Background Circle -->
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                            
+                            <!-- Wrap the foreground circle in a group with an inline transform -->
+                            <g transform="rotate(-90,50,50)">
+                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <div class="number">0</div>
+                        <!-- <div class="number">6</div> -->
+                    </div>
+                </div>
+                <!-- Details button and box -->
+                <button class="details-btn">Details</button>
+                <div class="details-box"></div>
+            </div>
+            
+
+            <!-- Symmetry Score -->
+            <div class="score-item">
+                <div class="score-circle symmetry" data-color="green"> <!-- Added the "symmetry" class -->
+                    <div class="label">Symmetry</div>
+                    <div class="circle-content">
+                        <svg width="200" height="200" viewBox="0 0 100 100">
+                            <!-- Background Circle -->
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                            
+                            <!-- Wrap the foreground circle in a group with an inline transform -->
+                            <g transform="rotate(-90,50,50)">
+                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <div class="number">0</div>
+                        <!-- <div class="number">85</div> -->
+                    </div>
+                </div>
+                <!-- Details button and box -->
+                <button class="details-btn">Details</button>
+                <div class="details-box"></div>
+            </div>
+
+            <!-- Fatigue Score -->
+            <div class="score-item">
+                <div class="score-circle fatigue" data-color="green"> <!-- Added the "fatigue" class -->
+                    <div class="label">Fatigue</div>
+                    <div class="circle-content">
+                        <svg width="200" height="200" viewBox="0 0 100 100">
+                            <!-- Background Circle -->
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                            
+                            <!-- Wrap the foreground circle in a group with an inline transform -->
+                            <g transform="rotate(-90,50,50)">
+                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <div class="number">0</div>
+                        <!-- <div class="number">31</div> -->
+                    </div>
+                </div>
+                <!-- Details button and box -->
+                <button class="details-btn">Details</button>
+                <div class="details-box"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Profile tab -->
@@ -127,6 +475,9 @@ git remote add origin https://github.com/jakewang21/srdesign.git
             <label for="last-name">Last Name:</label>
             <input type="text" id="last-name" name="last-name" required>
 
+            <label for="weight">Weight:</label>
+            <input type="text" id="weight" name="weight" required>
+
             <label for="gender">Gender:</label>
             <select id="gender" name="gender" required>
                 <option value="">Select Gender</option>
@@ -140,14 +491,145 @@ git remote add origin https://github.com/jakewang21/srdesign.git
 
         <!-- Start from here -- how do we save info? -->
         <form action="#" method="POST" class="profile-form">
+        </form>
     </div>
 
     <script>
+        // Nav Bar Tab 
         function showPage(pageId) {
+            // Hide all pages
             var pages = document.querySelectorAll('.content');
             pages.forEach(page => page.classList.remove('active'));
+
+            // Show the selected page
             document.getElementById(pageId).classList.add('active');
         }
+
+        // Scores Page
+        // Define score variables (temporary default values)
+        // Temporary default test values
+        let stressScore = 10;
+        let symmetryScore = 8;
+        let fatigueScore = 42;
+        
+        // Array of scores in order: Stress, Symmetry, Fatigue
+        let scoreValues = [stressScore, symmetryScore, fatigueScore];
+
+        function updateScoreCircles() {
+            const circles = document.querySelectorAll('.score-circle');
+            const perimeter = 251.2; // Circumference for a circle with r = 40
+
+            circles.forEach((circle, index) => {
+                let score = scoreValues[index];
+                const bar = circle.querySelector('svg circle.foreground');
+                if (!bar) {
+                    console.error("Foreground circle not found");
+                    return;
+                }
+                
+                // Set the dasharray and dashoffset so the arc length represents the score percentage
+                bar.setAttribute('stroke-dasharray', perimeter);
+                bar.setAttribute('stroke-dashoffset', perimeter - (score / 100 * perimeter));
+
+                // Determine the stroke color based on score and category.
+                let color;
+                if (circle.classList.contains('symmetry')) {
+                    // For symmetry, higher is better.
+                    if (score >= 70) {
+                        color = 'green';
+                    } else if (score >= 30) {
+                        color = 'yellow';
+                    } else {
+                        color = 'red';
+                    }
+                } else {
+                    // For stress and fatigue, lower is better.
+                    if (score <= 29) {
+                        color = 'green';
+                    } else if (score <= 69) {
+                        color = 'yellow';
+                    } else {
+                        color = 'red';
+                    }
+                }
+                bar.style.stroke = color;
+
+                // Set a data attribute for the score color for later use in the details box.
+                circle.setAttribute('data-color', color);
+
+                // Update the displayed number in the center.
+                const numberEl = circle.querySelector('.number');
+                if (numberEl) {
+                    numberEl.textContent = score;
+                }
+            });
+        }
+        
+        // DETAILS BUTTON
+
+        // Mapping of detailed responses for each category and color
+        const responses = {
+            stress: {
+                green: "Green Stress Response",
+                yellow: "Yellow Stress Response",
+                red: "Red Stress Response"
+            },
+            symmetry: {
+                green: "Green Symmetry Response",
+                yellow: "Yellow Symmetry Response",
+                red: "Red Symmetry Response"
+            },
+            fatigue: {
+                green: "Green Fatigue Response",
+                yellow: "Yellow Fatigue Response",
+                red: "Red Fatigue Response"
+            }
+        };
+
+        document.querySelectorAll('.details-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Get the parent container (.score-item)
+                const container = this.closest('.score-item');
+                const detailsBox = container.querySelector('.details-box');
+                const scoreCircle = container.querySelector('.score-circle');
+                const scoreColor = scoreCircle.getAttribute('data-color');
+                
+                // Determine category based on score-circle's classes
+                let category = "";
+                if (scoreCircle.classList.contains('stress')) {
+                    category = "stress";
+                } else if (scoreCircle.classList.contains('symmetry')) {
+                    category = "symmetry";
+                } else if (scoreCircle.classList.contains('fatigue')) {
+                    category = "fatigue";
+                }
+                
+                // Toggle the details box visibility and update button text
+                if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
+                    // Show details and update the button label to "Close ^"
+                    detailsBox.textContent = responses[category][scoreColor];
+                    detailsBox.style.display = 'block';
+                    this.textContent = "Close ^";
+                } else {
+                    // Hide details and revert button text to "Details"
+                    detailsBox.style.display = 'none';
+                    this.textContent = "Details";
+                }
+            });
+        });
+
+        // Temporary function to prompt for new scores
+        function testScoreInput() {
+            let newStress = prompt("Enter Stress score (0-100):", stressScore);
+            let newSymmetry = prompt("Enter Symmetry score (0-100):", symmetryScore);
+            let newFatigue = prompt("Enter Fatigue score (0-100):", fatigueScore);
+            scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigue)];
+            updateScoreCircles();
+        }
+
+        // Initial update
+        updateScoreCircles();
+        testScoreInput();
     </script>
 </body>
 </html>
