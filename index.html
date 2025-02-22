@@ -156,7 +156,7 @@
             color: #222;
         }
             
-        /* Scores tab styling */
+        /* SCORES Page styling */
         .scores-container {
             display: flex;
             justify-content: space-evenly;  /* Distribute circles evenly */
@@ -204,16 +204,6 @@
             transform: rotate(0deg); /*-90deg*/
             transform-origin: 50% 50%;
         }
-
-        /*
-        .score-circle .bar {
-            transform: rotate(-90deg);
-            transition: stroke-dasharray 0.5s ease;
-            position: absolute; 
-            top: 0;
-            left: 0;
-            z-index: 1; /
-        } */
 
         /* General styling for the bars */
         .score-circle .bar {
@@ -306,6 +296,104 @@
             font-size: 16px;
             display: none; /* Hidden by default */
             z-index: 10; /* Ensures it overlays content if needed */
+        }
+        
+        /* PROFILE Page styling */
+        .profile-container {
+            max-width: 600px;
+            margin: auto; /*50px*/
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form layout */
+        
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        /* Form rows should have uniform padding and spacing */
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: calc(100% - 10px); /* Ensures row width is correct without breaking layout */
+            padding: 0 0px; /* Uniform left and right padding for all rows */
+            gap: 10px; /* Ensures spacing between form fields */
+            margin-bottom: 15px; /* Space between rows */
+            box-sizing: border-box; /* Ensures padding does not affect overall width */
+        }
+
+        /* Form groups (input containers) should distribute space equally */
+        .form-group {
+            flex: 1;
+            min-width: 0; /* Prevents overflow */
+        }
+
+        /* Style for input fields */
+        .profile-form input,
+        .profile-form select {
+            width: 100%;
+            padding: 12px; /* Consistent padding inside input boxes */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #eaeaea; /* Light grey background */
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box; /* Ensures padding does not break width */
+        }
+        /* Form row: Holds two input fields side by side */
+        /*.form-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+        }*/
+
+        /* Ensures inputs share space evenly */
+        /*.form-group {
+            flex: 0 0 46%;
+        }*/
+
+        /* Labels */
+        .profile-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Input and Select Fields */
+        /*.profile-form input,
+        .profile-form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #eaeaea; 
+            font-size: 16px;
+            color: #333;
+        }*/ /* Light grey background */
+
+        /* Save button */
+        .profile-form button {
+            width: calc(100% - 10px);
+            padding: 10px;
+            background-color: #ff5500; /* Strava's orange */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .profile-form button:hover {
+            background-color: #e04a00;
         }
 
     </style>
@@ -467,35 +555,39 @@
     </div>
 
     <!-- Profile tab -->
-    <div id="profile" class="content">
-        <h1>Profile</h1>
-        <p>Manage your user profile and personal information.</p>
-
-        <h2>Create Profile</h2>
-        <form action="#" method="POST" class="profile-form">
-            <label for="first-name">First Name:</label>
-            <input type="text" id="first-name" name="first-name" required>
-
-            <label for="last-name">Last Name:</label>
-            <input type="text" id="last-name" name="last-name" required>
-
-            <label for="weight">Weight:</label>
-            <input type="text" id="weight" name="weight" required>
-
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender" required>
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-            </select>
-
-            <button type="submit">Save Profile</button>
-        </form>
-
-        <!-- Start from here -- how do we save info? -->
-        <form action="#" method="POST" class="profile-form">
-        </form>
+    <div id="profile" class="content">    
+        <div class="profile-container">
+            <h1>Profile</h1>
+            <p>Manage your user profile and personal information.</p>
+            <form id="profile-form" class="profile-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first-name">First Name:</label>
+                        <input type="text" id="first-name" name="firstName">
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name">Last Name:</label>
+                        <input type="text" id="last-name" name="lastName">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weight">Weight (lbs):</label>
+                        <input type="number" id="weight" name="weight">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">Save Profile</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -509,7 +601,8 @@
             document.getElementById(pageId).classList.add('active');
         }
 
-        // Scores Page
+        // SCORES Page
+
         // Define score variables (temporary default values)
         // Temporary default test values
         let stressScore = 10;
@@ -634,6 +727,30 @@
         // Initial update
         updateScoreCircles();
         testScoreInput();
+
+        // PROFILE Page
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileForm = document.getElementById('profile-form');
+            const inputs = profileForm.querySelectorAll('input, select');
+
+            // Load saved data from localStorage
+            inputs.forEach(input => {
+                const savedValue = localStorage.getItem(input.name);
+                if (savedValue) {
+                    input.value = savedValue;
+                }
+            });
+
+            // Save data to localStorage on form submit
+            profileForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                inputs.forEach(input => {
+                    localStorage.setItem(input.name, input.value);
+                });
+                alert('Profile saved successfully!');
+            });
+        });
+
     </script>
 </body>
 </html>
