@@ -403,7 +403,7 @@
                 <h1>Welcome to PressureSole</h1>
                 <h2>Real-time Gait Tracking</h2>
                 <p>Monitor your running mechanics with live feedback and optimize your performance.</p>
-                <a href="#" class="cta-button">View Your Scores</a>
+                <a href="#" class="cta-button" onclick="showPage('scores'); return false;">View Your Scores</a>
             </div>
             <!-- Right Half - "Your Last Run" Stats -->
             <div class="right-half">
@@ -438,17 +438,37 @@
     </div>
     -->
 
-    <!-- Data tab -->
-    <div id="data" class="content">
-        <h1>Data</h1>
-        <p>Below are the pressure distribution stats from your last run on 02/12/2025:</p>
-        
-        <!-- Embed the video -->
-        <video controls width="640" height="360">
-            <source src="loadsol_test.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <!-- DATA  tab -->
+    <div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+        <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            
+            <!-- Symmetry Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </div>
+            
+            <!-- Fatigue Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;">
+                </div>
+            </div>
+            
+            <!-- Stress Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+                <p style="color: #666; font-style: italic;">No data available</p>
+            </div>
+            
+        </div>
     </div>
+    
+    
 
     <!-- Scores tab -->
     <div id="scores" class="content">
@@ -536,6 +556,13 @@
             <h1>Profile</h1>
             <p>Manage your user profile and personal information.</p>
             <form id="profile-form" class="profile-form">
+                <!-- New Username Field -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username">
+                    </div>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="first-name">First Name:</label>
@@ -563,6 +590,12 @@
                 </div>
                 <button type="submit">Save Profile</button>
             </form>
+
+            <!-- Temporary measure to view all saved profiles -->
+            <button id="show-profiles-btn" onclick="showProfiles()">Show All Profiles</button>
+            <button id="clear-profiles-btn" onclick="clearProfiles()">Clear Profiles</button>
+            <div id="profiles-output" style="margin-top:20px; background:#f7f7f7; padding:10px; border:1px solid #ccc;"></div>
+            
         </div>
     </div>
 
@@ -691,7 +724,7 @@
             });
         });
 
-        // Temporary function to prompt for new scores
+        // TEMPORARY function to prompt for new SCORES
         function testScoreInput() {
             let newStress = prompt("Enter Stress score (0-100):", stressScore);
             let newSymmetry = prompt("Enter Symmetry score (0-100):", symmetryScore);
@@ -707,25 +740,59 @@
         // PROFILE Page
         document.addEventListener('DOMContentLoaded', function() {
             const profileForm = document.getElementById('profile-form');
-            const inputs = profileForm.querySelectorAll('input, select');
 
-            // Load saved data from localStorage
-            inputs.forEach(input => {
-                const savedValue = localStorage.getItem(input.name);
-                if (savedValue) {
-                    input.value = savedValue;
-                }
-            });
+            // Load saved data for a specific username if needed.
+            // (For now, we are focusing on saving, and the "Show All Profiles" button will help you inspect storage.)
 
             // Save data to localStorage on form submit
             profileForm.addEventListener('submit', function(event) {
                 event.preventDefault();
-                inputs.forEach(input => {
-                    localStorage.setItem(input.name, input.value);
-                });
-                alert('Profile saved successfully!');
+                // Retrieve the username field value
+                const username = document.getElementById('username').value.trim();
+                if (!username) {
+                    alert('Username cannot be empty');
+                    return;
+                }
+                // Create an object with the other profile fields
+                const profileData = {
+                    firstName: document.getElementById('first-name').value,
+                    lastName: document.getElementById('last-name').value,
+                    weight: document.getElementById('weight').value,
+                    gender: document.getElementById('gender').value
+                };
+                // Store the profile data under a key that links to the username
+                localStorage.setItem('profile_' + username, JSON.stringify(profileData));
+                alert('Profile saved successfully for user: ' + username);
             });
         });
+
+        // TEMPORARY function to view all saved profiles
+        function showProfiles() {
+            const outputDiv = document.getElementById('profiles-output');
+            outputDiv.innerHTML = ''; // Clear previous output
+            // Loop through localStorage keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                // Check for keys that start with "profile_"
+                if (key.indexOf('profile_') === 0) {
+                    const profile = JSON.parse(localStorage.getItem(key));
+                    outputDiv.innerHTML += `<p><strong>${key}</strong>: ${JSON.stringify(profile)}</p>`;
+                }
+            }
+        }
+
+        // Temporary function to clear all stored profiles
+        function clearProfiles() {
+            // Loop backwards through localStorage keys to safely remove items
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key.indexOf('profile_') === 0) {
+                    localStorage.removeItem(key);
+                }
+            }
+            // Update the output to reflect the cleared profiles
+            document.getElementById('profiles-output').innerHTML = 'All profiles have been cleared.';
+        }
 
     </script>
 </body>
