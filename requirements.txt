@@ -79,3 +79,6 @@ wcwidth==0.2.6
 webcolors==1.13
 webencodings==0.5.1
 websocket-client==1.5.1
+scipy==1.10.1
+matplotlib==3.6.3
+pandas==1.5.3
