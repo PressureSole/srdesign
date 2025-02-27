@@ -20,11 +20,10 @@ import git
 import shutil
 
 # Load the Excel file (ensure it's uploaded to the Colab environment)
-uploaded = files.upload()
-file_path = list(uploaded.keys())[0]
+filename = "Copy of test_lab shortening.xlsx"  # Ensure this path is correct
 
 # Read the data from the Excel file
-data = pd.read_excel(file_path)
+data = pd.read_excel(filename)
 
 # Extract timestamps and relevant pressure values
 timestamps = data["Time"].values
@@ -130,12 +129,10 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from scipy.interpolate import griddata, splprep, splev
 
-# Load the Excel file (ensure it's uploaded to the Colab environment)
-uploaded = files.upload()  # This will prompt you to upload the file
-file_path = list(uploaded.keys())[0]  # Get the name of the uploaded file
+filename = "Copy of test_lab shortening.xlsx"  # Ensure this path is correct
 
 # Read the data from the Excel file
-data = pd.read_excel(file_path)
+data = pd.read_excel(filename)
 
 # Extract timestamps and relevant pressure values
 timestamps = data["Time"].values  # Extract the "Time" column
