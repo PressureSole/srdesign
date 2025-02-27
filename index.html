@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PressureSole App</title>
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
-    
     <style>
         body {
             height: 100%;
@@ -13,8 +12,6 @@
             font-family: Arial, sans-serif;
             overflow-x: hidden; /* Prevents horizontal scrolling */
         }
-
-        /* TEST TEST TEST*/
 
         .navbar {
             display: flex;
@@ -441,35 +438,94 @@
     </div>
     -->
 
-    <!-- DATA  tab -->
     <div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
         <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
-        <div style="display: flex; justify-content: space-between; gap: 20px;">
-            
-            <!-- Symmetry Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
-            </div>
-            
-            <!-- Fatigue Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;">
+        
+        <!-- Button to switch between views -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button id="switch-view-btn" onclick="switchView()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Switch to Dynamic View</button>
+        </div>
+    
+        <!-- Content for Symmetry and Fatigue (Static View) -->
+        <div id="static-view" style="display: block;">
+    
+            <div style="display: flex; justify-content: space-between; gap: 20px;">
+                
+                <!-- Symmetry Section -->
+                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
                 </div>
+                
+                <!-- Fatigue Section -->
+                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;">
+                    </div>
+                </div>
+                
+                <!-- Stress Section -->
+                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+                    <p style="color: #666; font-style: italic;">No data available</p>
+                </div>
+                
             </div>
-            
-            <!-- Stress Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-                <p style="color: #666; font-style: italic;">No data available</p>
+        </div>
+    
+        <!-- Content for Dynamic Symmetry and Fatigue (Dynamic View) -->
+        <div id="dynamic-view" style="display: none;">
+            <div style="display: flex; justify-content: space-between; gap: 20px;">
+                
+                <!-- Dynamic Symmetry Section -->
+                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Dynamic Symmetry</h2>
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/dynamic_symmetry_score_visualization.png" alt="Dynamic Symmetry Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+                </div>
+                
+                <!-- Dynamic Fatigue Section -->
+                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Dynamic Fatigue</h2>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_1.png" alt="Dynamic Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_2.png" alt="Dynamic Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_3.png" alt="Dynamic Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;">
+                    </div>
+                </div>
+                
+                <!-- Stress Section -->
+                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+                    <p style="color: #666; font-style: italic;">No data available</p>
+                </div>
+                
             </div>
-            
         </div>
     </div>
+    
+    <script>
+        // Function to switch between static and dynamic views
+        function switchView() {
+            var staticView = document.getElementById('static-view');
+            var dynamicView = document.getElementById('dynamic-view');
+            var button = document.getElementById('switch-view-btn');
+    
+            // Toggle views
+            if (staticView.style.display === "none") {
+                staticView.style.display = "block";
+                dynamicView.style.display = "none";
+                button.innerHTML = "Switch to Dynamic View";
+            } else {
+                staticView.style.display = "none";
+                dynamicView.style.display = "block";
+                button.innerHTML = "Switch to Static View";
+            }
+        }
+    </script>
+    
     
     
 
