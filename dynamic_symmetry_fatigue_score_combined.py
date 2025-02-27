@@ -93,7 +93,7 @@ cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad
 import os
 import time
 
-output_file = "/content/dynamic_average_pressure_map.png"
+output_file = "dynamic_average_pressure_map.png"
 
 plt.savefig(output_file, bbox_inches='tight')
 plt.show()
@@ -110,7 +110,7 @@ print("File saved successfully!")
 files.download(output_file)
 
 # GitHub upload
-repo_dir = "/content/srdesign"
+repo_dir = "srdesign"
 photo_file_in_repo = os.path.join(repo_dir, "dynamic_symmetry_score_visualization.png")
 repo_url = "https://github.com/jakewang21/srdesign.git"
 pat = "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"  # Replace with your actual PAT
@@ -273,15 +273,15 @@ def create_heatmap_image(normalized_pressure_data, title, output_file):
     plt.close()
 
 # Generate and save the heatmaps for each third
-create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "/content/dynamic_first_third_pressure_map.png")
-create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "/content/dynamic_second_third_pressure_map.png")
-create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "/content/dynamic_third_third_pressure_map.png")
+create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "dynamic_first_third_pressure_map.png")
+create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "dynamic_second_third_pressure_map.png")
+create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "dynamic_third_third_pressure_map.png")
 
 
 # Provide download links for the images
-files.download("/content/dynamic_first_third_pressure_map.png")
-files.download("/content/dynamic_second_third_pressure_map.png")
-files.download("/content/dynamic_third_third_pressure_map.png")
+files.download("dynamic_first_third_pressure_map.png")
+files.download("dynamic_second_third_pressure_map.png")
+files.download("dynamic_third_third_pressure_map.png")
 
 
 import git
@@ -289,13 +289,13 @@ import shutil
 import os
 
 # Define the repository directory
-repo_dir = "/content/srdesign"
+repo_dir = "srdesign"
 
 # Define the list of PNG files to be uploaded
 photo_files = [
-    "/content/dynamic_first_third_pressure_map.png",
-    "/content/dynamic_second_third_pressure_map.png",
-    "/content/dynamic_third_third_pressure_map.png"
+    "dynamic_first_third_pressure_map.png",
+    "dynamic_second_third_pressure_map.png",
+    "dynamic_third_third_pressure_map.png"
 ]
 
 # Corresponding file names in the repo
