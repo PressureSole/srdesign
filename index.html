@@ -445,6 +445,18 @@
         <div style="text-align: center; margin-bottom: 20px;">
             <button id="switch-view-btn" onclick="switchView()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Switch to Dynamic View</button>
         </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button id="switch-view-btn" onclick="switchView()" 
+                style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Switch to Dynamic View
+            </button>
+            <button id="update-visuals-btn" onclick="triggerGitHubAction()" 
+                style="padding: 10px 20px; background-color: #e76f51; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+                Update Visualizations
+            </button>
+        </div>
+        
     
         <!-- Content for Symmetry and Fatigue (Static View) -->
         <div id="static-view" style="display: block;">
@@ -524,6 +536,36 @@
                 button.innerHTML = "Switch to Static View";
             }
         }
+            // Function to trigger GitHub Action
+    document.getElementById("triggerButton").addEventListener("click", async function() {
+        const token = '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';  // Replace with your token
+        const username = 'jakewang21';  // Replace with your username
+        const repo = 'srdesign';  // Replace with your repo name
+        const workflow = 'run_script.yml';  // Replace with your workflow name
+        const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflow}/dispatches`;
+
+        const requestData = {
+            ref: "main",  // The branch you want to trigger (replace with your branch if different)
+        };
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        });
+
+        if (response.ok) {
+            alert("GitHub Action triggered successfully!");
+        } else {
+            const errorText = await response.text();
+            alert("Error: " + errorText);
+        }
+    });
+
     </script>
     
     
