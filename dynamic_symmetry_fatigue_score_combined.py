@@ -8,11 +8,13 @@ Original file is located at
 """
 
 from scipy.interpolate import Rbf
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
+import matplotlib.pyplot as plt
 
 import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from scipy.interpolate import splprep, splev
 import git
@@ -88,11 +90,24 @@ ax.legend()
 cbar = fig.colorbar(pressure_img, ax=ax)
 cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
 
-# Save and download image
+import os
+import time
+
 output_file = "/content/dynamic_average_pressure_map.png"
+
 plt.savefig(output_file, bbox_inches='tight')
-files.download(output_file)
 plt.show()
+
+# Wait until file is actually saved
+time.sleep(2)
+
+if not os.path.exists(output_file):
+    raise FileNotFoundError(f"File {output_file} was not created successfully.")
+
+print("File saved successfully!")
+
+# Proceed with download
+files.download(output_file)
 
 # GitHub upload
 repo_dir = "/content/srdesign"
@@ -123,6 +138,8 @@ from scipy.interpolate import Rbf
 import os
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from scipy.interpolate import griddata, splprep, splev
@@ -259,6 +276,7 @@ def create_heatmap_image(normalized_pressure_data, title, output_file):
 create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "/content/dynamic_first_third_pressure_map.png")
 create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "/content/dynamic_second_third_pressure_map.png")
 create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "/content/dynamic_third_third_pressure_map.png")
+
 
 # Provide download links for the images
 files.download("/content/dynamic_first_third_pressure_map.png")
