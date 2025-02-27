@@ -7,7 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1gELQriynXj8VD4u-i1TorUhrpI0qYSH_
 """
 
-from google.colab import files
 from scipy.interpolate import Rbf
 
 import os
@@ -119,7 +118,6 @@ repo.git.push()
 
 print("Photo uploaded to GitHub successfully!")
 
-from google.colab import files
 from scipy.interpolate import Rbf
 
 import os
