@@ -106,9 +106,6 @@ if not os.path.exists(output_file):
 
 print("File saved successfully!")
 
-# Proceed with download
-files.download(output_file)
-
 # GitHub upload
 repo_dir = "srdesign"
 photo_file_in_repo = os.path.join(repo_dir, "dynamic_symmetry_score_visualization.png")
@@ -276,12 +273,6 @@ def create_heatmap_image(normalized_pressure_data, title, output_file):
 create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "dynamic_first_third_pressure_map.png")
 create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "dynamic_second_third_pressure_map.png")
 create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "dynamic_third_third_pressure_map.png")
-
-
-# Provide download links for the images
-files.download("dynamic_first_third_pressure_map.png")
-files.download("dynamic_second_third_pressure_map.png")
-files.download("dynamic_third_third_pressure_map.png")
 
 
 import git
