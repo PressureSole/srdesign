@@ -93,7 +93,7 @@ cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad
 import os
 import time
 
-output_file = "dynamic_average_pressure_map.png"
+output_file = "dynamic_symmetry_score_visualization.png"
 
 plt.savefig(output_file, bbox_inches='tight')
 plt.show()
@@ -291,9 +291,9 @@ photo_files = [
 
 # Corresponding file names in the repo
 photo_files_in_repo = [
-    os.path.join(repo_dir, "d_fatigue_1.png"),
-    os.path.join(repo_dir, "d_fatigue_2.png"),
-    os.path.join(repo_dir, "d_fatigue_3.png")
+    os.path.join(repo_dir, "dynamic_first_third_pressure_map.png"),
+    os.path.join(repo_dir, "dynamic_second_third_pressure_map.png"),
+    os.path.join(repo_dir, "dynamic_third_third_pressure_map.png")
 ]
 
 # GitHub repository details
