@@ -1,0 +1,32 @@
+name: Run Visualization Update
+
+on:
+  workflow_dispatch:  # This allows manual triggering via API
+
+jobs:
+  update_visualizations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt  # Ensure your script dependencies are in this file
+
+      - name: Run Python Script
+        run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-update visualizations"
+          git push
