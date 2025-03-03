@@ -177,7 +177,6 @@ print(f"Photo uploaded to GitHub successfully as {new_output_file}!")
 
 
 from scipy.interpolate import Rbf
-
 import os
 import numpy as np
 import pandas as pd
@@ -186,7 +185,9 @@ matplotlib.use('Agg')  # Use a non-GUI backend
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from scipy.interpolate import griddata, splprep, splev
+import time
 
+# Load the Excel file (ensure it's uploaded to the environment)
 filename = "Copy of test_lab shortening.xlsx"  # Ensure this path is correct
 
 # Read the data from the Excel file
@@ -201,7 +202,7 @@ sensor_pressures = [data[f"Sensor_{i+1}"].values for i in range(22)]
 # Sensor coordinates (x, y) for 22 sensors
 sensor_coords = np.array([
     [5.8,2.2],[7.0,4.9],[4.8,6.2],[6.4,9.6],[4.5,12.4],[2.8,15.1],[6.8,15.0],[4.9,16.9],[6.5,18.9],[2.2,19.2],[4.6,21.4],
-    [-5.8,2.2],[-7.0,4.9],[-4.8,6.2],[-6.4,9.6],[-4.5,12.4],[-2.8,15.1],[-6.8,15.0],[-4.9,16.9],[-6.5,18.9],[-2.2,19.2],[-4.6,21.4] # Mirrored for left foot
+    [-5.8,2.2],[-7.0,4.9],[-4.8,6.2],[-6.4,9.6],[-4.5,12.4],[-2.8,15.1],[-6.8,15.0],[-4.9,16.9],[-6.5,18.9],[-2.2,19.2],[-4.6,21.4]  # Mirrored for left foot
 ])
 
 # Sample coordinates of foot outline (x, y)
@@ -247,133 +248,83 @@ second_third_pressures = [sensor_pressure[first_third_end:second_third_end] for 
 third_third_pressures = [sensor_pressure[second_third_end:] for sensor_pressure in sensor_pressures]
 
 # Calculate average pressures for each third
-avg_first_third = np.mean(first_third_pressures, axis=1)
-avg_second_third = np.mean(second_third_pressures, axis=1)
-avg_third_third = np.mean(third_third_pressures, axis=1)
+avg_first_third_pressures = np.mean(first_third_pressures, axis=1)
+avg_second_third_pressures = np.mean(second_third_pressures, axis=1)
+avg_third_third_pressures = np.mean(third_third_pressures, axis=1)
 
-from scipy.interpolate import Rbf
+# Create radial basis function (Rbf) interpolators for each third
+rbf_first_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_first_third_pressures, function='multiquadric')
+rbf_second_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_second_third_pressures, function='multiquadric')
+rbf_third_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_third_third_pressures, function='multiquadric')
 
-# RBF Interpolation for each third
-rbf_first_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_first_third, function='multiquadric')
-rbf_second_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_second_third, function='multiquadric')
-rbf_third_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_third_third, function='multiquadric')
+# Pressure mapping for each third
+pressure_data_first_third = rbf_first_third(X, Y)
+pressure_data_second_third = rbf_second_third(X, Y)
+pressure_data_third_third = rbf_third_third(X, Y)
 
-# Interpolate the pressure values over the grid for each third
-first_third_pressure_grid = rbf_first_third(X, Y)
-second_third_pressure_grid = rbf_second_third(X, Y)
-third_third_pressure_grid = rbf_third_third(X, Y)
+# Mask points inside foot outlines
+points = np.column_stack([X.flatten(), Y.flatten()])
+inside_right = r_foot_path.contains_points(points).reshape(X.shape)
+inside_left = l_foot_path.contains_points(points).reshape(X.shape)
+combined_pressure_data_first_third = np.where(inside_right | inside_left, pressure_data_first_third, np.nan)
+combined_pressure_data_second_third = np.where(inside_right | inside_left, pressure_data_second_third, np.nan)
+combined_pressure_data_third_third = np.where(inside_right | inside_left, pressure_data_third_third, np.nan)
 
-# Apply foot mask for each section
-first_third_combined_pressure_data = np.where(inside_right | inside_left, first_third_pressure_grid, np.nan)
-second_third_combined_pressure_data = np.where(inside_right | inside_left, second_third_pressure_grid, np.nan)
-third_third_combined_pressure_data = np.where(inside_right | inside_left, third_third_pressure_grid, np.nan)
+# Normalize pressure data for each third
+min_pressure_first, max_pressure_first = np.nanmin(combined_pressure_data_first_third), np.nanmax(combined_pressure_data_first_third)
+min_pressure_second, max_pressure_second = np.nanmin(combined_pressure_data_second_third), np.nanmax(combined_pressure_data_second_third)
+min_pressure_third, max_pressure_third = np.nanmin(combined_pressure_data_third_third), np.nanmax(combined_pressure_data_third_third)
 
-# Normalize the pressure data for each section
-min_first_third = np.nanmin(first_third_combined_pressure_data)
-max_first_third = np.nanmax(first_third_combined_pressure_data)
-normalized_first_third = (first_third_combined_pressure_data - min_first_third) / (max_first_third - min_first_third)
+normalized_pressure_data_first_third = (combined_pressure_data_first_third - min_pressure_first) / (max_pressure_first - min_pressure_first)
+normalized_pressure_data_second_third = (combined_pressure_data_second_third - min_pressure_second) / (max_pressure_second - min_pressure_second)
+normalized_pressure_data_third_third = (combined_pressure_data_third_third - min_pressure_third) / (max_pressure_third - min_pressure_third)
 
-min_second_third = np.nanmin(second_third_combined_pressure_data)
-max_second_third = np.nanmax(second_third_combined_pressure_data)
-normalized_second_third = (second_third_combined_pressure_data - min_second_third) / (max_second_third - min_second_third)
-
-min_third_third = np.nanmin(third_third_combined_pressure_data)
-max_third_third = np.nanmax(third_third_combined_pressure_data)
-normalized_third_third = (third_third_combined_pressure_data - min_third_third) / (max_third_third - min_third_third)
-
-# Helper function to create and save the heatmap images for each third
-def create_heatmap_image(normalized_pressure_data, title, output_file):
+# Plotting the three images with respective timestamps
+output_files = []
+for i, pressure_data in enumerate([normalized_pressure_data_first_third, normalized_pressure_data_second_third, normalized_pressure_data_third_third]):
     fig, ax = plt.subplots(figsize=(12, 8))
-    pressure_img = ax.imshow(normalized_pressure_data, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
-
-    # Plot the smooth foot outlines
+    pressure_img = ax.imshow(pressure_data, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
     ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
     ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
-
-    # Plot sensor locations
-    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100, zorder=5)
-
-    # Label the sensors with their respective numbers
-    for i, (x, y) in enumerate(sensor_coords):
-        ax.text(x + 0.5, y + 0.5, f"{i+1}", fontsize=10, color="black", zorder=6)
-
-    # Mark the origin
+    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
     ax.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
-
     ax.set_xlim([min_x, max_x])
     ax.set_ylim([min_y, max_y])
     ax.set_xlabel("X (cm)")
     ax.set_ylabel("Y (cm)")
-    ax.set_title(title)
+    ax.set_title(f"Pressure Mapping (Timestamp {timestamps[first_third_end + i]:.2f} s)")
     ax.legend()
-
-    # Add colorbar
     cbar = fig.colorbar(pressure_img, ax=ax)
     cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
 
-    # Save the image
+    # Save the image with a timestamp
+    timestamp_str = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    output_file = f"dynamic_symmetry_score_visualization_{timestamp_str}_{i+1}.png"
+    output_files.append(output_file)
     plt.savefig(output_file, bbox_inches='tight')
     plt.close()
 
-# Generate and save the heatmaps for each third
-create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "dynamic_first_third_pressure_map.png")
-create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "dynamic_second_third_pressure_map.png")
-create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "dynamic_third_third_pressure_map.png")
+# Display the saved files
+print(f"Images saved successfully: {', '.join(output_files)}")
 
-
-import git
-import shutil
-import os
-
-# Define the repository directory
-repo_dir = "srdesign"
-
-# Define the list of PNG files to be uploaded
-photo_files = [
-    "dynamic_first_third_pressure_map.png",
-    "dynamic_second_third_pressure_map.png",
-    "dynamic_third_third_pressure_map.png"
-]
-
-# Corresponding file names in the repo
-photo_files_in_repo = [
-    os.path.join(repo_dir, "dynamic_first_third_pressure_map.png"),
-    os.path.join(repo_dir, "dynamic_second_third_pressure_map.png"),
-    os.path.join(repo_dir, "dynamic_third_third_pressure_map.png")
-]
-
-# GitHub repository details
+# Git operations
+repo_dir = "srdesign"  # Assuming this is your repo folder
+repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
 repo_url = "https://github.com/jakewang21/srdesign.git"
-pat = "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"  # Replace with your actual PAT
+pat = os.getenv('EK_TOKEN')  # Ensure your PAT is set as an environment variable
+if not pat:
+    raise ValueError("EK_TOKEN is not set in the environment.")
 
-# Clone the repo if not already present (or pull latest changes)
-if not os.path.isdir(repo_dir):
-    repo = git.Repo.clone_from(repo_url, repo_dir)
-else:
-    repo = git.Repo(repo_dir)
-    repo.git.config("pull.rebase", "false")
-    repo.git.pull()
+# Clone the repo if it doesn't exist
+if not os.path.exists(repo_dir):
+    os.system(f"git clone {repo_url}")
 
-# Set up remote URL with PAT for authentication
-remote_url = f"https://{pat}@github.com/jakewang21/srdesign.git"
-repo.git.remote("set-url", "origin", remote_url)
+# Pull the latest changes from the repo
+os.chdir(repo_dir)
+os.system("git pull")
 
-# Set username and email for the commit
-repo.git.config("user.name", "eugeniakritsuk")  # Replace with your GitHub username
-repo.git.config("user.email", "eugeniakritsuk@gmail.com")  # Replace with your GitHub email
-
-# Loop through and upload each PNG file
-for src, dest in zip(photo_files, photo_files_in_repo):
-    if os.path.exists(src):
-        shutil.copy(src, dest)
-        repo.git.add(os.path.abspath(dest))
-    else:
-        print(f"File not found: {src}")
-
-# Commit the changes with a message
-repo.git.commit("-m", "Update multiple PNG files")
-
-# Push the changes to GitHub
-repo.git.push()
-
-print("All photos uploaded to GitHub successfully!")
+# Add, commit, and push the changes to the GitHub repository
+for output_file in output_files:
+    os.system(f"git add {output_file}")
+os.system("git commit -m 'Add dynamic symmetry score visualizations'")
+os.system(f"git push https://{pat}@github.com/jakewang21/srdesign.git")
