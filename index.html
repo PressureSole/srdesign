@@ -447,142 +447,171 @@
     </div>
     -->
 
-    <!-- DATA tab -->
-    <div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
-        <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
-        
-        <!-- Button to switch between views -->
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button id="switch-view-btn" onclick="switchView()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Switch to Dynamic View</button>
-        </div>
+<!-- DATA tab -->
+<div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; ">
+    <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
 
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button id="switch-view-btn" onclick="switchView()" 
-                style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Switch to Dynamic View
-            </button>
-            <button id="update-visuals-btn" onclick="triggerGitHubAction()" 
-                style="padding: 10px 20px; background-color: #e76f51; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-                Update Visualizations
-            </button>
-        </div>
-        
-    
-        <!-- Content for Symmetry and Fatigue (Static View) -->
-        <div id="static-view" style="display: block;">
-    
-            <div style="display: flex; justify-content: space-between; gap: 20px;">
-                
-                <!-- Symmetry Section -->
-                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                    <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
-                </div>
-                
-                <!-- Fatigue Section -->
-                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                    <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;">
-                    </div>
-                </div>
-                
-                <!-- Stress Section -->
-                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                    <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-                    <p style="color: #666; font-style: italic;">No data available</p>
-                </div>
-                
+    <!-- Buttons for switching views and updating visualizations -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button id="switch-view-btn" onclick="switchView()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Switch to Dynamic View
+        </button>
+        <button id="update-visuals-btn" onclick="triggerGitHubAction()" style="padding: 10px 20px; background-color: #e76f51; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+            Update Visualizations
+        </button>
+    </div>
+
+    <!-- Static View -->
+    <div id="static-view" style="display: block;">
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <!-- Symmetry Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
             </div>
-        </div>
-    
-        <!-- Content for Dynamic Symmetry and Fatigue (Dynamic View) -->
-        <div id="dynamic-view" style="display: none;">
-            <div style="display: flex; justify-content: space-between; gap: 20px;">
-                
-                <!-- Dynamic Symmetry Section -->
-                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                    <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Dynamic Symmetry</h2>
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/dynamic_symmetry_score_visualization.png" alt="Dynamic Symmetry Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+            <!-- Fatigue Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
                 </div>
-                
-                <!-- Dynamic Fatigue Section -->
-                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                    <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Dynamic Fatigue</h2>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_1.png" alt="Dynamic Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_2.png" alt="Dynamic Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                        <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_3.png" alt="Dynamic Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;">
-                    </div>
-                </div>
-                
-                <!-- Stress Section -->
-                <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                    <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-                    <p style="color: #666; font-style: italic;">No data available</p>
-                </div>
-                
+            </div>
+            <!-- Stress Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+                <p style="color: #666; font-style: italic;">No data available</p>
             </div>
         </div>
     </div>
-    
-    <script>
-        // Function to switch between static and dynamic views
-        function switchView() {
-            var staticView = document.getElementById('static-view');
-            var dynamicView = document.getElementById('dynamic-view');
-            var button = document.getElementById('switch-view-btn');
-    
-            // Toggle views
-            if (staticView.style.display === "none") {
-                staticView.style.display = "block";
-                dynamicView.style.display = "none";
-                button.innerHTML = "Switch to Dynamic View";
-            } else {
-                staticView.style.display = "none";
-                dynamicView.style.display = "block";
-                button.innerHTML = "Switch to Static View";
-            }
-        }
-            // Function to trigger GitHub Action
-    document.getElementById("triggerButton").addEventListener("click", async function() {
-        const token = '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';  // Replace with your token
-        const username = 'jakewang21';  // Replace with your username
-        const repo = 'srdesign';  // Replace with your repo name
-        const workflow = 'run_script.yml';  // Replace with your workflow name
-        const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflow}/dispatches`;
 
-        const requestData = {
-            ref: "main",  // The branch you want to trigger (replace with your branch if different)
-        };
+    <!-- Dynamic View -->
+    <div id="dynamic-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <!-- Dynamic Symmetry Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Dynamic Symmetry</h2>
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/dynamic_symmetry_score_visualization.png" alt="Dynamic Symmetry Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </div>
+            <!-- Dynamic Fatigue Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Dynamic Fatigue</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_1.png" alt="Dynamic Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_2.png" alt="Dynamic Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_3.png" alt="Dynamic Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
+                </div>
+            </div>
+            <!-- Stress Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+                <p style="color: #666; font-style: italic;">No data available</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function switchView() {
+        var staticView = document.getElementById('static-view');
+        var dynamicView = document.getElementById('dynamic-view');
+        var button = document.getElementById('switch-view-btn');
+
+        if (staticView.style.display === "none") {
+            staticView.style.display = "block";
+            dynamicView.style.display = "none";
+            button.innerHTML = "Switch to Dynamic View";
+        } else {
+            staticView.style.display = "none";
+            dynamicView.style.display = "block";
+            button.innerHTML = "Switch to Static View";
+        }
+    }
+
+    async function triggerGitHubAction() {
+        const username = 'jakewang21';
+        const repo = 'srdesign';
+        const workflow = 'run_script.yml';
+        const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflow}/dispatches`;
 
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Accept': 'application/vnd.github.v3+json',
-                'Authorization': `token ${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(requestData),
+            body: JSON.stringify({ ref: "main" }),
         });
 
         if (response.ok) {
             alert("GitHub Action triggered successfully!");
         } else {
-            const errorText = await response.text();
-            alert("Error: " + errorText);
+            alert("Error triggering GitHub Action.");
         }
-    });
+    }
+</script>
 
-    </script>
+<!-- GAIT MECH tab -->
+<div id="gait-mechanics" class="content">    
+    <h1>Gait Mechanics</h1>
+    
+    <!-- Stride Time Section -->
+    <section id="stride-time">
+        <h2>Stride Time</h2>
+        <p>The time taken to complete one full gait cycle (from the initial contact of one foot to the next initial contact of the same foot)</p>
+        <div class="graph-container">
+            <!-- Insert graph here -->
+        </div>
+    </section>
+    
+    <!-- Step Time Section -->
+    <section id="step-time">
+        <h2>Step Time</h2>
+        <p>The time between consecutive foot contacts (i.e., from one foot's initial contact to the opposite foot's initial contact)</p>
+        <div class="graph-container">
+            <!-- Insert graph here -->
+        </div>
+    </section>
+    
+    <!-- Cadence Section -->
+    <section id="cadence">
+        <h2>Cadence</h2>
+        <p>The number of steps taken per unit of time, usually expressed in steps per minute</p>
+        <div class="graph-container">
+            <!-- Insert graph here -->
+        </div>
+    </section>
+    
+    <!-- Stance Time Section -->
+    <section id="stance-time">
+        <h2>Stance Time</h2>
+        <p>The duration for which a foot remains in contact with the ground during a gait cycle</p>
+        <div class="graph-container">
+            <!-- Insert graph here -->
+        </div>
+    </section>
+    
+    <!-- Swing Time Section -->
+    <section id="swing-time">
+        <h2>Swing Time</h2>
+        <p>The time the foot spends in the air, from toe-off to the next initial contact</p>
+        <div class="graph-container">
+            <!-- Insert graph here -->
+        </div>
+    </section>
+</div>
 
-    <!-- GAIT MECH tab -->
-    <div id="gait-mechanics" class="content">    
-        <h1>Gait Mechanics</h1>
-        <p>Go off Eugenia</p>
-    </div>
+<style>
+    .graph-container {
+        width: 100%;
+        height: 200px; /* Adjust as needed */
+        background-color: #f0f0f0; /* Placeholder background */
+        margin: 10px 0;
+    }
+</style>
+
 
     <!-- Scores tab -->
     <div id="scores" class="content">
