@@ -90,8 +90,6 @@ ax.legend()
 cbar = fig.colorbar(pressure_img, ax=ax)
 cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
 
-import os
-import time
 
 output_file = "dynamic_symmetry_score_visualization.png"
 
@@ -106,13 +104,11 @@ if not os.path.exists(output_file):
 
 print("File saved successfully!")
 
-import os
-import shutil
-import git
 
 import os
 import git
 import shutil
+import time
 
 # GitHub upload
 repo_dir = "srdesign"
@@ -132,8 +128,12 @@ else:
     repo.git.config("pull.rebase", "false")
     repo.git.pull()
 
+# Ensure the file exists
 if not os.path.exists(photo_file_in_repo):
     shutil.copyfile(photo_file_in_repo, photo_file_in_repo)
+
+# Force Git to recognize the file as changed by updating its timestamp
+os.utime(photo_file_in_repo, (time.time(), time.time()))
 
 # Set the remote URL with the PAT
 remote_url = f"https://{pat}@github.com/jakewang21/srdesign.git"
@@ -148,8 +148,8 @@ print(f"Checking file: {photo_file_in_repo}")
 print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
 print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 
-# Add the file to git, commit, and push
-repo.git.add(os.path.abspath(photo_file_in_repo))
+# Add, commit, and push the file
+repo.git.add(photo_file_in_repo)
 repo.git.commit("-m", "Update photo")
 repo.git.push(verbose=True)
 
