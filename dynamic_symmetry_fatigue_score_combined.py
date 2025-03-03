@@ -110,10 +110,19 @@ import os
 import shutil
 import git
 
-# GitHub upload (without the need for authentication)
+import os
+import git
+import shutil
+
+# GitHub upload
 repo_dir = "srdesign"
 photo_file_in_repo = os.path.join(repo_dir, "dynamic_symmetry_score_visualization.png")
 repo_url = "https://github.com/jakewang21/srdesign.git"
+
+# Get your GitHub PAT from an environment variable
+pat = os.getenv('EK_TOKEN')  # Ensure your PAT is set as an environment variable
+if not pat:
+    raise ValueError("EK_TOKEN is not set in the environment.")
 
 # Check if the repo directory exists
 if not os.path.isdir(repo_dir):
@@ -123,7 +132,14 @@ else:
     repo.git.config("pull.rebase", "false")
     repo.git.pull()
 
-# Configure git user settings (no need for GITHUB_TOKEN)
+# Copy the output file into the repository directory
+shutil.copy(photo_file_in_repo, photo_file_in_repo)
+
+# Set the remote URL with the PAT
+remote_url = f"https://{pat}@github.com/jakewang21/srdesign.git"
+repo.git.remote("set-url", "origin", remote_url)
+
+# Configure git user settings
 repo.git.config("user.name", "eugeniakritsuk")
 repo.git.config("user.email", "eugeniakritsuk@gmail.com")
 
@@ -132,16 +148,12 @@ print(f"Checking file: {photo_file_in_repo}")
 print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
 print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 
-# Copy the new visualization file into the repository directory
-shutil.copy("dynamic_symmetry_score_visualization.png", photo_file_in_repo)
-
 # Add the file to git, commit, and push
 repo.git.add(os.path.abspath(photo_file_in_repo))
 repo.git.commit("-m", "Update photo")
 repo.git.push(verbose=True)
 
 print("Photo uploaded to GitHub successfully!")
-
 
 
 
