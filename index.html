@@ -6,6 +6,7 @@
     <title>PressureSole App</title>
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
     <style>
+        /* INSERT "Gait Mechanics" tab */
         body {
             height: 100%;
             margin: 0;
@@ -385,6 +386,10 @@
             <i class="fas fa-chart-line"></i>
             <span>Data</span>
         </div>
+        <div class="tab" onclick="showPage('gait-mechanics')">
+            <i class="fas fa-running"></i>
+            <span>Gait Mechanics</span>
+        </div>
         <div class="tab" onclick="showPage('scores')">
             <i class="fas fa-cog"></i>
             <span>Scores</span>
@@ -392,6 +397,10 @@
         <div class="tab" onclick="showPage('profile')">
             <i class="fas fa-user"></i>
             <span>Profile</span>
+        </div>
+        <div class="tab" onclick="showPage('faqs')">
+            <i class="fas fa-question-circle"></i>
+            <span>FAQ's</span>
         </div>
     </div>
     
@@ -438,6 +447,7 @@
     </div>
     -->
 
+    <!-- DATA tab -->
     <div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
         <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
         
@@ -567,9 +577,12 @@
     });
 
     </script>
-    
-    
-    
+
+    <!-- GAIT MECH tab -->
+    <div id="gait-mechanics" class="content">    
+        <h1>Gait Mechanics</h1>
+        <p>Go off Eugenia</p>
+    </div>
 
     <!-- Scores tab -->
     <div id="scores" class="content">
@@ -699,6 +712,15 @@
             
         </div>
     </div>
+
+    <!-- FAQs tab -->
+    <div id="faqs" class="content">    
+        <div class="faqs-container">
+            <h1>Frequently Asked Questions</h1>
+            <p>FAQ's subheader</p>
+        </div>
+    </div>
+
 
     <script>
         // Nav Bar Tab 
