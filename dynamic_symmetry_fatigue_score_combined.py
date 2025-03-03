@@ -123,9 +123,6 @@ else:
     repo.git.config("pull.rebase", "false")
     repo.git.pull()
 
-# Copy the output file into the repository directory
-shutil.copy(photo_file_in_repo, photo_file_in_repo)
-
 # Configure git user settings (no need for GITHUB_TOKEN)
 repo.git.config("user.name", "eugeniakritsuk")
 repo.git.config("user.email", "eugeniakritsuk@gmail.com")
