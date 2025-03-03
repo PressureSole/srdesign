@@ -129,7 +129,7 @@ print(f"Checking file: {photo_file_in_repo}")
 print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
 print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 
-repo.git.add(photo_file_in_repo)
+repo.git.add(os.path.abspath(photo_file_in_repo))
 repo.git.commit("-m", "Update photo")
 repo.git.push()
 
@@ -325,7 +325,7 @@ repo.git.config("user.email", "eugeniakritsuk@gmail.com")  # Replace with your G
 for src, dest in zip(photo_files, photo_files_in_repo):
     if os.path.exists(src):
         shutil.copy(src, dest)
-        repo.git.add(dest)
+        repo.git.add(os.path.abspath(dest))
     else:
         print(f"File not found: {src}")
 
