@@ -19,6 +19,7 @@ from matplotlib.path import Path
 from scipy.interpolate import splprep, splev
 import git
 import shutil
+import time
 
 # Load the Excel file (ensure it's uploaded to the Colab environment)
 filename = "Copy of test_lab shortening.xlsx"  # Ensure this path is correct
@@ -108,7 +109,7 @@ print("File saved successfully!")
 import os
 import git
 import shutil
-import time
+
 
 # GitHub upload
 repo_dir = "srdesign"
