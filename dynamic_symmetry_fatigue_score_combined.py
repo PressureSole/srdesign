@@ -132,8 +132,8 @@ else:
     repo.git.config("pull.rebase", "false")
     repo.git.pull()
 
-# Copy the output file into the repository directory
-shutil.copy(photo_file_in_repo, photo_file_in_repo)
+if not os.path.exists(photo_file_in_repo):
+    shutil.copyfile(photo_file_in_repo, photo_file_in_repo)
 
 # Set the remote URL with the PAT
 remote_url = f"https://{pat}@github.com/jakewang21/srdesign.git"
