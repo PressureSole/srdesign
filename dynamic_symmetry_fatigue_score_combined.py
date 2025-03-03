@@ -112,10 +112,10 @@ import time
 import git
 
 # Directory and file settings
-repo_dir = "srdesign"
+repo_dir = "srdesign"  # Assuming this is your repo folder
 repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
 output_file = "dynamic_symmetry_score_visualization.png"  # The generated image file
-photo_file_in_repo = os.path.join(repo_root, output_file)  # Path to the image in the repo
+photo_file_in_repo = os.path.join(repo_root, repo_dir, output_file)  # Correct path inside the repo
 repo_url = "https://github.com/jakewang21/srdesign.git"
 
 # GitHub PAT from an environment variable
@@ -132,8 +132,7 @@ else:
     repo.git.pull()
 
 # Ensure the output file exists before proceeding
-photo_file_in_repo = os.path.join(repo_dir, output_file)  # Ensure it's inside the correct repo directory
-
+# The file should be inside the repository folder
 if not os.path.exists(photo_file_in_repo):
     raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(photo_file_in_repo)}")
 
@@ -163,6 +162,7 @@ repo.git.commit("-m", "Update photo")
 repo.git.push(verbose=True)
 
 print("Photo uploaded to GitHub successfully!")
+
 
 
 
