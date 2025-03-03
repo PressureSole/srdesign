@@ -107,21 +107,23 @@ print("File saved successfully!")
 
 
 import os
-import git
 import shutil
+import time
+import git
 
-
-# GitHub upload
+# Directory and file settings
 repo_dir = "srdesign"
-photo_file_in_repo = os.path.join(repo_dir, "dynamic_symmetry_score_visualization.png")
+repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
+output_file = "dynamic_symmetry_score_visualization.png"  # The generated image file
+photo_file_in_repo = os.path.join(repo_root, output_file)  # Path to the image in the repo
 repo_url = "https://github.com/jakewang21/srdesign.git"
 
-# Get your GitHub PAT from an environment variable
+# GitHub PAT from an environment variable
 pat = os.getenv('EK_TOKEN')  # Ensure your PAT is set as an environment variable
 if not pat:
     raise ValueError("EK_TOKEN is not set in the environment.")
 
-# Check if the repo directory exists
+# Clone the repo if it doesn't exist locally
 if not os.path.isdir(repo_dir):
     repo = git.Repo.clone_from(repo_url, repo_dir)
 else:
@@ -129,9 +131,9 @@ else:
     repo.git.config("pull.rebase", "false")
     repo.git.pull()
 
-# Ensure the file exists
+# Ensure the output file exists before proceeding
 if not os.path.exists(photo_file_in_repo):
-    shutil.copyfile(photo_file_in_repo, photo_file_in_repo)
+    raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(photo_file_in_repo)}")
 
 # Force Git to recognize the file as changed by updating its timestamp
 os.utime(photo_file_in_repo, (time.time(), time.time()))
@@ -144,18 +146,21 @@ repo.git.remote("set-url", "origin", remote_url)
 repo.git.config("user.name", "eugeniakritsuk")
 repo.git.config("user.email", "eugeniakritsuk@gmail.com")
 
-# Check if the file exists in the repository
+# Add, commit, and push the file
 print(f"Checking file: {photo_file_in_repo}")
 print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
 print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 
-# Add, commit, and push the file
+# Add the file to Git
 repo.git.add(photo_file_in_repo)
+
+# Commit the change
 repo.git.commit("-m", "Update photo")
+
+# Push to the GitHub repository
 repo.git.push(verbose=True)
 
 print("Photo uploaded to GitHub successfully!")
-
 
 
 from scipy.interpolate import Rbf
