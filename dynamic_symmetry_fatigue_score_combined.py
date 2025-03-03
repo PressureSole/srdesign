@@ -124,6 +124,11 @@ remote_url = f"https://{pat}@github.com/jakewang21/srdesign.git"
 repo.git.remote("set-url", "origin", remote_url)
 repo.git.config("user.name", "eugeniakritsuk")
 repo.git.config("user.email", "eugeniakritsuk@gmail.com")
+
+print(f"Checking file: {photo_file_in_repo}")
+print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
+print(f"Exists? {os.path.exists(photo_file_in_repo)}")
+
 repo.git.add(photo_file_in_repo)
 repo.git.commit("-m", "Update photo")
 repo.git.push()
