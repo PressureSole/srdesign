@@ -7,16 +7,14 @@ Original file is located at
     https://colab.research.google.com/drive/1gELQriynXj8VD4u-i1TorUhrpI0qYSH_
 """
 
-from scipy.interpolate import Rbf
+from scipy.interpolate import Rbf, splprep, splev, griddata
 import matplotlib
 matplotlib.use('Agg')  # Use a non-GUI backend
 import matplotlib.pyplot as plt
-
+from matplotlib.path import Path
 import os
 import numpy as np
 import pandas as pd
-from matplotlib.path import Path
-from scipy.interpolate import splprep, splev
 import git
 import shutil
 import time
@@ -105,12 +103,6 @@ if not os.path.exists(output_file):
 
 print("File saved successfully!")
 
-
-import os
-import shutil
-import time
-import git
-
 # Directory and file settings
 repo_dir = "srdesign"  # Assuming this is your repo folder
 repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
@@ -171,21 +163,6 @@ repo.git.commit("-m", f"Update photo with timestamp: {timestamp}")
 repo.git.push(verbose=True)
 
 print(f"Photo uploaded to GitHub successfully as {new_output_file}!")
-
-
-
-
-
-from scipy.interpolate import Rbf
-import os
-import numpy as np
-import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  # Use a non-GUI backend
-import matplotlib.pyplot as plt
-from matplotlib.path import Path
-from scipy.interpolate import griddata, splprep, splev
-import time
 
 # Load the Excel file (ensure it's uploaded to the environment)
 filename = "Copy of test_lab shortening.xlsx"  # Ensure this path is correct
@@ -312,19 +289,32 @@ repo_dir = "srdesign"  # Assuming this is your repo folder
 repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
 repo_url = "https://github.com/jakewang21/srdesign.git"
 pat = os.getenv('EK_TOKEN')  # Ensure your PAT is set as an environment variable
+
 if not pat:
     raise ValueError("EK_TOKEN is not set in the environment.")
 
-# Clone the repo if it doesn't exist
+# Check if the repo already exists
 if not os.path.exists(repo_dir):
+    print(f"Cloning repository {repo_url} into {repo_dir}")
     os.system(f"git clone {repo_url}")
+else:
+    print(f"Repository already exists in {repo_dir}, pulling latest changes.")
 
-# Pull the latest changes from the repo
+# Change to the repo directory
 os.chdir(repo_dir)
-os.system("git pull")
+
+# Ensure you're not inside another Git repository (check for .git folder)
+if os.path.exists(".git"):
+    # Pull the latest changes from the repo
+    os.system("git pull")
+else:
+    raise ValueError("Not a Git repository. Ensure that the path is correct.")
 
 # Add, commit, and push the changes to the GitHub repository
 for output_file in output_files:
     os.system(f"git add {output_file}")
+
 os.system("git commit -m 'Add dynamic symmetry score visualizations'")
+
+# Push to the remote repository using the token for authentication
 os.system(f"git push https://{pat}@github.com/jakewang21/srdesign.git")
