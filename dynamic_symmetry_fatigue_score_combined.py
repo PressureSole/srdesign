@@ -132,14 +132,16 @@ print(f"Checking file: {photo_file_in_repo}")
 print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
 print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 
+# Copy the new visualization file into the repository directory
+shutil.copy("dynamic_symmetry_score_visualization.png", photo_file_in_repo)
+
 # Add the file to git, commit, and push
 repo.git.add(os.path.abspath(photo_file_in_repo))
 repo.git.commit("-m", "Update photo")
-
-# Push without authentication (this will rely on existing git configurations for push access)
 repo.git.push(verbose=True)
 
 print("Photo uploaded to GitHub successfully!")
+
 
 
 
