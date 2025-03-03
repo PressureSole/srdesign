@@ -147,13 +147,16 @@ repo.git.remote("set-url", "origin", remote_url)
 repo.git.config("user.name", "eugeniakritsuk")
 repo.git.config("user.email", "eugeniakritsuk@gmail.com")
 
-# Add, commit, and push the file
-print(f"Checking file: {photo_file_in_repo}")
-print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
-print(f"Exists? {os.path.exists(photo_file_in_repo)}")
+# Check the git status to ensure the file is detected as new or modified
+print("Git status output:")
+repo.git.status()
 
-# Add the file to Git
+# Add the file to Git (force add in case the file is being ignored)
 repo.git.add(photo_file_in_repo)
+
+# Check if the file is staged for commit
+print("Git status after adding:")
+repo.git.status()
 
 # Commit the change
 repo.git.commit("-m", "Update photo")
