@@ -110,8 +110,12 @@ print("File saved successfully!")
 repo_dir = "srdesign"
 photo_file_in_repo = os.path.join(repo_dir, "dynamic_symmetry_score_visualization.png")
 repo_url = "https://github.com/jakewang21/srdesign.git"
-pat = "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"  # Replace with your actual PAT
 
+# Get your GitHub PAT from an environment variable (best practice for security)
+import os
+pat = os.getenv('GITHUB_TOKEN')  # Ensure your PAT is set as an environment variable
+
+# Check if the repo directory exists
 if not os.path.isdir(repo_dir):
     repo = git.Repo.clone_from(repo_url, repo_dir)
 else:
@@ -119,21 +123,29 @@ else:
     repo.git.config("pull.rebase", "false")
     repo.git.pull()
 
+# Copy the output file into the repository directory
 shutil.copy(output_file, photo_file_in_repo)
+
+# Set the remote URL with the PAT
 remote_url = f"https://{pat}@github.com/jakewang21/srdesign.git"
 repo.git.remote("set-url", "origin", remote_url)
+
+# Configure git user settings
 repo.git.config("user.name", "eugeniakritsuk")
 repo.git.config("user.email", "eugeniakritsuk@gmail.com")
 
+# Check if the file exists in the repository
 print(f"Checking file: {photo_file_in_repo}")
 print(f"Absolute path: {os.path.abspath(photo_file_in_repo)}")
 print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 
+# Add the file to git, commit, and push
 repo.git.add(os.path.abspath(photo_file_in_repo))
 repo.git.commit("-m", "Update photo")
 repo.git.push()
 
 print("Photo uploaded to GitHub successfully!")
+
 
 from scipy.interpolate import Rbf
 
