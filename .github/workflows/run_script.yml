@@ -22,8 +22,6 @@ jobs:
 
       - name: Run Python Script
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set GITHUB_TOKEN as an environment variable
 
       - name: Commit and Push Changes
         run: |
@@ -31,8 +29,4 @@ jobs:
           git config --global user.email "actions@github.com"
           git add .
           git commit -m "Auto-update visualizations"
-          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set GITHUB_TOKEN as an environment variable
-
-          
+          git push  # No authentication needed
