@@ -132,6 +132,8 @@ else:
     repo.git.pull()
 
 # Ensure the output file exists before proceeding
+photo_file_in_repo = os.path.join(repo_dir, output_file)  # Ensure it's inside the correct repo directory
+
 if not os.path.exists(photo_file_in_repo):
     raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(photo_file_in_repo)}")
 
@@ -161,6 +163,7 @@ repo.git.commit("-m", "Update photo")
 repo.git.push(verbose=True)
 
 print("Photo uploaded to GitHub successfully!")
+
 
 
 from scipy.interpolate import Rbf
