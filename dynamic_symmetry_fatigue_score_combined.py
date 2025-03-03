@@ -115,7 +115,9 @@ import git
 repo_dir = "srdesign"  # Assuming this is your repo folder
 repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
 output_file = "dynamic_symmetry_score_visualization.png"  # The generated image file
-photo_file_in_repo = os.path.join(repo_root, repo_dir, output_file)  # Correct path inside the repo
+timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())  # Format: YYYYMMDDHHMMSS
+new_output_file = f"dynamic_symmetry_score_visualization_{timestamp}.png"  # New file name with timestamp
+photo_file_in_repo = os.path.join(repo_root, repo_dir, new_output_file)  # Correct path inside the repo
 repo_url = "https://github.com/jakewang21/srdesign.git"
 
 # GitHub PAT from an environment variable
@@ -133,8 +135,12 @@ else:
 
 # Ensure the output file exists before proceeding
 # The file should be inside the repository folder
-if not os.path.exists(photo_file_in_repo):
-    raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(photo_file_in_repo)}")
+photo_file_in_repo_original = os.path.join(repo_root, repo_dir, output_file)  # Original file path
+if not os.path.exists(photo_file_in_repo_original):
+    raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(photo_file_in_repo_original)}")
+
+# Rename the file to include timestamp
+os.rename(photo_file_in_repo_original, photo_file_in_repo)
 
 # Force Git to recognize the file as changed by updating its timestamp
 os.utime(photo_file_in_repo, (time.time(), time.time()))
@@ -151,7 +157,7 @@ repo.git.config("user.email", "eugeniakritsuk@gmail.com")
 print("Git status output:")
 repo.git.status()
 
-# Add the file to Git (force add in case the file is being ignored)
+# Add the renamed file to Git (force add in case the file is being ignored)
 repo.git.add(photo_file_in_repo)
 
 # Check if the file is staged for commit
@@ -159,12 +165,13 @@ print("Git status after adding:")
 repo.git.status()
 
 # Commit the change
-repo.git.commit("-m", "Update photo")
+repo.git.commit("-m", f"Update photo with timestamp: {timestamp}")
 
 # Push to the GitHub repository
 repo.git.push(verbose=True)
 
-print("Photo uploaded to GitHub successfully!")
+print(f"Photo uploaded to GitHub successfully as {new_output_file}!")
+
 
 
 
