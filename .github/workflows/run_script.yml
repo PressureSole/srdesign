@@ -1,7 +1,7 @@
 name: Run Visualization Update
 
 on:
-  workflow_dispatch:  # This allows manual triggering via API
+  workflow_dispatch:  # Allows manual triggering via API
 
 jobs:
   update_visualizations:
@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.EK_TOKEN }}  # Uses your GitHub token for authentication
+          token: ${{ secrets.EK_TOKEN }}  # Ensures checkout uses your token
 
       - name: Set Up Python
         uses: actions/setup-python@v4
@@ -20,9 +20,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install -r requirements.txt  # Ensure dependencies are listed in this file
+          pip install -r requirements.txt  # Ensure dependencies are installed
 
       - name: Run Python Script
+        env:
+          EK_TOKEN: ${{ secrets.EK_TOKEN }}  
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
 
       - name: Commit and Push Changes
