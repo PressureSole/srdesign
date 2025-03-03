@@ -103,36 +103,35 @@ if not os.path.exists(output_file):
 
 print("File saved successfully!")
 
-# Directory and file settings
-repo_dir = "srdesign"  # Assuming this is your repo folder
-repo_root = os.getcwd()  # Assuming current working directory is the root where the script runs
-output_file = "dynamic_symmetry_score_visualization.png"  # The generated image file
+# Existing GitHub repository and file paths
+repo_url = "https://github.com/jakewang21/srdesign.git"  # Your repository URL
+repo_dir = "srdesign"  # Your local repo folder (this can be kept, but you don't need to clone every time)
+output_file = "dynamic_symmetry_score_visualization.png"  # Generated image file
 timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())  # Format: YYYYMMDDHHMMSS
 new_output_file = f"dynamic_symmetry_score_visualization_{timestamp}.png"  # New file name with timestamp
-photo_file_in_repo = os.path.join(repo_root, repo_dir, new_output_file)  # Correct path inside the repo
-repo_url = "https://github.com/jakewang21/srdesign.git"
+photo_file_in_repo = os.path.join(repo_dir, new_output_file)  # Correct path inside the repo
+repo_root = os.getcwd()  # Current working directory (repo folder should be here)
 
 # GitHub PAT from an environment variable
 pat = os.getenv('EK_TOKEN')  # Ensure your PAT is set as an environment variable
 if not pat:
     raise ValueError("EK_TOKEN is not set in the environment.")
 
-# Clone the repo if it doesn't exist locally
+# Check if the repository already exists locally
 if not os.path.isdir(repo_dir):
-    repo = git.Repo.clone_from(repo_url, repo_dir)
+    raise FileNotFoundError(f"Repository folder {repo_dir} not found. Please ensure it's already cloned.")
 else:
+    # Use the existing local repository
     repo = git.Repo(repo_dir)
     repo.git.config("pull.rebase", "false")
-    repo.git.pull()
+    repo.git.pull()  # Ensure the repo is up to date
 
 # Ensure the output file exists before proceeding
-# The file should be inside the repository folder
-photo_file_in_repo_original = os.path.join(repo_root, repo_dir, output_file)  # Original file path
-if not os.path.exists(photo_file_in_repo_original):
-    raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(photo_file_in_repo_original)}")
+if not os.path.exists(output_file):
+    raise FileNotFoundError(f"Output file '{output_file}' not found in the expected location: {os.path.abspath(output_file)}")
 
 # Rename the file to include timestamp
-os.rename(photo_file_in_repo_original, photo_file_in_repo)
+os.rename(output_file, photo_file_in_repo)
 
 # Force Git to recognize the file as changed by updating its timestamp
 os.utime(photo_file_in_repo, (time.time(), time.time()))
@@ -163,4 +162,5 @@ repo.git.commit("-m", f"Update photo with timestamp: {timestamp}")
 repo.git.push(verbose=True)
 
 print(f"Photo uploaded to GitHub successfully as {new_output_file}!")
+
 
