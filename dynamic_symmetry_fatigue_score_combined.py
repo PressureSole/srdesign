@@ -114,6 +114,8 @@ repo_url = "https://github.com/jakewang21/srdesign.git"
 # Get your GitHub PAT from an environment variable (best practice for security)
 import os
 pat = os.getenv('GITHUB_TOKEN')  # Ensure your PAT is set as an environment variable
+if not pat:
+    raise ValueError("GITHUB_TOKEN is not set in the environment.")
 
 # Check if the repo directory exists
 if not os.path.isdir(repo_dir):
@@ -142,7 +144,7 @@ print(f"Exists? {os.path.exists(photo_file_in_repo)}")
 # Add the file to git, commit, and push
 repo.git.add(os.path.abspath(photo_file_in_repo))
 repo.git.commit("-m", "Update photo")
-repo.git.push()
+repo.git.push(verbose=True)
 
 print("Photo uploaded to GitHub successfully!")
 
