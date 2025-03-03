@@ -8,11 +8,13 @@ Original file is located at
 """
 
 from scipy.interpolate import Rbf
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
+import matplotlib.pyplot as plt
 
 import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from scipy.interpolate import splprep, splev
 import git
@@ -88,14 +90,24 @@ ax.legend()
 cbar = fig.colorbar(pressure_img, ax=ax)
 cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
 
-# Save and download image
-output_file = "/content/dynamic_average_pressure_map.png"
+import os
+import time
+
+output_file = "dynamic_symmetry_score_visualization.png"
+
 plt.savefig(output_file, bbox_inches='tight')
-files.download(output_file)
 plt.show()
 
+# Wait until file is actually saved
+time.sleep(2)
+
+if not os.path.exists(output_file):
+    raise FileNotFoundError(f"File {output_file} was not created successfully.")
+
+print("File saved successfully!")
+
 # GitHub upload
-repo_dir = "/content/srdesign"
+repo_dir = "srdesign"
 photo_file_in_repo = os.path.join(repo_dir, "dynamic_symmetry_score_visualization.png")
 repo_url = "https://github.com/jakewang21/srdesign.git"
 pat = "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"  # Replace with your actual PAT
@@ -123,6 +135,8 @@ from scipy.interpolate import Rbf
 import os
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from scipy.interpolate import griddata, splprep, splev
@@ -256,14 +270,9 @@ def create_heatmap_image(normalized_pressure_data, title, output_file):
     plt.close()
 
 # Generate and save the heatmaps for each third
-create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "/content/dynamic_first_third_pressure_map.png")
-create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "/content/dynamic_second_third_pressure_map.png")
-create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "/content/dynamic_third_third_pressure_map.png")
-
-# Provide download links for the images
-files.download("/content/dynamic_first_third_pressure_map.png")
-files.download("/content/dynamic_second_third_pressure_map.png")
-files.download("/content/dynamic_third_third_pressure_map.png")
+create_heatmap_image(normalized_first_third, "Dynamic First Third of the Run (0-33%)", "dynamic_first_third_pressure_map.png")
+create_heatmap_image(normalized_second_third, "Dynamic Second Third of the Run (33-66%)", "dynamic_second_third_pressure_map.png")
+create_heatmap_image(normalized_third_third, "Dynamic Third Third of the Run (66-100%)", "dynamic_third_third_pressure_map.png")
 
 
 import git
@@ -271,20 +280,20 @@ import shutil
 import os
 
 # Define the repository directory
-repo_dir = "/content/srdesign"
+repo_dir = "srdesign"
 
 # Define the list of PNG files to be uploaded
 photo_files = [
-    "/content/dynamic_first_third_pressure_map.png",
-    "/content/dynamic_second_third_pressure_map.png",
-    "/content/dynamic_third_third_pressure_map.png"
+    "dynamic_first_third_pressure_map.png",
+    "dynamic_second_third_pressure_map.png",
+    "dynamic_third_third_pressure_map.png"
 ]
 
 # Corresponding file names in the repo
 photo_files_in_repo = [
-    os.path.join(repo_dir, "d_fatigue_1.png"),
-    os.path.join(repo_dir, "d_fatigue_2.png"),
-    os.path.join(repo_dir, "d_fatigue_3.png")
+    os.path.join(repo_dir, "dynamic_first_third_pressure_map.png"),
+    os.path.join(repo_dir, "dynamic_second_third_pressure_map.png"),
+    os.path.join(repo_dir, "dynamic_third_third_pressure_map.png")
 ]
 
 # GitHub repository details
