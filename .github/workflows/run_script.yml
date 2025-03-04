@@ -27,6 +27,11 @@ jobs:
           EK_TOKEN: ${{ secrets.EK_TOKEN }}  
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
 
+      - name: Fetch Latest Changes from Remote Repository
+        run: |
+          git fetch origin main  # Fetches the latest changes from the remote main branch
+          git reset --hard origin/main  # Resets local state to match the remote main branch
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions"
