@@ -1,4 +1,4 @@
-<!DOCTYPE html> <!--Hi Audrey-->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,8 @@
     <title>PressureSole App</title>
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
     <style>
+        /* TEST TEST TEST */
+        /* NEWEST TEST */
         body {
             height: 100%;
             margin: 0;
@@ -757,10 +759,12 @@
                             <input type="text" id="signup-username" name="username">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="signup-password">Password:</label>
-                            <input type="password" id="signup-password" name="password">
+                    <div class="form-row" style="position: relative;">
+                        <div class="form-group" style="width: 100%;">
+                          <label for="signup-password">Password:</label>
+                          <input type="password" id="signup-password" name="password">
+                          <!-- Eye icon for toggling password visibility in Sign Up form -->
+                          <i id="signup-toggle-password" class="fas fa-eye" style="position: absolute; top: 35px; right: 10px; cursor: pointer;"></i>
                         </div>
                     </div>
                     <div class="form-row">
@@ -802,10 +806,12 @@
                             <input type="text" id="login-username" name="username">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="login-password">Password:</label>
-                            <input type="password" id="login-password" name="password">
+                    <div class="form-row" style="position: relative;">
+                        <div class="form-group" style="width: 100%;">
+                          <label for="login-password">Password:</label>
+                          <input type="password" id="login-password" name="password">
+                          <!-- Eye icon for toggling password visibility in Log In form -->
+                          <i id="login-toggle-password" class="fas fa-eye" style="position: absolute; top: 35px; right: 10px; cursor: pointer;"></i>
                         </div>
                     </div>
                     <button type="submit">Log In</button>
@@ -825,10 +831,10 @@
                 </div>
                 <div class="form-row" style="position: relative;">
                     <div class="form-group" style="width: 100%;">
-                        <label for="display-password">Password:</label>
-                        <input type="password" id="display-password" name="password" readonly style="background-color: #eaeaea; padding-right: 40px;">
-                        <!-- Eye icon for toggling password visibility / CHANGE LINE BELOW -->
-                        <i id="toggle-password" class="fas fa-eye" style="position: absolute; top: 35px; right: 10px; cursor: pointer; display: inline-block !important; z-index: 2; background-color: red;"></i>
+                      <label for="display-password">Password:</label>
+                      <input type="password" id="display-password" name="password" readonly style="background-color: #eaeaea; padding-right: 40px;">
+                      <!-- Eye icon for toggling password visibility in the Your Profile form -->
+                      <i id="profile-toggle-password" class="fas fa-eye" style="position: absolute; top: 35px; right: 10px; cursor: pointer; display: none;"></i>
                     </div>
                 </div>
                 <div class="form-row">
@@ -1016,93 +1022,156 @@
 
         // PROFILE Page ---------------------------------
 
-        // Listen for the sign-up form submission
-        document.getElementById('signup-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+        // Reusable function to attach a toggle event listener to a password field
+        function setupTogglePassword(inputID, iconID) {
+            const inputField = document.getElementById(inputID);
+            const icon = document.getElementById(iconID);
+            icon.addEventListener('click', function() {
+                if (inputField.type === "password") {
+                inputField.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                } else {
+                inputField.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                }
+            });
+        }
 
-            // Retrieve values from the sign-up form
-            const username = document.getElementById('signup-username').value.trim();
-            const password = document.getElementById('signup-password').value.trim();
-            const firstName = document.getElementById('first-name').value.trim();
-            const lastName = document.getElementById('last-name').value.trim();
-            const weight = document.getElementById('weight').value.trim();
-            const gender = document.getElementById('gender').value.trim();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attach toggle for Sign Up form
+            setupTogglePassword('signup-password', 'signup-toggle-password');
+            // Attach toggle for Log In form
+            setupTogglePassword('login-password', 'login-toggle-password');
+            // Attach toggle for Your Profile form (it remains attached even if hidden initially)
+            setupTogglePassword('display-password', 'profile-toggle-password');
 
-            // Validate that all fields are filled
-            if (!username || !password || !firstName || !lastName || !weight || !gender) {
+            // For Sign Up password field:
+            document.getElementById('signup-password').addEventListener('input', function() {
+                const icon = document.getElementById('signup-toggle-password');
+                if (this.value.length > 0) {
+                    icon.style.display = "inline-block";
+                } else {
+                    icon.style.display = "none";
+                }
+            });
+
+            // For Log In password field:
+            document.getElementById('login-password').addEventListener('input', function() {
+                const icon = document.getElementById('login-toggle-password');
+                if (this.value.length > 0) {
+                    icon.style.display = "inline-block";
+                } else {
+                    icon.style.display = "none";
+                }
+            });
+
+            // For Your Profile password field:
+            document.getElementById('display-password').addEventListener('input', function() {
+                const icon = document.getElementById('profile-toggle-password');
+                // In the profile form, we want the toggle icon to be visible only during editing
+                // So if the field is in edit mode (i.e. not readonly) and has text, show the icon.
+                if (this.value.length > 0 && !this.hasAttribute('readonly')) {
+                    icon.style.display = "inline-block";
+                } else {
+                    icon.style.display = "none";
+                }
+            });
+
+            // Log In functionality
+            document.getElementById('login-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+                const storedProfile = localStorage.getItem('profile_' + username);
+                if (!storedProfile) {
+                alert("No profile found for this username.");
+                return;
+                }
+                const profileData = JSON.parse(storedProfile);
+                if (profileData.password !== password) {
+                alert("Incorrect password.");
+                return;
+                }
+                document.getElementById('signup-login-container').style.display = 'none';
+                document.getElementById('display-username').value = profileData.username;
+                document.getElementById('display-password').value = profileData.password;
+                document.getElementById('display-first-name').value = profileData.firstName;
+                document.getElementById('display-last-name').value = profileData.lastName;
+                document.getElementById('display-weight').value = profileData.weight;
+                document.getElementById('display-gender').value = profileData.gender;
+                document.getElementById('your-profile').style.display = 'block';
+            });
+            
+            // Sign Up functionality
+            document.getElementById('signup-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const username = document.getElementById('signup-username').value.trim();
+                const password = document.getElementById('signup-password').value.trim();
+                const firstName = document.getElementById('first-name').value.trim();
+                const lastName = document.getElementById('last-name').value.trim();
+                const weight = document.getElementById('weight').value.trim();
+                const gender = document.getElementById('gender').value.trim();
+                if (!username || !password || !firstName || !lastName || !weight || !gender) {
                 alert("Please fill out all fields.");
                 return;
-            }
-
-            // Create an object with the user's data
-            const profileData = {
+                }
+                if (localStorage.getItem('profile_' + username)) {
+                alert("This username already exists. Please choose a different username or log in.");
+                return;
+                }
+                const profileData = {
                 username: username,
                 password: password,
                 firstName: firstName,
                 lastName: lastName,
                 weight: weight,
                 gender: gender
-            };
+                };
+                localStorage.setItem('profile_' + username, JSON.stringify(profileData));
+                document.getElementById('signup-login-container').style.display = 'none';
+                document.getElementById('display-username').value = username;
+                document.getElementById('display-password').value = password;
+                document.getElementById('display-first-name').value = firstName;
+                document.getElementById('display-last-name').value = lastName;
+                document.getElementById('display-weight').value = weight;
+                document.getElementById('display-gender').value = gender;
+                document.getElementById('your-profile').style.display = 'block';
+            });
+            
+            // Toggle between Edit and Save Profile modes on the "Your Profile" page
+            document.getElementById('edit-profile-btn').addEventListener('click', function() {
+                const usernameInput = document.getElementById('display-username');
+                const passwordInput = document.getElementById('display-password');
+                const firstNameInput = document.getElementById('display-first-name');
+                const lastNameInput = document.getElementById('display-last-name');
+                const weightInput = document.getElementById('display-weight');
+                const genderSelect = document.getElementById('display-gender');
+                const profileToggleIcon = document.getElementById('profile-toggle-password');
 
-            // Save the profile data to local storage using a key linked to the username
-            localStorage.setItem('profile_' + username, JSON.stringify(profileData));
-
-            // Hide the entire sign-up and log-in container
-            document.getElementById('signup-login-container').style.display = 'none';
-
-            // Populate the "Your Profile" container's read-only inputs with the saved information
-            document.getElementById('display-username').value = username;
-            document.getElementById('display-password').value = password;
-            document.getElementById('display-first-name').value = firstName;
-            document.getElementById('display-last-name').value = lastName;
-            document.getElementById('display-weight').value = weight;
-            document.getElementById('display-gender').value = gender;
-
-            // Show the "Your Profile" container
-            document.getElementById('your-profile').style.display = 'block';
-        });
-        
-        // Toggle between Edit and Save Profile modes on the "Your Profile" page
-        document.getElementById('edit-profile-btn').addEventListener('click', function() {
-            // Grab all the profile input fields and the toggle icon
-            const usernameInput = document.getElementById('display-username');
-            const passwordInput = document.getElementById('display-password');
-            const firstNameInput = document.getElementById('display-first-name');
-            const lastNameInput = document.getElementById('display-last-name');
-            const weightInput = document.getElementById('display-weight');
-            const genderSelect = document.getElementById('display-gender');
-            const toggleIcon = document.getElementById('toggle-password');
-
-            if (this.innerText === "Edit Profile") {
-                // Switch to edit mode: remove readonly/disabled attributes
+                if (this.innerText === "Edit Profile") {
                 usernameInput.removeAttribute('readonly');
                 passwordInput.removeAttribute('readonly');
                 firstNameInput.removeAttribute('readonly');
                 lastNameInput.removeAttribute('readonly');
                 weightInput.removeAttribute('readonly');
                 genderSelect.disabled = false;
-                
-                // Ensure the toggle icon is visible
-                toggleIcon.style.display = "inline-block";
-
-                // Change button text to "Save Profile"
+                // Show the eye icon for the profile form while editing
+                profileToggleIcon.style.display = "inline-block";
+                profileToggleIcon.style.zIndex = "100";
                 this.innerText = "Save Profile";
-            } else {
-                // In Save mode: retrieve updated values
+                } else {
                 const username = usernameInput.value.trim();
                 const password = passwordInput.value.trim();
                 const firstName = firstNameInput.value.trim();
                 const lastName = lastNameInput.value.trim();
                 const weight = weightInput.value.trim();
                 const gender = genderSelect.value;
-
-                // Validate that all fields are filled
                 if (!username || !password || !firstName || !lastName || !weight || !gender) {
                     alert("Please fill out all fields before saving.");
                     return;
                 }
-
-                // Create a profile object with the updated data
                 const profileData = {
                     username: username,
                     password: password,
@@ -1111,40 +1180,22 @@
                     weight: weight,
                     gender: gender
                 };
-
-                // Save the updated profile data to local storage (keyed by username)
                 localStorage.setItem('profile_' + username, JSON.stringify(profileData));
-
-                // Set inputs back to read-only/disabled
                 usernameInput.setAttribute('readonly', true);
                 passwordInput.setAttribute('readonly', true);
                 firstNameInput.setAttribute('readonly', true);
                 lastNameInput.setAttribute('readonly', true);
                 weightInput.setAttribute('readonly', true);
                 genderSelect.disabled = true;
-
-                // Change button text back to "Edit Profile"
                 this.innerText = "Edit Profile";
-
                 alert("Profile saved successfully!");
-            }
+                // Optionally, hide the toggle icon when not editing:
+                profileToggleIcon.style.display = "none";
+                }
+            });
         });
-
-        // Toggle password visibility for the "Your Profile" password field
-        document.getElementById('toggle-password').addEventListener('click', function() {
-            const pwdField = document.getElementById('display-password');
-            if (pwdField.type === "password") {
-                pwdField.type = "text";
-                this.classList.remove('fa-eye');
-                this.classList.add('fa-eye-slash');
-            } else {
-                pwdField.type = "password";
-                this.classList.remove('fa-eye-slash');
-                this.classList.add('fa-eye');
-            }
-        });
-
-            // TEMPORARY function to view all saved profiles
+        
+        // TEMPORARY function to view all saved profiles
             function showProfiles() {
                 const outputDiv = document.getElementById('profiles-output');
                 outputDiv.innerHTML = ''; // Clear previous output
