@@ -7,8 +7,6 @@
     <!--<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /*TEST1*/
-        /*TEST2*/
         body {
             height: 100%;
             margin: 0;
@@ -391,6 +389,45 @@
         input[type="password"]::-webkit-credentials-auto-fill-button {
             display: none !important;
         }
+        
+        /* FAQs Page styling -------------------------------------------------------------- */
+
+        /* Container for the two FAQ columns */
+        .faq-columns {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        }
+
+        /* Left and right column styles */
+        .faq-column-left,
+        .faq-column-right {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        flex: 1;
+        }
+
+        /* FAQ box styling */
+        .faq-box {
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        }
+
+        /* FAQ question heading */
+        .faq-box h2 {
+        margin: 0;
+        font-weight: bold;
+        }
+
+        /* FAQ answer styling (hidden by default) */
+        .faq-answer {
+        margin-top: 10px;
+        display: none;
+        }
     </style>
 </head>
 
@@ -437,14 +474,14 @@
                 <div class="stats-box">
                     <h2>Your Last Run</h2>
                     <div class="stats">
-                        <div class="stat-item">
-                            <span>5.2</span> Miles
+                        <div class="stat-item" id="home-stress">
+                            <span>0</span> Stress
                         </div>
-                        <div class="stat-item">
-                            <span>7:45</span> Min/Mile
+                        <div class="stat-item" id="home-symmetry">
+                            <span>0</span> Symmetry
                         </div>
-                        <div class="stat-item">
-                            <span>153</span> Avg BPM
+                        <div class="stat-item" id="home-fatigue">
+                            <span>0</span> Fatigue
                         </div>
                     </div>
                 </div>
@@ -890,29 +927,116 @@
             </div>
             <div id="profiles-output" style="margin-top: 20px; background: #f7f7f7; padding: 10px; border: 1px solid #ccc;"></div>
         </div>
+    </div>
 
-
-    <!-- FAQs tab -->
+    <!-- FAQs tab --------------------------------------------------------------------- -->
     <div id="faqs" class="content">    
-        <div class="faqs-container">
-            <h1>Frequently Asked Questions</h1>
-            <p>FAQ's subheader</p>
+        <div class="faqs-container" style="padding: 20px;">
+            <h1 style="text-align: center; margin-bottom: 20px;">Frequently Asked Questions</h1>
+            <div class="faq-columns">
+                <div class="faq-column-left">
+                    <div class="faq-box">
+                        <h2>Question 1</h2>
+                        <div class="faq-answer">Answer 1</div>
+                    </div>
+                    <div class="faq-box">
+                        <h2>Question 2</h2>
+                        <div class="faq-answer">Answer 2</div>
+                    </div>
+                    <div class="faq-box">
+                        <h2>Question 3</h2>
+                        <div class="faq-answer">Answer 3</div>
+                    </div>
+                </div>
+                <div class="faq-column-right">
+                    <div class="faq-box">
+                        <h2>Question 4</h2>
+                        <div class="faq-answer">Answer 4</div>
+                    </div>
+                    <div class="faq-box">
+                        <h2>Question 5</h2>
+                        <div class="faq-answer">Answer 5</div>
+                    </div>
+                    <div class="faq-box">
+                        <h2>Question 6</h2>
+                        <div class="faq-answer">Answer 6</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- SCRIPT / FUNCTIONS -->
+    <!-- SCRIPT / FUNCTIONS ----------------------------------------------------------------- -->
     <script>
         // Nav Bar Tab 
         function showPage(pageId) {
+            console.log("Switching to page: " + pageId);  // Debugging log
             // Hide all pages
             var pages = document.querySelectorAll('.content');
             pages.forEach(page => page.classList.remove('active'));
-
+            
             // Show the selected page
-            document.getElementById(pageId).classList.add('active');
+            var pageToShow = document.getElementById(pageId);
+            if (pageToShow) {
+                pageToShow.classList.add('active');
+            } else {
+                console.error("No page found with id:", pageId);
+            }
         }
 
-        // SCORES Page
+        // HOME Page -----------------------------------------------------------------------
+        function updateHomeRunStats() {
+            // Get the stat items from the home page.
+            const homeStress = document.getElementById('home-stress');
+            const homeSymmetry = document.getElementById('home-symmetry');
+            const homeFatigue = document.getElementById('home-fatigue');
+
+            // Helper functions for color logic:
+            function getColorForLowerBetter(score) {
+                if (score <= 29) {
+                    return 'green';
+                } else if (score <= 69) {
+                    return 'yellow';
+                } else {
+                    return 'red';
+                }
+            }
+            function getColorForHigherBetter(score) {
+                if (score >= 70) {
+                    return 'green';
+                } else if (score >= 30) {
+                    return 'yellow';
+                } else {
+                    return 'red';
+                }
+            }
+
+            // Extract the scores from your scoreValues array.
+            // In your code, scoreValues is defined as [stressScore, symmetryScore, fatigueScore].
+            // Since you want the order Stress, Fatigue, Symmetry on the home page, note the difference.
+            const stressScore = scoreValues[0];
+            const symmetryScore = scoreValues[1];
+            const fatigueScore = scoreValues[2];
+
+            // Update the home page items:
+            // For stress and fatigue, lower is better.
+            homeStress.querySelector('span').textContent = stressScore;
+            homeStress.querySelector('span').style.color = getColorForLowerBetter(stressScore);
+
+            homeFatigue.querySelector('span').textContent = fatigueScore;
+            homeFatigue.querySelector('span').style.color = getColorForLowerBetter(fatigueScore);
+
+            // For symmetry, higher is better.
+            homeSymmetry.querySelector('span').textContent = symmetryScore;
+            homeSymmetry.querySelector('span').style.color = getColorForHigherBetter(symmetryScore);
+
+            homeStress.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
+            homeSymmetry.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
+            homeFatigue.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
+        }
+
+
+        // SCORES Page ---------------------------------------------------------------------
 
         // Define score variables (temporary default values)
         // Temporary default test values
@@ -1033,6 +1157,7 @@
             let newFatigue = prompt("Enter Fatigue score (0-100):", fatigueScore);
             scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigue)];
             updateScoreCircles();
+            updateHomeRunStats(); // Update the home page "Your Last Run" box
         }
 
         // Initial update
@@ -1213,11 +1338,13 @@
                     weightInput.setAttribute('readonly', true);
                     genderSelect.disabled = true;
 
+                    passwordInput.type = "password";
+                    
+                    // Hide the toggle icon now that editing is finished
+                    profileToggleIcon.style.display = "none";
+
                     this.innerText = "Edit Profile";
                     alert("Profile saved successfully!");
-
-                    // Hide the toggle icon when not editing
-                    profileToggleIcon.style.display = "none";
                 }
             });
             // Add event listener for the Log Out button
@@ -1261,6 +1388,19 @@
             // Update the output to reflect the cleared profiles
             document.getElementById('profiles-output').innerHTML = 'All profiles have been cleared.';
         }
+
+        // FAQs Page ------------------------------------------------------------------------- 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attach click event to each FAQ box so each toggles only its own answer
+            document.querySelectorAll('.faq-box').forEach(function(box) {
+                box.addEventListener('click', function(event) {
+                event.stopPropagation();
+                var answer = this.querySelector('.faq-answer');
+                // Toggle display for this box's answer
+                answer.style.display = (answer.style.display === "block") ? "none" : "block";
+                });
+            });
+        });
     </script>
 </body>
 </html>
