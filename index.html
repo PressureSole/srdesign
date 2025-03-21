@@ -23,6 +23,7 @@
             position: fixed;
             top: 0;
             width: 100%;
+            z-index: 1000;  /* Nav Bar will always appear on top */
         }
 
         .tab {
@@ -927,6 +928,32 @@
             </div>
             <div id="profiles-output" style="margin-top: 20px; background: #f7f7f7; padding: 10px; border: 1px solid #ccc;"></div>
         </div>
+
+        <!-- Run History container -->
+        <div class="run-history-container" style="display: none; max-width: 1000px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+            <h1 style="text-align: center; margin-bottom: 20px;">Run History</h1>
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background-color: #f4f4f4;">
+                  <th style="padding: 10px; text-align: left;">Date</th>
+                  <th style="padding: 10px; text-align: left;">Distance</th>
+                  <th style="padding: 10px; text-align: left;">Stress</th>
+                  <th style="padding: 10px; text-align: left;">Symmetry</th>
+                  <th style="padding: 10px; text-align: left;">Fatigue</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- For now, there is only one run row -->
+                <tr>
+                  <td style="padding: 10px;">--</td>
+                  <td style="padding: 10px;">--</td>
+                  <td id="run-stress" style="padding: 10px;">--</td>
+                  <td id="run-symmetry" style="padding: 10px;">--</td>
+                  <td id="run-fatigue" style="padding: 10px;">--</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- FAQs tab --------------------------------------------------------------------- -->
@@ -1156,13 +1183,18 @@
             let newSymmetry = prompt("Enter Symmetry score (0-100):", symmetryScore);
             let newFatigue = prompt("Enter Fatigue score (0-100):", fatigueScore);
             scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigue)];
+            
+            // Store the run scores in localStorage so they persist.
+            localStorage.setItem('runScores', JSON.stringify(scoreValues));
+
             updateScoreCircles();
             updateHomeRunStats(); // Update the home page "Your Last Run" box
+            updateRunHistory();   // Update the Run History table with new scores
         }
 
         // Initial update
-        updateScoreCircles();
-        testScoreInput();
+        //updateScoreCircles();
+        //testScoreInput();
 
         // PROFILE Page ---------------------------------
 
@@ -1246,6 +1278,12 @@
                 document.getElementById('display-weight').value = profileData.weight;
                 document.getElementById('display-gender').value = profileData.gender;
                 document.getElementById('your-profile').style.display = 'block';
+
+                // **NEW LINE: Update the Run History with the stored test scores**
+                updateRunHistory();
+
+                // NEW: Show the Run History container on login:
+                document.getElementById('run-history-container').style.display = 'block';
             });
             
             // Sign Up functionality
@@ -1359,7 +1397,32 @@
                 // Clear the log in form
                 document.getElementById('login-form').reset();
             });
+            function updateRunHistory() {
+                // Assuming scoreValues is defined as: [stressScore, symmetryScore, fatigueScore]
+                const stressVal = scoreValues[0];
+                const symmetryVal = scoreValues[1];
+                const fatigueVal = scoreValues[2];
+                
+                document.getElementById('run-stress').innerText = stressVal;
+                document.getElementById('run-symmetry').innerText = symmetryVal;
+                document.getElementById('run-fatigue').innerText = fatigueVal;
+            }
+
+            testScoreInput();
+
+            // Check if run scores are already stored
+            //const storedRunScores = localStorage.getItem('runScores');
+            //if (!storedRunScores || storedRunScores === '[]') {
+            //testScoreInput();
+            //} else {
+            //    scoreValues = JSON.parse(storedRunScores);
+            //    updateScoreCircles();
+            //    updateHomeRunStats();
+            //    updateRunHistory();
+            //}
         });
+
+        
         
         // TEMPORARY function to view all saved profiles
             function showProfiles() {
