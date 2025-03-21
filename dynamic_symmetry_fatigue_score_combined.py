@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
-from scipy.interpolate import Rbf, splprep, splev
+from scipy.interpolate import griddata, Rbf, splprep, splev
 from github import Github
 from io import BytesIO
 
@@ -27,16 +27,16 @@ sensor_pressures = [data[f"Sensor_{i+1}"].values for i in range(22)]
 
 # Sensor coordinates
 sensor_coords = np.array([
-    [5.8, 2.2], [7.0, 4.9], [4.8, 6.2], [6.4, 9.6], [4.5, 12.4], [2.8, 15.1], 
+    [5.8, 2.2], [7.0, 4.9], [4.8, 6.2], [6.4, 9.6], [4.5, 12.4], [2.8, 15.1],
     [6.8, 15.0], [4.9, 16.9], [6.5, 18.9], [2.2, 19.2], [4.6, 21.4],
-    [-5.8, 2.2], [-7.0, 4.9], [-4.8, 6.2], [-6.4, 9.6], [-4.5, 12.4], [-2.8, 15.1], 
+    [-5.8, 2.2], [-7.0, 4.9], [-4.8, 6.2], [-6.4, 9.6], [-4.5, 12.4], [-2.8, 15.1],
     [-6.8, 15.0], [-4.9, 16.9], [-6.5, 18.9], [-2.2, 19.2], [-4.6, 21.4]
 ])
 
 # Foot outline
 foot_outline = np.array([
-    [6, 0.4], [3.6, 2.2], [3.7, 7], [3, 10.8], [1.2, 15.7], [1.3, 19.8], 
-    [4, 23.6], [7, 22], [8.5, 19.2], [9.2, 15.2], [9, 11.5], [8.5, 6.6], 
+    [6, 0.4], [3.6, 2.2], [3.7, 7], [3, 10.8], [1.2, 15.7], [1.3, 19.8],
+    [4, 23.6], [7, 22], [8.5, 19.2], [9.2, 15.2], [9, 11.5], [8.5, 6.6],
     [8.4, 2.3], [7.9, 0.9], [6, 0.4]
 ])
 
@@ -60,49 +60,73 @@ l_foot_path = create_foot_path(left_foot_outline[:, 0], left_foot_outline[:, 1])
 
 # Compute pressure mapping
 avg_sensor_pressures = np.mean(sensor_pressures, axis=1)
-rbf = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='multiquadric')
-pressure_data_grid = rbf(X, Y)
+
+# --- RBF Interpolation ---
+rbf_interpolator = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='linear')
+pressure_data_rbf = rbf_interpolator(X, Y)
+
+# --- GridData Interpolation ---
+points = sensor_coords
+values = avg_sensor_pressures
+grid_points = np.column_stack([X.flatten(), Y.flatten()])
+pressure_data_grid = griddata(points, values, grid_points, method='nearest').reshape(X.shape)
 
 # Mask points inside foot outlines
-points = np.column_stack([X.flatten(), Y.flatten()])
-inside_right = r_foot_path.contains_points(points).reshape(X.shape)
-inside_left = l_foot_path.contains_points(points).reshape(X.shape)
-combined_pressure_data = np.where(inside_right | inside_left, pressure_data_grid, np.nan)
+inside_right = r_foot_path.contains_points(grid_points).reshape(X.shape)
+inside_left = l_foot_path.contains_points(grid_points).reshape(X.shape)
 
-# Normalize pressure data
-min_pressure, max_pressure = np.nanmin(combined_pressure_data), np.nanmax(combined_pressure_data)
-normalized_pressure_data = (combined_pressure_data - min_pressure) / (max_pressure - min_pressure)
+combined_pressure_rbf = np.where(inside_right | inside_left, pressure_data_rbf, np.nan)
+combined_pressure_grid = np.where(inside_right | inside_left, pressure_data_grid, np.nan)
 
-# Plotting
-fig, ax = plt.subplots(figsize=(12, 8))
-pressure_img = ax.imshow(normalized_pressure_data, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
-ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
-ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
-ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
-ax.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
-ax.set_xlim([min_x, max_x])
-ax.set_ylim([min_y, max_y])
-ax.set_xlabel("X (cm)")
-ax.set_ylabel("Y (cm)")
-ax.set_title("Average Foot Pressure Mapping")
-ax.legend()
-cbar = fig.colorbar(pressure_img, ax=ax)
-cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
+# Normalize pressure data for comparison
+def normalize(data):
+    min_val, max_val = np.nanmin(data), np.nanmax(data)
+    return (data - min_val) / (max_val - min_val)
 
-# Save the image to a BytesIO object instead of a file
-output_file = "dynamic_symmetry_score_visualization.png"
-plt.savefig(output_file, bbox_inches='tight')
-plt.close()
+normalized_pressure_rbf = normalize(combined_pressure_rbf)
+normalized_pressure_grid = normalize(combined_pressure_grid)
+
+# Save RBF plot
+fig_rbf, ax_rbf = plt.subplots(figsize=(8, 8))
+pressure_img_rbf = ax_rbf.imshow(normalized_pressure_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+ax_rbf.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
+ax_rbf.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
+ax_rbf.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
+ax_rbf.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
+ax_rbf.set_title("Pressure Mapping (RBF Interpolation)")
+ax_rbf.legend()
+cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
+cbar_rbf.set_label('Pressure Value (Normalized)')
+rbf_output_file = "pressure_mapping_rbf.png"
+fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
+plt.close(fig_rbf)
+
+# Save GridData plot
+fig_grid, ax_grid = plt.subplots(figsize=(8, 8))
+pressure_img_grid = ax_grid.imshow(normalized_pressure_grid, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+ax_grid.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
+ax_grid.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
+ax_grid.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
+ax_grid.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
+ax_grid.set_title("Pressure Mapping (GridData Nearest Interpolation)")
+ax_grid.legend()
+cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
+cbar_grid.set_label('Pressure Value (Normalized)')
+grid_output_file = "pressure_mapping_griddata.png"
+fig_grid.savefig(grid_output_file, bbox_inches='tight')
+plt.close(fig_grid)
 
 # GitHub upload
 timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
-new_output_file = f"dynamic_symmetry_score_visualization_{timestamp}.png"
-
-# Read the image as a binary stream
-with open(output_file, "rb") as f:
-    image_data = f.read()
 
 # Upload to GitHub
-repo.create_file(f"images/{new_output_file}", "Upload dynamic symmetry score plot", image_data, branch="main")
+with open(rbf_output_file, "rb") as f:
+    image_data_rbf = f.read()
+repo.create_file(f"images/pressure_mapping_rbf_{timestamp}.png", "Upload RBF pressure mapping", image_data_rbf, branch="main")
 
-print(f"Image uploaded to GitHub repository as {new_output_file}!")
+with open(grid_output_file, "rb") as f:
+    image_data_grid = f.read()
+repo.create_file(f"images/pressure_mapping_griddata_{timestamp}.png", "Upload GridData pressure mapping", image_data_grid, branch="main")
+
+print(f"RBF image uploaded to GitHub as pressure_mapping_rbf_{timestamp}.png")
+print(f"GridData image uploaded to GitHub as pressure_mapping_griddata_{timestamp}.png")
