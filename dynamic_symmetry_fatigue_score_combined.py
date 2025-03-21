@@ -58,24 +58,32 @@ def create_foot_path(smooth_x, smooth_y):
 r_foot_path = create_foot_path(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1])
 l_foot_path = create_foot_path(left_foot_outline[:, 0], left_foot_outline[:, 1])
 
-# Compute pressure mapping
+# Compute pressure mapping (method='multiquadric' for the first image)
 avg_sensor_pressures = np.mean(sensor_pressures, axis=1)
-rbf = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='multiquadric')
-pressure_data_grid = rbf(X, Y)
+rbf_multi = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='multiquadric')
+pressure_data_grid_multi = rbf_multi(X, Y)
+
+# Compute pressure mapping (method='nearest' for the second image)
+rbf_nearest = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='nearest')
+pressure_data_grid_nearest = rbf_nearest(X, Y)
 
 # Mask points inside foot outlines
 points = np.column_stack([X.flatten(), Y.flatten()])
 inside_right = r_foot_path.contains_points(points).reshape(X.shape)
 inside_left = l_foot_path.contains_points(points).reshape(X.shape)
-combined_pressure_data = np.where(inside_right | inside_left, pressure_data_grid, np.nan)
+combined_pressure_data_multi = np.where(inside_right | inside_left, pressure_data_grid_multi, np.nan)
+combined_pressure_data_nearest = np.where(inside_right | inside_left, pressure_data_grid_nearest, np.nan)
 
 # Normalize pressure data
-min_pressure, max_pressure = np.nanmin(combined_pressure_data), np.nanmax(combined_pressure_data)
-normalized_pressure_data = (combined_pressure_data - min_pressure) / (max_pressure - min_pressure)
+min_pressure, max_pressure = np.nanmin(combined_pressure_data_multi), np.nanmax(combined_pressure_data_multi)
+normalized_pressure_data_multi = (combined_pressure_data_multi - min_pressure) / (max_pressure - min_pressure)
 
-# Plotting
+min_pressure_nearest, max_pressure_nearest = np.nanmin(combined_pressure_data_nearest), np.nanmax(combined_pressure_data_nearest)
+normalized_pressure_data_nearest = (combined_pressure_data_nearest - min_pressure_nearest) / (max_pressure_nearest - min_pressure_nearest)
+
+# Plotting first image (multiquadric method)
 fig, ax = plt.subplots(figsize=(12, 8))
-pressure_img = ax.imshow(normalized_pressure_data, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+pressure_img = ax.imshow(normalized_pressure_data_multi, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
 ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
 ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
 ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
@@ -84,25 +92,51 @@ ax.set_xlim([min_x, max_x])
 ax.set_ylim([min_y, max_y])
 ax.set_xlabel("X (cm)")
 ax.set_ylabel("Y (cm)")
-ax.set_title("Average Foot Pressure Mapping")
+ax.set_title("Average Foot Pressure Mapping (Multiquadric)")
 ax.legend()
 cbar = fig.colorbar(pressure_img, ax=ax)
 cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
 
-# Save the image to a BytesIO object instead of a file
-output_file = "dynamic_symmetry_score_visualization.png"
-plt.savefig(output_file, bbox_inches='tight')
+# Save the first image
+output_file_multi = "dynamic_symmetry_score_visualization.png"
+plt.savefig(output_file_multi, bbox_inches='tight')
+plt.close()
+
+# Plotting second image (nearest method)
+fig, ax = plt.subplots(figsize=(12, 8))
+pressure_img_nearest = ax.imshow(normalized_pressure_data_nearest, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
+ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
+ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
+ax.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
+ax.set_xlim([min_x, max_x])
+ax.set_ylim([min_y, max_y])
+ax.set_xlabel("X (cm)")
+ax.set_ylabel("Y (cm)")
+ax.set_title("Average Foot Pressure Mapping (Nearest)")
+ax.legend()
+cbar = fig.colorbar(pressure_img_nearest, ax=ax)
+cbar.set_label('Pressure Value (Normalized from 0 to 1)', rotation=270, labelpad=20)
+
+# Save the second image
+output_file_nearest = "dynamic_symmetry_score_visualization_nearest.png"
+plt.savefig(output_file_nearest, bbox_inches='tight')
 plt.close()
 
 # GitHub upload
 timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
-new_output_file = f"dynamic_symmetry_score_visualization_{timestamp}.png"
+new_output_file_multi = f"dynamic_symmetry_score_visualization_{timestamp}.png"
+new_output_file_nearest = f"dynamic_symmetry_score_visualization_nearest_{timestamp}.png"
 
-# Read the image as a binary stream
-with open(output_file, "rb") as f:
-    image_data = f.read()
+# Read the images as binary streams
+with open(output_file_multi, "rb") as f:
+    image_data_multi = f.read()
 
-# Upload to GitHub
-repo.create_file(f"images/{new_output_file}", "Upload dynamic symmetry score plot", image_data, branch="main")
+with open(output_file_nearest, "rb") as f:
+    image_data_nearest = f.read()
 
-print(f"Image uploaded to GitHub repository as {new_output_file}!")
+# Upload both images to GitHub
+repo.create_file(f"images/{new_output_file_multi}", "Upload multiquadric symmetry score plot", image_data_multi, branch="main")
+repo.create_file(f"images/{new_output_file_nearest}", "Upload nearest symmetry score plot", image_data_nearest, branch="main")
+
+print(f"Images uploaded to GitHub repository as {new_output_file_multi} and {new_output_file_nearest}!")
