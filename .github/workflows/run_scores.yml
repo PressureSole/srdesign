@@ -1,4 +1,3 @@
-#Test
 name: Run Score Calculation
 
 on:
@@ -26,3 +25,9 @@ jobs:
       - name: Run the baseline model scores script
         run: |
           python baseline_model_scores.py
+
+      - name: Commit and push score file
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Auto-update score file"
+          add: "scores"
