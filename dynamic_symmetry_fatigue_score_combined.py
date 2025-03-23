@@ -118,6 +118,8 @@ plt.close(fig_grid)
 
 # --- New workflow (Splitting pressure data into thirds) ---
 # Split the pressure data into thirds
+# --- New workflow (Splitting pressure data into thirds) ---
+# Split the pressure data into thirds
 def split_into_thirds(data):
     split_size = len(data) // 3
     return data[:split_size], data[split_size:2*split_size], data[2*split_size:]
@@ -125,20 +127,30 @@ def split_into_thirds(data):
 # Split the pressure data
 pressure_first_third, pressure_second_third, pressure_third_third = split_into_thirds(avg_sensor_pressures)
 
+# Truncate the arrays to the same length (based on the smallest array size between sensor_coords and the pressure data)
+min_length = min(len(sensor_coords), len(pressure_first_third), len(pressure_second_third), len(pressure_third_third))
+
+# Truncate sensor_coords and pressure data to ensure they have the same length
+sensor_coords_truncated = sensor_coords[:min_length]
+pressure_first_third_truncated = pressure_first_third[:min_length]
+pressure_second_third_truncated = pressure_second_third[:min_length]
+pressure_third_third_truncated = pressure_third_third[:min_length]
+
 # Apply RBF interpolation for each third
-rbf_first = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], pressure_first_third, function='linear')
+rbf_first = Rbf(sensor_coords_truncated[:, 0], sensor_coords_truncated[:, 1], pressure_first_third_truncated, function='linear')
 pressure_first_third_rbf = rbf_first(X, Y)
 
-rbf_second = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], pressure_second_third, function='linear')
+rbf_second = Rbf(sensor_coords_truncated[:, 0], sensor_coords_truncated[:, 1], pressure_second_third_truncated, function='linear')
 pressure_second_third_rbf = rbf_second(X, Y)
 
-rbf_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], pressure_third_third, function='linear')
+rbf_third = Rbf(sensor_coords_truncated[:, 0], sensor_coords_truncated[:, 1], pressure_third_third_truncated, function='linear')
 pressure_third_third_rbf = rbf_third(X, Y)
 
 # Normalize the data for comparison
 normalized_first_third_rbf = normalize(pressure_first_third_rbf)
 normalized_second_third_rbf = normalize(pressure_second_third_rbf)
 normalized_third_third_rbf = normalize(pressure_third_third_rbf)
+
 
 # Save RBF plot for the first third
 fig_first_third_rbf, ax_first_third_rbf = plt.subplots(figsize=(8, 8))
