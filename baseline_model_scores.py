@@ -27,6 +27,16 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     data = pd.read_excel(filename)
 
     time = data['Time'].values
+
+    # Sum sensor values for each foot region.
+    R_Heel = data[['Sensor_1', 'Sensor_2', 'Sensor_3']].sum(axis=1).values
+    R_Midfoot = data[['Sensor_4', 'Sensor_5', 'Sensor_6', 'Sensor_7']].sum(axis=1).values
+    R_Forefoot = data[['Sensor_8', 'Sensor_9', 'Sensor_10', 'Sensor_11']].sum(axis=1).values
+
+    L_Heel = data[['Sensor_12', 'Sensor_13', 'Sensor_14']].sum(axis=1).values
+    L_Midfoot = data[['Sensor_15', 'Sensor_16', 'Sensor_17', 'Sensor_18']].sum(axis=1).values
+    L_Forefoot = data[['Sensor_19', 'Sensor_20', 'Sensor_21', 'Sensor_22']].sum(axis=1).values
+    
     R_Total = data['R_Heel'].values + data['R_Midfoot'].values + data['R_Forefoot'].values
     L_Total = data['L_Heel'].values + data['L_Midfoot'].values + data['L_Forefoot'].values
     total_time = time[-1] - time[0]
