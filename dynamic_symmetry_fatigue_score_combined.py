@@ -129,7 +129,7 @@ def generate_plots(pressure_values, method, output_prefix):
     normalized_pressure_rbf = normalize(interpolated_pressure_rbf)
     normalized_pressure_grid = normalize(interpolated_pressure_grid)
     
-    # Save RBF plot
+    # Save RBF plot (Gradient)
     fig_rbf, ax_rbf = plt.subplots(figsize=(8, 8))
     pressure_img_rbf = ax_rbf.imshow(normalized_pressure_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
     ax_rbf.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
@@ -147,7 +147,7 @@ def generate_plots(pressure_values, method, output_prefix):
     fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
     plt.close(fig_rbf)
 
-    # Save GridData plot
+    # Save GridData plot (Section)
     fig_grid, ax_grid = plt.subplots(figsize=(8, 8))
     pressure_img_grid = ax_grid.imshow(normalized_pressure_grid, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
     ax_grid.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
@@ -166,14 +166,19 @@ def generate_plots(pressure_values, method, output_prefix):
     plt.close(fig_grid)
 
 
-# Generate plots for the full dataset with the new naming scheme
+# Generate and save the plots with the correct naming scheme
+# Full dataset plots
 full_data = np.mean(sensor_pressures, axis=1)
+
+# Symmetry plots
 generate_plots(full_data, method='rbf', output_prefix='symmetry_gradient')
 generate_plots(full_data, method='griddata', output_prefix='symmetry_section')
 
-# Generate plots for each third of the dataset with the new naming scheme
+# Generate plots for each third of the dataset
 for i, (start_time, end_time) in enumerate(thirds):
     pressure_values = get_pressure_data_for_third(start_time, end_time)
+    
+    # Fatigue plots
     generate_plots(pressure_values, method='rbf', output_prefix=f"fatigue{i+1}_gradient")
     generate_plots(pressure_values, method='griddata', output_prefix=f"fatigue{i+1}_section")
 
