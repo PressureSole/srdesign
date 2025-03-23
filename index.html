@@ -7,7 +7,6 @@
     <!--<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /*TEST GOD PLEASE WORK*/
         body {
             height: 100%;
             margin: 0;
@@ -511,79 +510,110 @@
     <!-- Buttons for switching views and updating visualizations -->
     <div style="text-align: center; margin-bottom: 20px;">
         <button id="switch-view-btn" onclick="switchView()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            Switch to Dynamic View
+            Switch to Gradient View
         </button>
         <button id="update-visuals-btn" onclick="triggerGitHubAction()" style="padding: 10px 20px; background-color: #e76f51; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
             Update Visualizations
         </button>
     </div>
 
-    <!-- Static View -->
-    <div id="static-view" style="display: block;">
-        <div style="display: flex; justify-content: space-between; gap: 20px;">
-            <!-- Symmetry Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
-            </div>
-            <!-- Fatigue Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
-                </div>
-            </div>
-            <!-- Stress Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-                <p style="color: #666; font-style: italic;">No data available</p>
+<!-- JavaScript to Load Latest Image -->
+<script>
+    async function fetchLatestImage(sectionId, fileNamePrefix) {
+        const repoUrl = 'https://api.github.com/repos/jakewang21/srdesign/contents/images';
+        try {
+            const response = await fetch(repoUrl);
+            if (!response.ok) {
+                console.error('Failed to fetch images.');
+                return;
+            }
+            const files = await response.json();
+            const filteredFiles = files
+                .filter(file => file.name.startsWith(fileNamePrefix))
+                .sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
+
+            if (filteredFiles.length > 0) {
+                const latestImageUrl = `https://raw.githubusercontent.com/jakewang21/srdesign/main/images/${filteredFiles[0].name}`;
+                document.getElementById(sectionId).src = latestImageUrl;
+            }
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        }
+    }
+
+    // Load images dynamically
+    window.onload = () => {
+        fetchLatestImage('symmetry-static', 'symmetry_score_visualization');
+        fetchLatestImage('symmetry-dynamic', 'dynamic_symmetry_score_visualization');
+    };
+</script>
+
+<!-- Section View -->
+<div id="section-view" style="display: block;">
+    <div style="display: flex; justify-content: space-between; gap: 20px;">
+        <!-- Symmetry Section -->
+        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+            <img id="symmetry-static" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+        </div>
+        <!-- Fatigue Section -->
+        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
             </div>
         </div>
-    </div>
-
-    <!-- Dynamic View -->
-    <div id="dynamic-view" style="display: none;">
-        <div style="display: flex; justify-content: space-between; gap: 20px;">
-            <!-- Dynamic Symmetry Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Dynamic Symmetry</h2>
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/dynamic_symmetry_score_visualization.png" alt="Dynamic Symmetry Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
-            </div>
-            <!-- Dynamic Fatigue Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Dynamic Fatigue</h2>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_1.png" alt="Dynamic Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_2.png" alt="Dynamic Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                    <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_3.png" alt="Dynamic Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
-                </div>
-            </div>
-            <!-- Stress Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-                <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-                <p style="color: #666; font-style: italic;">No data available</p>
-            </div>
+        <!-- Stress Section -->
+        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+            <p style="color: #666; font-style: italic;">No data available</p>
         </div>
     </div>
 </div>
 
+<!-- Gra View -->
+<div id="gradient-view" style="display: none;">
+    <div style="display: flex; justify-content: space-between; gap: 20px;">
+        <!-- Dynamic Symmetry Section -->
+        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+            <img id="symmetry-dynamic" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/dynamic_symmetry_score_visualization.png" alt="Dynamic Symmetry Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+        </div>
+        <!-- Dynamic Fatigue Section -->
+        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_1.png" alt="Dynamic Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_2.png" alt="Dynamic Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_3.png" alt="Dynamic Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </div>
+        </div>
+        <!-- Stress Section -->
+        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
+            <p style="color: #666; font-style: italic;">No data available</p>
+        </div>
+    </div>
+</div>
+
+
 <script>
 
     function switchView() {
-        var staticView = document.getElementById('static-view');
-        var dynamicView = document.getElementById('dynamic-view');
+        var staticView = document.getElementById('section-view');
+        var dynamicView = document.getElementById('gradient-view');
         var button = document.getElementById('switch-view-btn');
 
         if (staticView.style.display === "none") {
             staticView.style.display = "block";
             dynamicView.style.display = "none";
-            button.innerHTML = "Switch to Dynamic View";
+            button.innerHTML = "Switch to Gradient View";
         } else {
             staticView.style.display = "none";
             dynamicView.style.display = "block";
-            button.innerHTML = "Switch to Static View";
+            button.innerHTML = "Switch to Section View";
         }
     }
 
@@ -958,36 +988,56 @@
     </div>
 
     <!-- FAQs tab --------------------------------------------------------------------- -->
-    <div id="faqs" class="content">    
+    <div id="faqs" class="content">
+        <h1>Frequently Asked Questions</h1>
         <div class="faqs-container" style="padding: 20px;">
-            <h1 style="text-align: center; margin-bottom: 20px;">Frequently Asked Questions</h1>
+            <!-- <h1 style="text-align: center; margin-bottom: 20px;">Frequently Asked Questions</h1> -->
             <div class="faq-columns">
                 <div class="faq-column-left">
                     <div class="faq-box">
-                        <h2>Question 1</h2>
-                        <div class="faq-answer">Answer 1</div>
+                        <h3>What is PressureSole and how does it help runners?</h3>
+                        <div class="faq-answer">PressureSole is a low-cost insole with embedded sensors that provides feedback on your running form. It helps reduce the risk of running-related injuries by giving real-time insights into stress, fatigue, and symmetry during your runs.</div>
                     </div>
                     <div class="faq-box">
-                        <h2>Question 2</h2>
+                        <h3>How does PressureSole calculate my Stress, Fatigue, and Symmetry scores?</h3>
+                        <div class="faq-answer">The system analyzes pressure values collected from 11 sensors placed across the insole and PressureSole’s models process this data to provide:<br>
+                            Stress: Overall loading and intensity on your feet.<br>
+                            Fatigue: Signs of declining performance (force output, step rate, contact time).<br>
+                            Symmetry: The balance between your left and right foot pressures. </div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>Question 2</h3>
                         <div class="faq-answer">Answer 2</div>
                     </div>
                     <div class="faq-box">
-                        <h2>Question 3</h2>
-                        <div class="faq-answer">Answer 3</div>
+                        <h3>Question 2</h3>
+                        <div class="faq-answer">Answer 2</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>Question 2</h3>
+                        <div class="faq-answer">Answer 2</div>
                     </div>
                 </div>
                 <div class="faq-column-right">
                     <div class="faq-box">
-                        <h2>Question 4</h2>
-                        <div class="faq-answer">Answer 4</div>
+                        <h3>How accurate is PressureSole compared to professional devices?</h3>
+                        <div class="faq-answer">PressureSole achieves approximately 80% accuracy when compared to industry-standard devices like the Loadsol, which is sufficient for amateur runners to receive actionable feedback at a much lower cost.</div>
                     </div>
                     <div class="faq-box">
-                        <h2>Question 5</h2>
-                        <div class="faq-answer">Answer 5</div>
+                        <h3>Question 2</h3>
+                        <div class="faq-answer">Answer 2</div>
                     </div>
                     <div class="faq-box">
-                        <h2>Question 6</h2>
-                        <div class="faq-answer">Answer 6</div>
+                        <h3>Question 2</h3>
+                        <div class="faq-answer">Answer 2</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>Question 2</h3>
+                        <div class="faq-answer">Answer 2</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>Question 2</h3>
+                        <div class="faq-answer">Answer 2</div>
                     </div>
                 </div>
             </div>
