@@ -55,11 +55,13 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
         if len(window_time) < 2:
             continue
 
-        R_peak_forces = np.partition(window_R, -10)[-10:]
-        L_peak_forces = np.partition(window_L, -10)[-10:]
-
-        R_weighted_peak = np.average(R_peak_forces, weights=np.arange(1, 11))
-        L_weighted_peak = np.average(L_peak_forces, weights=np.arange(1, 11))
+        num_peaks = min(10, len(window_R))
+        R_peak_forces = np.partition(window_R, -num_peaks)[-num_peaks:]
+        L_peak_forces = np.partition(window_L, -num_peaks)[-num_peaks:]
+        weights = np.arange(1, num_peaks + 1)
+        
+        R_weighted_peak = np.average(R_peak_forces, weights=weights)
+        L_weighted_peak = np.average(L_peak_forces, weights=weights)
 
         if i > 0:
             R_fatigue_changes.append(R_weighted_peak - prev_R_peak)
