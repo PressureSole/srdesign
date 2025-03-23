@@ -97,7 +97,7 @@ ax_rbf.set_title("Pressure Mapping (RBF Interpolation)")
 ax_rbf.legend()
 cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
 cbar_rbf.set_label('Pressure Value (Normalized)')
-rbf_output_file = "pressure_mapping_rbf.png"
+rbf_output_file = "symmetry_gradient.png"
 fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
 plt.close(fig_rbf)
 
@@ -112,7 +112,7 @@ ax_grid.set_title("Pressure Mapping (GridData Nearest Interpolation)")
 ax_grid.legend()
 cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
 cbar_grid.set_label('Pressure Value (Normalized)')
-grid_output_file = "pressure_mapping_griddata.png"
+grid_output_file = "symmetry_section.png"
 fig_grid.savefig(grid_output_file, bbox_inches='tight')
 plt.close(fig_grid)
 
@@ -122,11 +122,11 @@ timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
 # Upload to GitHub
 with open(rbf_output_file, "rb") as f:
     image_data_rbf = f.read()
-repo.create_file(f"images/pressure_mapping_rbf_{timestamp}.png", "Upload RBF pressure mapping", image_data_rbf, branch="main")
+repo.create_file(f"images/symmetry_gradrient_{timestamp}.png", "Upload symmetry gradient mapping", image_data_rbf, branch="main")
 
 with open(grid_output_file, "rb") as f:
     image_data_grid = f.read()
-repo.create_file(f"images/pressure_mapping_griddata_{timestamp}.png", "Upload GridData pressure mapping", image_data_grid, branch="main")
+repo.create_file(f"images/symmetry_section_{timestamp}.png", "Upload symmetry section mapping", image_data_grid, branch="main")
 
 print(f"RBF image uploaded to GitHub as pressure_mapping_rbf_{timestamp}.png")
 print(f"GridData image uploaded to GitHub as pressure_mapping_griddata_{timestamp}.png")
