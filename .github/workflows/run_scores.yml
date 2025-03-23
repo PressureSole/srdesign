@@ -1,0 +1,27 @@
+name: Run Score Calculation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering from the Actions tab
+
+jobs:
+  run-scores:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install required packages
+        run: |
+          pip install pandas numpy scipy openpyxl
+
+      - name: Run the baseline model scores script
+        run: |
+          python baseline_model_scores.py
