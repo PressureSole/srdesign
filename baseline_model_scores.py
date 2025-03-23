@@ -5,8 +5,10 @@
 Automatically converted from the Google Colab version.
 """
 
+import os
 import pandas as pd
 import numpy as np
+from datetime import datetime
 from scipy.integrate import trapz
 
 def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
@@ -21,7 +23,6 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     Returns:
         dict: A dictionary containing the refined scores.
     """
-
     data = pd.read_excel(filename)
 
     time = data['Time'].values
@@ -89,7 +90,25 @@ if __name__ == '__main__':
     # Use the "Copy of test_lab shortening.xlsx" file from the repo.
     filename = 'Copy of test_lab shortening.xlsx'
     scores = calculate_refined_scores(filename)
+
+    # Create a "scores" folder if it doesn't exist.
+    scores_dir = "scores"
+    os.makedirs(scores_dir, exist_ok=True)
+
+    # Generate a timestamped filename.
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_filename = os.path.join(scores_dir, f"scores_{timestamp}.txt")
+
+    # Write the scores to the file.
+    with open(output_filename, "w") as f:
+        f.write(f"Stress Score: {scores['Stress_Score']:.2f}\n")
+        f.write(f"Symmetry Score: {scores['Symmetry_Score']:.2f}\n")
+        f.write(f"Fatigue Score (Right): {scores['Right_Fatigue']:.2f}\n")
+        f.write(f"Fatigue Score (Left): {scores['Left_Fatigue']:.2f}\n")
+
+    # Print the scores to the console.
     print(f"Fatigue Score (Right): {scores['Right_Fatigue']:.2f}")
     print(f"Fatigue Score (Left): {scores['Left_Fatigue']:.2f}")
     print(f"Stress Score: {scores['Stress_Score']:.2f}")
     print(f"Symmetry Score: {scores['Symmetry_Score']:.2f}")
+    print(f"Scores written to {output_filename}")
