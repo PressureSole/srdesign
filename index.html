@@ -293,7 +293,7 @@
             /* align-items: center; /* TESTING CHANGES (delete) */
             top: 100%;  /* Position immediately below the score-item content */
             /*left: 0;*/ 
-            width: 200%; /* TESTING CHANGES (100%) */
+            width: 150%; /* TESTING CHANGES (100%) */
             background-color: #eaeaea;
             color: #333;
             border: 1px solid #ccc;
@@ -419,15 +419,21 @@
         }
 
         /* FAQ question heading */
-        .faq-box h2 {
-        margin: 0;
+        .faq-box h3 {
+        max-width: 90%;   
+        margin: 0 auto;
         font-weight: bold;
+        text-align: Left;
         }
 
         /* FAQ answer styling (hidden by default) */
         .faq-answer {
         margin-top: 10px;
+        max-width: 90%; /* or any value you prefer */
+        margin-left: auto;
+        margin-right: auto; /* this centers the container within its parent */
         display: none;
+        text-align: left;
         }
     </style>
 </head>
@@ -481,8 +487,11 @@
                         <div class="stat-item" id="home-symmetry">
                             <span>0</span> Symmetry
                         </div>
-                        <div class="stat-item" id="home-fatigue">
-                            <span>0</span> Fatigue
+                        <div class="stat-item" id="home-fatigue-left">
+                            <span>0</span> Fatigue (Left)
+                        </div>
+                        <div class="stat-item" id="home-fatigue-right">
+                            <span>0</span> Fatigue (Right)
                         </div>
                     </div>
                 </div>
@@ -504,7 +513,8 @@
     -->
 
 <!-- DATA tab ----------------------------------------------------------------------- -->
-<div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; ">
+<!-- DATA tab -->
+<div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
     <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
 
     <!-- Buttons for switching views and updating visualizations -->
@@ -517,129 +527,138 @@
         </button>
     </div>
 
-<!-- JavaScript to Load Latest Image -->
-<script>
-    async function fetchLatestImage(sectionId, fileNamePrefix) {
-        const repoUrl = 'https://api.github.com/repos/jakewang21/srdesign/contents/images';
-        try {
-            const response = await fetch(repoUrl);
-            if (!response.ok) {
-                console.error('Failed to fetch images.');
-                return;
-            }
-            const files = await response.json();
-            const filteredFiles = files
-                .filter(file => file.name.startsWith(fileNamePrefix))
-                .sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
-
-            if (filteredFiles.length > 0) {
-                const latestImageUrl = `https://raw.githubusercontent.com/jakewang21/srdesign/main/images/${filteredFiles[0].name}`;
-                document.getElementById(sectionId).src = latestImageUrl;
-            }
-        } catch (error) {
-            console.error('Error fetching images:', error);
-        }
-    }
-
-    // Load images dynamically
-    window.onload = () => {
-        fetchLatestImage('symmetry-section', 'symmetry_section');
-        fetchLatestImage('symmetry-gradient', 'symmetry_gradient');
-    };
-</script>
-
-<!-- Section View -->
-<div id="section-view" style="display: block;">
-    <div style="display: flex; justify-content: space-between; gap: 20px;">
-        <!-- Symmetry Section -->
-        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-            <img id="symmetry-section" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_section.png" alt="Symmetry Section" style="max-width: 100%; height: auto; border-radius: 8px;">
-        </div>
-        <!-- Fatigue Section -->
-        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_1.png" alt="Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_2.png" alt="Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/fatigue_3.png" alt="Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
+    <!-- Section View -->
+    <div id="section-view" style="display: block;">
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <!-- Symmetry Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+                <img id="symmetry-section" src="" alt="Symmetry Section" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <p id="symmetry-timestamp" style="color: #333;"></p>
+            </div>
+            <!-- Fatigue Section -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;" id="fatigue-section-images"></div>
             </div>
         </div>
-        <!-- Stress Section -->
-        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-            <p style="color: #666; font-style: italic;">No data available</p>
-        </div>
     </div>
-</div>
 
-<!-- Gradient View -->
-<div id="gradient-view" style="display: none;">
-    <div style="display: flex; justify-content: space-between; gap: 20px;">
-        <!-- Symmetry Section -->
-        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-            <img id="symmetry-gradient" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_gradient.png" alt="Symmetry Gradient" style="max-width: 100%; height: auto; border-radius: 8px;">
-        </div>
-        <!-- Fatigue Section -->
-        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_1.png" alt="Dynamic Fatigue 1" style="max-width: 100%; height: auto; border-radius: 8px;">
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_2.png" alt="Dynamic Fatigue 2" style="max-width: 100%; height: auto; border-radius: 8px;">
-                <img src="https://raw.githubusercontent.com/jakewang21/srdesign/main/d_fatigue_3.png" alt="Dynamic Fatigue 3" style="max-width: 100%; height: auto; border-radius: 8px;">
+    <!-- Gradient View -->
+    <div id="gradient-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <!-- Symmetry Gradient -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
+                <img id="symmetry-gradient" src="" alt="Symmetry Gradient" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <p id="symmetry-gradient-timestamp" style="color: #333;"></p>
+            </div>
+            <!-- Fatigue Gradient -->
+            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;" id="fatigue-gradient-images"></div>
             </div>
         </div>
-        <!-- Stress Section -->
-        <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
-            <h2 style="color: #264653; border-bottom: 2px solid #264653; padding-bottom: 10px;">Stress</h2>
-            <p style="color: #666; font-style: italic;">No data available</p>
-        </div>
     </div>
+
+    <script>
+        // Helper function to format the timestamp to a readable format
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString(); // Formats date and time in a readable way
+        }
+
+        // Fetch the latest image based on the prefix and category
+        async function fetchLatestImage(sectionId, category) {
+            const repoUrl = 'https://api.github.com/repos/jakewang21/srdesign/contents/images';
+            try {
+                const response = await fetch(repoUrl);
+                if (!response.ok) {
+                    console.error('Failed to fetch images.');
+                    return;
+                }
+                const files = await response.json();
+                const filteredFiles = files
+                    .filter(file => file.name.startsWith(category))
+                    .sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
+
+                if (filteredFiles.length > 0) {
+                    const latestImageUrl = `https://raw.githubusercontent.com/jakewang21/srdesign/main/images/${filteredFiles[0].name}`;
+                    document.getElementById(sectionId).src = latestImageUrl;
+
+                    // Display timestamp near the image
+                    const timestamp = filteredFiles[0].commit.committer.date;
+                    document.getElementById(sectionId + "-timestamp").textContent = "Last updated: " + formatTimestamp(timestamp);
+                }
+            } catch (error) {
+                console.error('Error fetching images:', error);
+            }
+        }
+
+        // Fetch images for section and gradient view
+        async function loadImages() {
+            // Section View
+            fetchLatestImage('symmetry-section', 'symmetry_section');
+            fetchLatestImage('fatigue-section-images', 'fatigue1_section');
+            fetchLatestImage('fatigue-section-images', 'fatigue2_section');
+            fetchLatestImage('fatigue-section-images', 'fatigue3_section');
+
+            // Gradient View
+            fetchLatestImage('symmetry-gradient', 'symmetry_gradient');
+            fetchLatestImage('fatigue-gradient-images', 'fatigue1_gradient');
+            fetchLatestImage('fatigue-gradient-images', 'fatigue2_gradient');
+            fetchLatestImage('fatigue-gradient-images', 'fatigue3_gradient');
+        }
+
+        // Toggle between section and gradient views
+        function switchView() {
+            const staticView = document.getElementById('section-view');
+            const dynamicView = document.getElementById('gradient-view');
+            const button = document.getElementById('switch-view-btn');
+
+            if (staticView.style.display === "none") {
+                staticView.style.display = "block";
+                dynamicView.style.display = "none";
+                button.innerHTML = "Switch to Gradient View";
+            } else {
+                staticView.style.display = "none";
+                dynamicView.style.display = "block";
+                button.innerHTML = "Switch to Section View";
+            }
+        }
+
+        // Trigger GitHub action (without needing to pass the token explicitly)
+        async function triggerGitHubAction() {
+            const username = 'jakewang21';
+            const repo = 'srdesign';
+            const workflow = 'run_script.yml';
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflow}/dispatches`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                    // No need for token here; GitHub Actions will authenticate the request automatically
+                },
+                body: JSON.stringify({ ref: "main" }),  // This specifies which branch to trigger on
+            });
+
+            if (response.ok) {
+                alert("GitHub Action triggered successfully!");
+            } else {
+                const errorData = await response.json();
+                console.error('Error triggering GitHub Action:', errorData);
+                alert("Error triggering GitHub Action: " + errorData.message);
+            }
+        }
+
+
+        // Load images on page load
+        window.onload = loadImages;
+    </script>
 </div>
 
-
-<script>
-
-    function switchView() {
-        var staticView = document.getElementById('section-view');
-        var dynamicView = document.getElementById('gradient-view');
-        var button = document.getElementById('switch-view-btn');
-
-        if (staticView.style.display === "none") {
-            staticView.style.display = "block";
-            dynamicView.style.display = "none";
-            button.innerHTML = "Switch to Gradient View";
-        } else {
-            staticView.style.display = "none";
-            dynamicView.style.display = "block";
-            button.innerHTML = "Switch to Section View";
-        }
-    }
-
-    async function triggerGitHubAction() {
-        const username = 'jakewang21';
-        const repo = 'srdesign';
-        const workflow = 'run_script.yml';
-        const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflow}/dispatches`;
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ ref: "main" }),
-        });
-
-        if (response.ok) {
-            alert("GitHub Action triggered successfully!");
-        } else {
-            alert("Error triggering GitHub Action.");
-        }
-    }
-</script>
-</div>
 
 
 <!-- GAIT MECH tab ------------------------------------------------------------------- -->
@@ -756,26 +775,40 @@
                 <div class="details-box"></div>
             </div>
 
-            <!-- Fatigue Score -->
+            <!-- Fatigue (Left) Score -->
             <div class="score-item">
-                <div class="score-circle fatigue" data-color="green"> <!-- Added the "fatigue" class -->
-                    <div class="label">Fatigue</div>
+                <div class="score-circle fatigue-left" data-color="green">
+                    <div class="label">Fatigue (Left)</div>
                     <div class="circle-content">
                         <svg width="200" height="200" viewBox="0 0 100 100">
-                            <!-- Background Circle -->
                             <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
-                            
-                            <!-- Wrap the foreground circle in a group with an inline transform -->
                             <g transform="rotate(-90,50,50)">
                                 <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
-                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                                        stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
                             </g>
                         </svg>
                         <div class="number">0</div>
-                        <!-- <div class="number">31</div> -->
                     </div>
                 </div>
-                <!-- Details button and box -->
+                <button class="details-btn">Details</button>
+                <div class="details-box"></div>
+            </div>
+            
+            <!-- Fatigue (Right) Score -->
+            <div class="score-item">
+                <div class="score-circle fatigue-right" data-color="green">
+                    <div class="label">Fatigue (Right)</div>
+                    <div class="circle-content">
+                        <svg width="200" height="200" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                            <g transform="rotate(-90,50,50)">
+                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                        stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <div class="number">0</div>
+                    </div>
+                </div>
                 <button class="details-btn">Details</button>
                 <div class="details-box"></div>
             </div>
@@ -1069,7 +1102,8 @@
             // Get the stat items from the home page.
             const homeStress = document.getElementById('home-stress');
             const homeSymmetry = document.getElementById('home-symmetry');
-            const homeFatigue = document.getElementById('home-fatigue');
+            const homeFatigueLeft = document.getElementById('home-fatigue-left');
+            const homeFatigueRight = document.getElementById('home-fatigue-right');
 
             // Helper functions for color logic:
             function getColorForLowerBetter(score) {
@@ -1096,15 +1130,19 @@
             // Since you want the order Stress, Fatigue, Symmetry on the home page, note the difference.
             const stressScore = scoreValues[0];
             const symmetryScore = scoreValues[1];
-            const fatigueScore = scoreValues[2];
+            const fatigueLeft = scoreValues[2];
+            const fatigueRight = scoreValues[3];
 
             // Update the home page items:
             // For stress and fatigue, lower is better.
             homeStress.querySelector('span').textContent = stressScore;
             homeStress.querySelector('span').style.color = getColorForLowerBetter(stressScore);
 
-            homeFatigue.querySelector('span').textContent = fatigueScore;
-            homeFatigue.querySelector('span').style.color = getColorForLowerBetter(fatigueScore);
+            homeFatigueLeft.querySelector('span').textContent = fatigueLeft;
+            homeFatigueLeft.querySelector('span').style.color = getColorForLowerBetter(fatigueLeft);
+
+            homeFatigueRight.querySelector('span').textContent = fatigueRight;
+            homeFatigueRight.querySelector('span').style.color = getColorForLowerBetter(fatigueRight);
 
             // For symmetry, higher is better.
             homeSymmetry.querySelector('span').textContent = symmetryScore;
@@ -1112,7 +1150,8 @@
 
             homeStress.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
             homeSymmetry.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
-            homeFatigue.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
+            homeFatigueLeft.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
+            homeFatigueRight.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
         }
 
 
@@ -1122,10 +1161,11 @@
         // Temporary default test values
         let stressScore = 10;
         let symmetryScore = 8;
-        let fatigueScore = 42;
+        let fatigueLeft = 42;
+        let fatigueRight = 50;
         
         // Array of scores in order: Stress, Symmetry, Fatigue
-        let scoreValues = [stressScore, symmetryScore, fatigueScore];
+        let scoreValues = [stressScore, symmetryScore, fatigueLeft, fatigueRight];
 
         function updateScoreCircles() {
             const circles = document.querySelectorAll('.score-circle');
@@ -1191,7 +1231,12 @@
                 yellow: "Your symmetry score suggests some imbalance between your left and right sides. This could be due to muscle imbalances, fatigue, or slight inefficiencies in your stride. While not a major concern yet, it’s worth paying attention to any discomfort or overuse on one side. Strengthening weaker muscles, focusing on even foot strikes, and incorporating single-leg exercises may help improve your balance over time.",
                 red: "Significant asymmetry detected! A major imbalance in your running form could lead to uneven stress on your joints and muscles, increasing the risk of injury. Possible causes include past injuries, muscle weaknesses, or poor movement patterns. Consider consulting a specialist or incorporating targeted strength and mobility work to correct imbalances and enhance your running efficiency."
             },
-            fatigue: {
+            fatigueLeft: {
+                green: "Your fatigue levels are low, meaning your feet are handling the demands of your run well. This suggests that your muscles and biomechanics are efficiently managing workload without excessive strain. Keep up your current training routine and recovery practices to maintain endurance and prevent overuse injuries.",
+                yellow: "Moderate fatigue detected. This means your feet are starting to show signs of stress, which could lead to decreased efficiency and increased risk of discomfort over longer distances. Consider incorporating proper warm-ups, strength training, and post-run recovery techniques like stretching or massage to help manage fatigue and sustain performance.",
+                red: "High fatigue levels detected! Your feet are likely experiencing significant strain, which could negatively impact your running form and increase injury risk. This may be due to overtraining, insufficient recovery, or inefficient biomechanics. It’s a good idea to assess your training load, prioritize rest, and focus on strengthening your feet and lower legs to improve endurance and reduce strain over time."
+            },
+            fatigueRight: {
                 green: "Your fatigue levels are low, meaning your feet are handling the demands of your run well. This suggests that your muscles and biomechanics are efficiently managing workload without excessive strain. Keep up your current training routine and recovery practices to maintain endurance and prevent overuse injuries.",
                 yellow: "Moderate fatigue detected. This means your feet are starting to show signs of stress, which could lead to decreased efficiency and increased risk of discomfort over longer distances. Consider incorporating proper warm-ups, strength training, and post-run recovery techniques like stretching or massage to help manage fatigue and sustain performance.",
                 red: "High fatigue levels detected! Your feet are likely experiencing significant strain, which could negatively impact your running form and increase injury risk. This may be due to overtraining, insufficient recovery, or inefficient biomechanics. It’s a good idea to assess your training load, prioritize rest, and focus on strengthening your feet and lower legs to improve endurance and reduce strain over time."
@@ -1212,8 +1257,10 @@
                     category = "stress";
                 } else if (scoreCircle.classList.contains('symmetry')) {
                     category = "symmetry";
-                } else if (scoreCircle.classList.contains('fatigue')) {
-                    category = "fatigue";
+                } else if (scoreCircle.classList.contains('fatigue-left')) {
+                    category = "fatigueLeft";
+                } else if (scoreCircle.classList.contains('fatigue-right')) {
+                    category = "fatigueRight";
                 }
                 
                 // Toggle the details box visibility and update button text
@@ -1221,7 +1268,7 @@
                     // Show details and update the button label to "Close ^"
                     detailsBox.textContent = responses[category][scoreColor];
                     detailsBox.style.display = 'block';
-                    this.textContent = "Close ^";
+                    this.textContent = "Close";
                 } else {
                     // Hide details and revert button text to "Details"
                     detailsBox.style.display = 'none';
@@ -1234,8 +1281,9 @@
         function testScoreInput() {
             let newStress = prompt("Enter Stress score (0-100):", stressScore);
             let newSymmetry = prompt("Enter Symmetry score (0-100):", symmetryScore);
-            let newFatigue = prompt("Enter Fatigue score (0-100):", fatigueScore);
-            scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigue)];
+            let newFatigueLeft = prompt("Enter Fatigue (Left) score (0-100):", fatigueLeft);
+            let newFatigueRight = prompt("Enter Fatigue score (Right) (0-100):", fatigueRight);
+            scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigueLeft), Number(newFatigueRight)];
             
             // Store the run scores in localStorage so they persist.
             localStorage.setItem('runScores', JSON.stringify(scoreValues));
