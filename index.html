@@ -543,8 +543,8 @@
 
     // Load images dynamically
     window.onload = () => {
-        fetchLatestImage('symmetry-static', 'symmetry_score_visualization');
-        fetchLatestImage('symmetry-dynamic', 'dynamic_symmetry_score_visualization');
+        fetchLatestImage('symmetry-section', 'symmetry_section');
+        fetchLatestImage('symmetry-gradient', 'symmetry_gradient');
     };
 </script>
 
@@ -554,7 +554,7 @@
         <!-- Symmetry Section -->
         <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
             <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-            <img id="symmetry-static" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_score_visualization.png" alt="Symmetry Score Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+            <img id="symmetry-section" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_section.png" alt="Symmetry Section" style="max-width: 100%; height: auto; border-radius: 8px;">
         </div>
         <!-- Fatigue Section -->
         <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
@@ -573,15 +573,15 @@
     </div>
 </div>
 
-<!-- Gra View -->
+<!-- Gradient View -->
 <div id="gradient-view" style="display: none;">
     <div style="display: flex; justify-content: space-between; gap: 20px;">
-        <!-- Dynamic Symmetry Section -->
+        <!-- Symmetry Section -->
         <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
             <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-            <img id="symmetry-dynamic" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/dynamic_symmetry_score_visualization.png" alt="Dynamic Symmetry Visualization" style="max-width: 100%; height: auto; border-radius: 8px;">
+            <img id="symmetry-gradient" src="https://raw.githubusercontent.com/jakewang21/srdesign/main/symmetry_gradient.png" alt="Symmetry Gradient" style="max-width: 100%; height: auto; border-radius: 8px;">
         </div>
-        <!-- Dynamic Fatigue Section -->
+        <!-- Fatigue Section -->
         <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
             <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
@@ -639,6 +639,8 @@
         }
     }
 </script>
+</div>
+
 
 <!-- GAIT MECH tab ------------------------------------------------------------------- -->
 <div id="gait-mechanics" class="content">    
