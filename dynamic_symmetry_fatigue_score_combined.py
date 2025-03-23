@@ -93,7 +93,7 @@ ax_rbf.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", l
 ax_rbf.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
 ax_rbf.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
 ax_rbf.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
-ax_rbf.set_title("Pressure Mapping (RBF Interpolation)")
+ax_rbf.set_title("Pressure Mapping (Gradient View)")
 ax_rbf.legend()
 cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
 cbar_rbf.set_label('Pressure Value (Normalized)')
@@ -108,13 +108,57 @@ ax_grid.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", 
 ax_grid.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
 ax_grid.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
 ax_grid.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
-ax_grid.set_title("Pressure Mapping (GridData Nearest Interpolation)")
+ax_grid.set_title("Pressure Mapping (Section View)")
 ax_grid.legend()
 cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
 cbar_grid.set_label('Pressure Value (Normalized)')
 grid_output_file = "symmetry_section.png"
 fig_grid.savefig(grid_output_file, bbox_inches='tight')
 plt.close(fig_grid)
+
+# --- New workflow (Splitting pressure data into thirds) ---
+# Split the pressure data into thirds
+def split_into_thirds(data):
+    split_size = len(data) // 3
+    return data[:split_size], data[split_size:2*split_size], data[2*split_size:]
+
+# Split the pressure data
+pressure_first_third, pressure_second_third, pressure_third_third = split_into_thirds(avg_sensor_pressures)
+
+# Apply RBF interpolation for each third
+rbf_first = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], pressure_first_third, function='linear')
+pressure_first_third_rbf = rbf_first(X, Y)
+
+rbf_second = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], pressure_second_third, function='linear')
+pressure_second_third_rbf = rbf_second(X, Y)
+
+rbf_third = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], pressure_third_third, function='linear')
+pressure_third_third_rbf = rbf_third(X, Y)
+
+# Normalize the data for comparison
+normalized_first_third_rbf = normalize(pressure_first_third_rbf)
+normalized_second_third_rbf = normalize(pressure_second_third_rbf)
+normalized_third_third_rbf = normalize(pressure_third_third_rbf)
+
+# Save RBF plot for the first third
+fig_first_third_rbf, ax_first_third_rbf = plt.subplots(figsize=(8, 8))
+pressure_img_first_third_rbf = ax_first_third_rbf.imshow(normalized_first_third_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+ax_first_third_rbf.set_title("Pressure Mapping (First Third)")
+
+# Save RBF plot for the second third
+fig_second_third_rbf, ax_second_third_rbf = plt.subplots(figsize=(8, 8))
+pressure_img_second_third_rbf = ax_second_third_rbf.imshow(normalized_second_third_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+ax_second_third_rbf.set_title("Pressure Mapping (Second Third)")
+
+# Save RBF plot for the third third
+fig_third_third_rbf, ax_third_third_rbf = plt.subplots(figsize=(8, 8))
+pressure_img_third_third_rbf = ax_third_third_rbf.imshow(normalized_third_third_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
+ax_third_third_rbf.set_title("Pressure Mapping (Third Third)")
+
+# Save all figures for GitHub upload
+fig_first_third_rbf.savefig("pressure_first_third.png", bbox_inches='tight')
+fig_second_third_rbf.savefig("pressure_second_third.png", bbox_inches='tight')
+fig_third_third_rbf.savefig("pressure_third_third.png", bbox_inches='tight')
 
 # GitHub upload
 timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
@@ -128,6 +172,22 @@ with open(grid_output_file, "rb") as f:
     image_data_grid = f.read()
 repo.create_file(f"images/symmetry_section_{timestamp}.png", "Upload symmetry section mapping", image_data_grid, branch="main")
 
-print(f"RBF image uploaded to GitHub as symmetry_gradient_{timestamp}.png")
-print(f"GridData image uploaded to GitHub as symmetry_section_{timestamp}.png")
+with open("pressure_first_third.png", "rb") as f:
+    image_data_first_third = f.read()
+repo.create_file(f"images/pressure_first_third_{timestamp}.png", "Upload first third pressure mapping", image_data_first_third, branch="main")
+
+with open("pressure_second_third.png", "rb") as f:
+    image_data_second_third = f.read()
+repo.create_file(f"images/pressure_second_third_{timestamp}.png", "Upload second third pressure mapping", image_data_second_third, branch="main")
+
+with open("pressure_third_third.png", "rb") as f:
+    image_data_third_third = f.read()
+repo.create_file(f"images/pressure_third_third_{timestamp}.png", "Upload third third pressure mapping", image_data_third_third, branch="main")
+
+print(f"First third image uploaded to GitHub as pressure_first_third_{timestamp}.png")
+print(f"Second third image uploaded to GitHub as pressure_second_third_{timestamp}.png")
+print(f"Third third image uploaded to GitHub as pressure_third_third_{timestamp}.png")
+
+print(f"Gradient image uploaded to GitHub as symmetry_gradient_{timestamp}.png")
+print(f"Section image uploaded to GitHub as symmetry_section_{timestamp}.png")
 
