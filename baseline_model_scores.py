@@ -36,8 +36,8 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     L_Midfoot = data[['Sensor_15', 'Sensor_16', 'Sensor_17', 'Sensor_18']].sum(axis=1).values
     L_Forefoot = data[['Sensor_19', 'Sensor_20', 'Sensor_21', 'Sensor_22']].sum(axis=1).values
     
-    R_Total = data['R_Heel'].values + data['R_Midfoot'].values + data['R_Forefoot'].values
-    L_Total = data['L_Heel'].values + data['L_Midfoot'].values + data['L_Forefoot'].values
+    R_Total = R_Heel + R_Midfoot + R_Forefoot
+    L_Total = L_Heel + L_Midfoot + L_Forefoot
     total_time = time[-1] - time[0]
 
     # Refined Fatigue Calculation
