@@ -141,46 +141,6 @@ def generate_plots(pressure_values, method, output_prefix):
     ax_rbf.legend()
     cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
     cbar_rbf.set_label('Pressure Value (Normalized)')
-    rbf_output_file = f"{output_prefix}_rbf.png"
-    fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
-    plt.close(fig_rbf)
-
-    # Save GridData plot
-    fig_grid, ax_grid = plt.subplots(figsize=(8, 8))
-    pressure_img_grid = ax_grid.imshow(normalized_pressure_grid, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
-    ax_grid.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
-    ax_grid.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
-    ax_grid.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
-    ax_grid.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
-    ax_grid.set_title(f"Pressure Mapping (Section View) - {output_prefix}")
-    ax_grid.legend()
-    cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
-    cbar_grid.set_label('Pressure Value (Normalized)')
-    grid_output_file = f"{output_prefix}_grid.png"
-    fig_grid.savefig(grid_output_file, bbox_inches='tight')
-    plt.close(fig_grid)
-
-# Generate and save the plots with the new naming scheme
-def generate_plots(pressure_values, method, output_prefix):
-    # Interpolate pressure data using RBF and GridData
-    interpolated_pressure_rbf = interpolate_pressure_data(pressure_values, method='rbf')
-    interpolated_pressure_grid = interpolate_pressure_data(pressure_values, method='griddata')
-    
-    # Normalize the pressure data
-    normalized_pressure_rbf = normalize(interpolated_pressure_rbf)
-    normalized_pressure_grid = normalize(interpolated_pressure_grid)
-    
-    # Save RBF plot
-    fig_rbf, ax_rbf = plt.subplots(figsize=(8, 8))
-    pressure_img_rbf = ax_rbf.imshow(normalized_pressure_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
-    ax_rbf.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="red", lw=2, label="Right Foot")
-    ax_rbf.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="blue", lw=2, label="Left Foot")
-    ax_rbf.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=100)
-    ax_rbf.scatter(0, 0, color="green", s=150, marker="x", label="Origin")
-    ax_rbf.set_title(f"Pressure Mapping (Gradient View) - {output_prefix}")
-    ax_rbf.legend()
-    cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
-    cbar_rbf.set_label('Pressure Value (Normalized)')
     
     # Save the plot with _gradient suffix
     rbf_output_file = f"{output_prefix}_gradient.png"
