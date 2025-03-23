@@ -9,7 +9,8 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
-from scipy.integrate import trapz
+#from scipy.integrate import trapz
+from numpy import trapz
 
 def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     """
