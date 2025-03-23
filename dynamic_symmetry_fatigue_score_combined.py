@@ -122,11 +122,12 @@ timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
 # Upload to GitHub
 with open(rbf_output_file, "rb") as f:
     image_data_rbf = f.read()
-repo.create_file(f"images/symmetry_gradrient_{timestamp}.png", "Upload symmetry gradient mapping", image_data_rbf, branch="main")
+repo.create_file(f"images/symmetry_gradient_{timestamp}.png", "Upload symmetry gradient mapping", image_data_rbf, branch="main")
 
 with open(grid_output_file, "rb") as f:
     image_data_grid = f.read()
 repo.create_file(f"images/symmetry_section_{timestamp}.png", "Upload symmetry section mapping", image_data_grid, branch="main")
 
-print(f"RBF image uploaded to GitHub as pressure_mapping_rbf_{timestamp}.png")
-print(f"GridData image uploaded to GitHub as pressure_mapping_griddata_{timestamp}.png")
+print(f"RBF image uploaded to GitHub as symmetry_gradient_{timestamp}.png")
+print(f"GridData image uploaded to GitHub as symmetry_section_{timestamp}.png")
+
