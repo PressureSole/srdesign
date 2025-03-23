@@ -120,7 +120,6 @@ thirds = [
     (timestamps[0] + 2 * third_duration, timestamps[-1])  # Third third
 ]
 
-# Generate and save the plots for the entire dataset and for each third of the run
 def generate_plots(pressure_values, method, output_prefix):
     # Interpolate pressure data using RBF and GridData
     interpolated_pressure_rbf = interpolate_pressure_data(pressure_values, method='rbf')
@@ -144,6 +143,7 @@ def generate_plots(pressure_values, method, output_prefix):
     
     # Save the plot with _gradient suffix
     rbf_output_file = f"{output_prefix}_gradient.png"
+    print(f"Saving plot as {rbf_output_file}")
     fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
     plt.close(fig_rbf)
 
@@ -161,8 +161,10 @@ def generate_plots(pressure_values, method, output_prefix):
     
     # Save the plot with _section suffix
     grid_output_file = f"{output_prefix}_section.png"
+    print(f"Saving plot as {grid_output_file}")
     fig_grid.savefig(grid_output_file, bbox_inches='tight')
     plt.close(fig_grid)
+
 
 # Generate plots for the full dataset with the new naming scheme
 full_data = np.mean(sensor_pressures, axis=1)
