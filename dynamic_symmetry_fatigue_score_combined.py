@@ -215,6 +215,8 @@ for i, (start_time, end_time) in enumerate(thirds):
     generate_plots(pressure_values, method='rbf', output_prefix=f"fatigue{i+1}_gradient")
     generate_plots(pressure_values, method='griddata', output_prefix=f"fatigue{i+1}_section")
 
+# GitHub upload
+timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
 
 # For the full dataset images (RBF and GridData)
 with open("symmetry_gradient.png", "rb") as f:
