@@ -31,3 +31,5 @@ jobs:
         with:
           message: "Auto-update score file"
           add: "scores"
+          force: true
+
