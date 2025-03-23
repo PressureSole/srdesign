@@ -159,14 +159,13 @@ def generate_plots(pressure_values, method, output_prefix):
     cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
     cbar_grid.set_label('Pressure Value (Normalized)')
     
-    # Save the plot with _section suffix
-    grid_output_file = f"{output_prefix}_section.png"
+    # Save the plot
+    grid_output_file = f"{output_prefix}.png"
     print(f"Saving plot as {grid_output_file}")
     fig_grid.savefig(grid_output_file, bbox_inches='tight')
     plt.close(fig_grid)
 
 
-# Generate and save the plots with the correct naming scheme
 # Full dataset plots
 full_data = np.mean(sensor_pressures, axis=1)
 
