@@ -1,7 +1,12 @@
 name: Run Visualization Update
 
 on:
-  workflow_dispatch:  # Allows manual triggering via API
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Run Type'
+        required: true
+        default: 'visualization'
 
 jobs:
   update_visualizations:
