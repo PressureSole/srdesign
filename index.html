@@ -565,11 +565,25 @@
     </div>
 
     <script>
-        // Helper function to format the timestamp to a readable format
-        function formatTimestamp(timestamp) {
-            const date = new Date(timestamp);
-            return date.toLocaleString(); // Formats date and time in a readable way
+        function formatTimestamp(filename) {
+            // Extract the timestamp part from the filename
+            const timestampMatch = filename.match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+            
+            if (!timestampMatch) {
+                return "Invalid timestamp format";
+            }
+            
+            // Destructure the matched groups
+            const [, year, month, day, hours, minutes, seconds] = timestampMatch;
+            
+            // Create a Date object 
+            // Note: Month is 0-indexed in JavaScript Date, so subtract 1 from month
+            const date = new Date(year, month - 1, day, hours, minutes, seconds);
+            
+            // Use toLocaleString for local formatting
+            return date.toLocaleString();
         }
+        
 
         // Fetch the latest image based on the prefix and category
         async function fetchImagesByCategory() {
