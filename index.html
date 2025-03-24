@@ -512,8 +512,8 @@
 >>>>>>> a941849e38387b1ec1b5565716114cb65622b769
     </div>
     -->
-
-<!-- DATA tab -->
+    
+<!--data tab-->
 <div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
     <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
 
@@ -521,9 +521,6 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <button id="switch-view-btn" onclick="switchView()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">
             Switch to Gradient View
-        </button>
-        <button id="update-visuals-btn" onclick="triggerGitHubAction()" style="padding: 10px 20px; background-color: #e76f51; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-            Update Visualizations
         </button>
     </div>
 
@@ -578,6 +575,8 @@
                     return;
                 }
                 const files = await response.json();
+                console.log(files);  // Log the response for debugging
+
                 const filteredFiles = files
                     .filter(file => file.name.startsWith(category))
                     .sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
@@ -589,6 +588,8 @@
                     // Display timestamp near the image
                     const timestamp = filteredFiles[0].commit.committer.date;
                     document.getElementById(sectionId + "-timestamp").textContent = "Last updated: " + formatTimestamp(timestamp);
+                } else {
+                    console.log('No images found for category:', category);
                 }
             } catch (error) {
                 console.error('Error fetching images:', error);
@@ -627,38 +628,13 @@
             }
         }
 
-        // Trigger GitHub action (without needing to pass the token explicitly)
-        async function triggerGitHubAction() {
-            const username = 'PressureSole';
-            const repo = 'srdesign';
-            const workflow = 'run_script.yml';
-            const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflow}/dispatches`;
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.EUGENIA_TOKEN}`, // Use your new token here
-                },
-                body: JSON.stringify({ ref: "main" }),  // This specifies which branch to trigger on
-            });
-
-            if (response.ok) {
-                alert("GitHub Action triggered successfully!");
-            } else {
-                const errorData = await response.json();
-                console.error('Error triggering GitHub Action:', errorData);
-                alert("Error triggering GitHub Action: " + errorData.message);
-            }
-        }
-
-
-
         // Load images on page load
         window.onload = loadImages;
     </script>
 </div>
+
+
+
 
 
 
@@ -1045,14 +1021,6 @@
                         <h3>Why did you choose to use 11 sensors instead of more?</h3>
                         <div class="faq-answer">Through extensive research, we found that 11 strategically placed sensors provide a strong balance between accuracy and cost reduction. This keeps the product affordable without sacrificing meaningful data.</div>
                     </div>
-                    <div class="faq-box">
-                        <h3>Is PressureSole only for runners or can others use it? </h3>
-                        <div class="faq-answer">While the primary focus is on amateur runners, PressureSole can be useful for anyone looking to recieve feedback on their risk for injury, including athletes in other sports or individuals undergoing physical therapy.</div>
-                    </div>
-                    <div class="faq-box">
-                        <h3>Question 3</h3>
-                        <div class="faq-answer">Answer 3</div>
-                    </div>
                 </div>
                 <div class="faq-column-right">
                     <div class="faq-box">
@@ -1060,20 +1028,12 @@
                         <div class="faq-answer">PressureSole achieves approximately 80% accuracy when compared to industry-standard devices like the Loadsol, which is sufficient for amateur runners to receive actionable feedback at a much lower cost.</div>
                     </div>
                     <div class="faq-box">
-                        <h3>Question 4</h3>
-                        <div class="faq-answer">Answer 4</div>
+                        <h3>Is PressureSole only for runners or can others use it? </h3>
+                        <div class="faq-answer">While the primary focus is on amateur runners, PressureSole can be useful for anyone looking to recieve feedback on their risk for injury, including athletes in other sports or individuals undergoing physical therapy.</div>
                     </div>
                     <div class="faq-box">
-                        <h3>Question 5</h3>
-                        <div class="faq-answer">Answer 5</div>
-                    </div>
-                    <div class="faq-box">
-                        <h3>Question 6</h3>
-                        <div class="faq-answer">Answer 6</div>
-                    </div>
-                    <div class="faq-box">
-                        <h3>Question 7</h3>
-                        <div class="faq-answer">Answer 7</div>
+                        <h3>How is data transmitted from the insole to the web app? </h3>
+                        <div class="faq-answer">Pressure data is collected via the embedded sensors and transmitted wirelessly to the web app through a Bluetooth-enabled PCB, where it is processed and displayed in real time.</div>
                     </div>
                 </div>
             </div>
