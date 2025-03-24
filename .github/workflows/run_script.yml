@@ -22,19 +22,16 @@ jobs:
 
       - name: Run Python Script
         env:
-          GITHUB_TOKEN: ${{ secrets.EUG_SECRET }}  # Use your secret if needed here
+          GITHUB_TOKEN: ${{ secrets.EUG_SECRET }}  # Use your PAT if required for API access
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
 
-      - name: Fetch Latest Changes from Remote Repository
-        run: |
-          git fetch origin main  # Fetches the latest changes from the remote main branch
-          git reset --hard origin/main  # Resets local state to match the remote main branch
-
       - name: Commit and Push Changes
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Auto-update visualizations" || echo "No changes to commit"
-          # Push using the PAT stored in EUG_SECRET
-          git push https://x-access-token:${{ secrets.EUG_SECRET }}@github.com/PressureSole/srdesign.git
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: "github-actions[bot]"
+          author_email: "actions@github.com"
+          message: "Auto-update visualizations"
+          add: "."
+          push: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.EUG_SECRET }}  # Use your PAT to push changes
