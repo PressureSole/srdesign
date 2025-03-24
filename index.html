@@ -513,7 +513,6 @@
     </div>
     -->
 
-<!-- DATA tab ----------------------------------------------------------------------- -->
 <!-- DATA tab -->
 <div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
     <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
@@ -571,7 +570,7 @@
 
         // Fetch the latest image based on the prefix and category
         async function fetchLatestImage(sectionId, category) {
-            const repoUrl = 'https://api.github.com/repos/jakewang21/srdesign/contents/images';
+            const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/images';
             try {
                 const response = await fetch(repoUrl);
                 if (!response.ok) {
@@ -584,7 +583,7 @@
                     .sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
 
                 if (filteredFiles.length > 0) {
-                    const latestImageUrl = `https://raw.githubusercontent.com/jakewang21/srdesign/main/images/${filteredFiles[0].name}`;
+                    const latestImageUrl = `https://raw.githubusercontent.com/PressureSole/srdesign/main/images/${filteredFiles[0].name}`;
                     document.getElementById(sectionId).src = latestImageUrl;
 
                     // Display timestamp near the image
@@ -640,7 +639,7 @@
                 headers: {
                     'Accept': 'application/vnd.github.v3+json',
                     'Content-Type': 'application/json',
-                    // No need for token here; GitHub Actions will authenticate the request automatically
+                    'Authorization': `Bearer ${process.env.EUGENIA_TOKEN}`, // Use your new token here
                 },
                 body: JSON.stringify({ ref: "main" }),  // This specifies which branch to trigger on
             });
@@ -653,6 +652,7 @@
                 alert("Error triggering GitHub Action: " + errorData.message);
             }
         }
+
 
 
         // Load images on page load
