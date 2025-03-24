@@ -14,7 +14,11 @@ GITHUB_TOKEN = os.getenv('EK_TOKEN')  # Set the GitHub Personal Access Token as 
 REPO_NAME = "PressureSole/srdesign"
 g = Github(GITHUB_TOKEN)
 repo = g.get_repo(REPO_NAME)
-
+# Make sure the token has access to the PressureSole organization
+g = Github(os.getenv("GITHUB_TOKEN"))
+# Correctly reference the repo under the organization
+repo = g.get_repo("PressureSole/srdesign")
+print(repo.full_name)  # Add this to check if you're connecting to the correct repo
 # Load the Excel file (uploaded from the website)
 filename = "Copy of test_lab shortening.xlsx"  # Adjust this path based on the uploaded file
 
