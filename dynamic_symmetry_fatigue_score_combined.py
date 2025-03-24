@@ -171,13 +171,13 @@ def generate_plots(pressure_values, method, output_prefix):
 full_data = np.mean(sensor_pressures, axis=1)
 
 # Symmetry plots
-generate_plots(full_data, method='rbf', output_prefix='symmetry_gradient')
 generate_plots(full_data, method='griddata', output_prefix='symmetry_section')
+generate_plots(full_data, method='rbf', output_prefix='symmetry_gradient')
 
 # Generate plots for each third of the dataset
 for i, (start_time, end_time) in enumerate(thirds):
     pressure_values = get_pressure_data_for_third(start_time, end_time)
-    
+    print(f"Third {i+1}: {pressure_values}")
     # Fatigue plots
     generate_plots(pressure_values, method='rbf', output_prefix=f"fatigue{i+1}_gradient")
     generate_plots(pressure_values, method='griddata', output_prefix=f"fatigue{i+1}_section")
