@@ -11,7 +11,7 @@ from io import BytesIO
 
 # GitHub repository and token
 GITHUB_TOKEN = os.getenv('EK_TOKEN')  # Set the GitHub Personal Access Token as an environment variable
-REPO_NAME = "jakewang21/srdesign"
+REPO_NAME = "PressureSole/srdesign"
 g = Github(GITHUB_TOKEN)
 repo = g.get_repo(REPO_NAME)
 
