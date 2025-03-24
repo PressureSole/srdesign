@@ -26,7 +26,7 @@ jobs:
 
       - name: Run Python Script
         env:
-          GITHUB_TOKEN: ${{ secrets.EK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.EUGENIA_TOKEN }}
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
 
       - name: Pull Latest Changes from Remote
@@ -39,4 +39,4 @@ jobs:
           git config --global user.email "actions@github.com"
           git add .
           git commit -m "Auto-update visualizations" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.EK_TOKEN }}@github.com/PressureSole/srdesign.git main
+          git push https://x-access-token:${{ secrets.EUGENIA_TOKEN }}@github.com/PressureSole/srdesign.git main
