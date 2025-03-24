@@ -68,14 +68,14 @@ l_foot_path = create_foot_path(left_foot_outline[:, 0], left_foot_outline[:, 1])
 avg_sensor_pressures = np.mean(sensor_pressures, axis=1)
 
 # --- RBF Interpolation ---
-#rbf_interpolator = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='linear')
-#pressure_data_rbf = rbf_interpolator(X, Y)
+rbf_interpolator = Rbf(sensor_coords[:, 0], sensor_coords[:, 1], avg_sensor_pressures, function='linear')
+pressure_data_rbf = rbf_interpolator(X, Y)
 
 # --- GridData Interpolation ---
-#points = sensor_coords
-#values = avg_sensor_pressures
-#grid_points = np.column_stack([X.flatten(), Y.flatten()])
-#pressure_data_grid = griddata(points, values, grid_points, method='nearest').reshape(X.shape)
+points = sensor_coords
+values = avg_sensor_pressures
+grid_points = np.column_stack([X.flatten(), Y.flatten()])
+pressure_data_grid = griddata(points, values, grid_points, method='nearest').reshape(X.shape)
 
 # Mask points inside foot outlines
 inside_right = r_foot_path.contains_points(grid_points).reshape(X.shape)
