@@ -140,12 +140,7 @@ def generate_plots(pressure_values, method, output_prefix):
     ax_rbf.legend()
     cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
     cbar_rbf.set_label('Pressure Value (Normalized)')
-    
-    # Save the plot with _gradient suffix
-    rbf_output_file = f"{output_prefix}_gradient.png"
-    print(f"Saving plot as {rbf_output_file}")
-    fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
-    plt.close(fig_rbf)
+
 
     # Save GridData plot (Section)
     fig_grid, ax_grid = plt.subplots(figsize=(8, 8))
