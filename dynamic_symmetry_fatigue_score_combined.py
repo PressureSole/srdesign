@@ -221,15 +221,3 @@ with open("fatigue3_section.png", "rb") as f:
     image_data_third_third_grid = f.read()
 repo.create_file(f"images/fatigue3_section_{timestamp}.png", "Upload third third section mapping", image_data_third_third_grid, branch="main")
 
-# Confirm uploads
-print(f"Full dataset gradient image uploaded as symmetry_gradient_{timestamp}.png")
-print(f"Full dataset section image uploaded as symmetry_section_{timestamp}.png")
-
-print(f"First third gradient image uploaded as fatigue1_gradient_{timestamp}.png")
-print(f"First third section image uploaded as fatigue1_section_{timestamp}.png")
-
-print(f"Second third gradient image uploaded as fatigue2_gradient_{timestamp}.png")
-print(f"Second third section image uploaded as fatigue2_section_{timestamp}.png")
-
-print(f"Third third gradient image uploaded as fatigue3_gradient_{timestamp}.png")
-print(f"Third third section image uploaded as fatigue3_section_{timestamp}.png")
