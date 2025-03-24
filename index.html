@@ -528,15 +528,18 @@
     <div id="section-view" style="display: block;">
         <div style="display: flex; justify-content: space-between; gap: 20px;">
             <!-- Symmetry Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <div id="symmetry-section" style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
                 <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-                <img id="symmetry-section" src="" alt="Symmetry Section" style="max-width: 100%; height: auto; border-radius: 8px;">
-                <p id="symmetry-timestamp" style="color: #333;"></p>
+                <div id="symmetry-images" style="text-align: center;">
+                    <!-- Symmetry images will be inserted here -->
+                </div>
             </div>
             <!-- Fatigue Section -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <div id="fatigue-section" style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
                 <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;" id="fatigue-section-images"></div>
+                <div id="fatigue-images" style="text-align: center;">
+                    <!-- Fatigue images will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
@@ -545,15 +548,18 @@
     <div id="gradient-view" style="display: none;">
         <div style="display: flex; justify-content: space-between; gap: 20px;">
             <!-- Symmetry Gradient -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <div id="symmetry-gradient" style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
                 <h2 style="color: #2a9d8f; border-bottom: 2px solid #2a9d8f; padding-bottom: 10px;">Symmetry</h2>
-                <img id="symmetry-gradient" src="" alt="Symmetry Gradient" style="max-width: 100%; height: auto; border-radius: 8px;">
-                <p id="symmetry-gradient-timestamp" style="color: #333;"></p>
+                <div id="symmetry-gradient-images" style="text-align: center;">
+                    <!-- Symmetry gradient images will be inserted here -->
+                </div>
             </div>
             <!-- Fatigue Gradient -->
-            <div style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+            <div id="fatigue-gradient" style="flex: 1; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
                 <h2 style="color: #e76f51; border-bottom: 2px solid #e76f51; padding-bottom: 10px;">Fatigue</h2>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;" id="fatigue-gradient-images"></div>
+                <div id="fatigue-gradient-images" style="text-align: center;">
+                    <!-- Fatigue gradient images will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
@@ -566,7 +572,7 @@
         }
 
         // Fetch the latest image based on the prefix and category
-        async function fetchLatestImage(sectionId, category) {
+        async function fetchImagesByCategory() {
             const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/images';
             try {
                 const response = await fetch(repoUrl);
@@ -575,40 +581,81 @@
                     return;
                 }
                 const files = await response.json();
-                console.log(files);  // Log the response for debugging
 
-                const filteredFiles = files
-                    .filter(file => file.name.startsWith(category))
-                    .sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
+                // First, categorize images into symmetry and fatigue
+                const symmetryImages = files.filter(file => file.name.includes('symmetry'));
+                const fatigueImages = files.filter(file => file.name.includes('fatigue'));
 
-                if (filteredFiles.length > 0) {
-                    const latestImageUrl = `https://raw.githubusercontent.com/PressureSole/srdesign/main/images/${filteredFiles[0].name}`;
-                    document.getElementById(sectionId).src = latestImageUrl;
+                // Then, sort the images chronologically within each category by the timestamp
+                const sortedSymmetryImages = sortImagesByTimestamp(symmetryImages);
+                const sortedFatigueImages = sortImagesByTimestamp(fatigueImages);
 
-                    // Display timestamp near the image
-                    const timestamp = filteredFiles[0].commit.committer.date;
-                    document.getElementById(sectionId + "-timestamp").textContent = "Last updated: " + formatTimestamp(timestamp);
-                } else {
-                    console.log('No images found for category:', category);
-                }
+                // Separate into section and gradient categories for each image group
+                const symmetrySectionImages = filterImagesByType(sortedSymmetryImages, 'section');
+                const symmetryGradientImages = filterImagesByType(sortedSymmetryImages, 'gradient');
+                const fatigueSectionImages = filterImagesByType(sortedFatigueImages, 'section');
+                const fatigueGradientImages = filterImagesByType(sortedFatigueImages, 'gradient');
+
+                // Insert images into the correct sections (Section View)
+                insertImagesIntoSection(symmetrySectionImages, 'symmetry-images');
+                insertImagesIntoSection(fatigueSectionImages, 'fatigue-images');
+
+                // Insert images into the correct sections (Gradient View)
+                insertImagesIntoSection(symmetryGradientImages, 'symmetry-gradient-images');
+                insertImagesIntoSection(fatigueGradientImages, 'fatigue-gradient-images');
+
             } catch (error) {
                 console.error('Error fetching images:', error);
             }
         }
 
-        // Fetch images for section and gradient view
-        async function loadImages() {
-            // Section View
-            fetchLatestImage('symmetry-section', 'symmetry_section');
-            fetchLatestImage('fatigue-section-images', 'fatigue1_section');
-            fetchLatestImage('fatigue-section-images', 'fatigue2_section');
-            fetchLatestImage('fatigue-section-images', 'fatigue3_section');
+        // Helper function to sort images by timestamp extracted from the filename
+        function sortImagesByTimestamp(images) {
+            return images.sort((a, b) => {
+                // Extract timestamp from filename (e.g., 'fatigue1_gradient_20250323204223.png')
+                const timestampA = a.name.match(/(\d{14})/);
+                const timestampB = b.name.match(/(\d{14})/);
+                if (timestampA && timestampB) {
+                    return timestampA[1] < timestampB[1] ? -1 : 1;
+                }
+                return 0;
+            });
+        }
 
-            // Gradient View
-            fetchLatestImage('symmetry-gradient', 'symmetry_gradient');
-            fetchLatestImage('fatigue-gradient-images', 'fatigue1_gradient');
-            fetchLatestImage('fatigue-gradient-images', 'fatigue2_gradient');
-            fetchLatestImage('fatigue-gradient-images', 'fatigue3_gradient');
+        // Helper function to filter images by type (section or gradient)
+        function filterImagesByType(images, type) {
+            return images.filter(image => image.name.includes(type));
+        }
+
+        // Helper function to insert images into the correct section
+        function insertImagesIntoSection(images, sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) {
+                console.error('Section with ID ' + sectionId + ' not found.');
+                return;
+            }
+            section.innerHTML = '';  // Clear existing images
+            images.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = `https://raw.githubusercontent.com/PressureSole/srdesign/main/${image.path}`;
+                imgElement.alt = image.name;
+                imgElement.style = 'max-width: 100%; height: auto; border-radius: 8px;';
+                section.appendChild(imgElement);
+
+                // Optionally display the timestamp next to the image
+                const timestamp = image.name.match(/(\d{14})/);
+                if (timestamp) {
+                    const timestampElement = document.createElement('p');
+                    timestampElement.textContent = "Timestamp: " + formatTimestamp(timestamp[0]);
+                    timestampElement.style = 'color: #333;';
+                    section.appendChild(timestampElement);
+                } else {
+                    const timestampElement = document.createElement('p');
+                    timestampElement.textContent = "Timestamp: Not available";
+                    timestampElement.style = 'color: red;';
+                    section.appendChild(timestampElement);
+                }
+            });
         }
 
         // Toggle between section and gradient views
@@ -626,15 +673,33 @@
                 dynamicView.style.display = "block";
                 button.innerHTML = "Switch to Section View";
             }
+
+            // Update images based on the view type after toggle
+            updateImagesForView();
         }
 
-        // Load images on page load
-        window.onload = loadImages;
+        // Update images based on the active view (section or gradient)
+        function updateImagesForView() {
+            const sectionImages = document.querySelectorAll('.section-img');
+            const gradientImages = document.querySelectorAll('.gradient-img');
+
+            const isSectionView = document.getElementById('section-view').style.display === "block";
+
+            // Show only section images when in section view
+            sectionImages.forEach(img => {
+                img.style.display = isSectionView ? 'block' : 'none';
+            });
+
+            // Show only gradient images when in gradient view
+            gradientImages.forEach(img => {
+                img.style.display = !isSectionView ? 'block' : 'none';
+            });
+        }
+
+        // Load images when the page loads
+        window.onload = fetchImagesByCategory;
     </script>
 </div>
-
-
-
 
 
 
