@@ -3,7 +3,7 @@ name: Run Visualization Update
 on:
   workflow_dispatch:  # Allows manual triggering via API
 
-permissions:  # 👈 Add this block here
+permissions:
   contents: write  # Allows pushing changes to the repository
   actions: read    # Allows reading actions
 
@@ -28,6 +28,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.EK_TOKEN }}
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
+
+      - name: Pull Latest Changes from Remote
+        run: |
+          git pull origin main
 
       - name: Commit and Push Changes
         run: |
