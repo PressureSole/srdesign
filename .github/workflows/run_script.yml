@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.EK_TOKEN }}  # Ensures checkout uses your token
 
       - name: Set Up Python
         uses: actions/setup-python@v4
@@ -24,7 +22,7 @@ jobs:
 
       - name: Run Python Script
         env:
-          EK_TOKEN: ${{ secrets.EK_TOKEN }}  
+          GITHUB_TOKEN: ${{ secrets.EK_TOKEN }}
         run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
 
       - name: Fetch Latest Changes from Remote Repository
@@ -40,4 +38,4 @@ jobs:
           git commit -m "Auto-update visualizations" || echo "No changes to commit"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.EK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
