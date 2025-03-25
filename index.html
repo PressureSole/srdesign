@@ -1162,6 +1162,66 @@
             }
         }
 
+        // Auto Score Load -----------------------------------------------------------------
+        async function loadScoresFromFile() {
+            try {
+                // URL for the contents of the "scores" folder in your GitHub repo
+                const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
+                const response = await fetch(repoUrl);
+                if (!response.ok) {
+                    console.error('Failed to fetch scores folder.');
+                    return;
+                }
+                const files = await response.json();
+                // Filter for files that follow the naming convention: scores_YYYYMMDD_HHMMSS.txt
+                const scoreFiles = files.filter(file => /^scores_\d{8}_\d{6}\.txt$/.test(file.name));
+                if (scoreFiles.length === 0) {
+                    console.error('No score files found.');
+                    return;
+                }
+                // Sort files descending (latest first) using the timestamp embedded in the filename
+                scoreFiles.sort((a, b) => {
+                    const timestampA = a.name.match(/scores_(\d{8}_\d{6})\.txt/)[1];
+                    const timestampB = b.name.match(/scores_(\d{8}_\d{6})\.txt/)[1];
+                    return timestampB.localeCompare(timestampA);
+                });
+                // Get the latest file
+                const latestFile = scoreFiles[0];
+                // Fetch its content using the provided download URL
+                const fileResponse = await fetch(latestFile.download_url);
+                if (!fileResponse.ok) {
+                    console.error('Failed to fetch the latest score file.');
+                    return;
+                }
+                const text = await fileResponse.text();
+                // Parse the file content (assuming lines like "Stress Score: 55.23")
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                let newScores = {};
+                lines.forEach(line => {
+                    const parts = line.split(':');
+                    if (parts.length >= 2) {
+                        const key = parts[0].trim();
+                        const value = parseFloat(parts[1].trim());
+                        newScores[key] = value;
+                    }
+                });
+                // Update the global scoreValues array in the expected order:
+                // [Stress Score, Symmetry Score, Fatigue Score (Left), Fatigue Score (Right)]
+                scoreValues = [
+                    newScores["Stress Score"] || 0,
+                    newScores["Symmetry Score"] || 0,
+                    newScores["Fatigue Score (Left)"] || 0,
+                    newScores["Fatigue Score (Right)"] || 0
+                ];
+                // Update your UI accordingly
+                updateScoreCircles();
+                updateHomeRunStats();
+                updateRunHistory();
+            } catch (error) {
+                console.error("Error loading scores:", error);
+            }
+        }
+
         // HOME Page -----------------------------------------------------------------------
         function updateHomeRunStats() {
             // Get the stat items from the home page.
@@ -1571,7 +1631,8 @@
                 document.getElementById('run-fatigue').innerText = fatigueVal;
             }
 
-            testScoreInput();
+            loadScoresFromFile();
+            //testScoreInput(); Comment out for until auto file load works
 
             // Check if run scores are already stored
             //const storedRunScores = localStorage.getItem('runScores');
