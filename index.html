@@ -724,7 +724,10 @@
     <!-- Cadence Section -->
     <section id="cadence">
         <h2>Cadence</h2>
-        <p>The number of steps taken per unit of time, usually expressed in steps per minute</p>
+        <button onclick="toggleDetails('cadence-details')">Details</button>
+        <p id="cadence-details" class="details" style="display:none;">
+            The number of steps taken per unit of time, expressed in steps per minute. A good running cadence typically falls around 170-180 steps per minute (SPM) for most runners. A cadence lower than 160 SPM often indicates overstriding, which can increase impact forces and elevate the risk of injuries such as shin splints or knee pain. Conversely, a cadence significantly higher than 190 SPM may suggest a short, inefficient stride that can lead to excessive muscular fatigue. To improve cadence, runners can focus on strength training, especially targeting the core, glutes, and hip flexors to improve stability and control. Incorporating dynamic stretching and mobility work can help improve flexibility and range of motion, allowing for a more efficient stride. Doing short intervals at a higher cadence can also help runners safely reach and maintain an optimal cadence.
+        </p>
         <div class="graph-container">
             <!-- Insert graph here -->
         </div>
@@ -733,21 +736,28 @@
     <!-- Ground Contact Time Section -->
     <section id="stance-time">
         <h2>Stance Time</h2>
-        <p>The duration for which a foot remains in contact with the ground during a gait cycle</p>
+        <button onclick="toggleDetails('stance-details')">Details</button>
+        <p id="stance-details" class="details" style="display:none;">
+            The duration for which a foot remains in contact with the ground during a gait cycle. Stance time, the amount of time a foot stays in contact with the ground during running, is typically around 200-300 milliseconds for most runners. A longer stance time (above 300 ms) often indicates inefficient mechanics, such as overstriding or weak push-off, which can increase the risk of injuries like plantar fasciitis or Achilles tendinopathy. On the other hand, a very short stance time (below 200 ms) may suggest insufficient shock absorption, leading to increased stress on the joints and muscles. To improve stance time, runners can work on strength training, particularly focusing on the glutes, calves, and hamstrings to generate a stronger, more efficient push-off. Incorporating plyometric exercises and single-leg balance drills can enhance foot strength and neuromuscular coordination. Additionally, practicing running drills that promote a quick, light foot strike, such as high knees and quick cadence strides, can help reduce stance time and improve running efficiency.
+        </p>
         <div class="graph-container">
             <!-- Insert graph here -->
         </div>
     </section>
     
-    <!-- Supination/Pronation section -->
+    <!-- Supination/Pronation Section -->
     <section id="supination/pronation">
         <h2>Supination/Pronation</h2>
-        <p>If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. If you seee the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.</p>
+        <button onclick="toggleDetails('supination-details')">Details</button>
+        <p id="supination-details" class="details" style="display:none;">
+            If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
+            If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.
+            overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury. 
+        </p>
         <div class="graph-container">
             <!-- Insert graph here -->
         </div>
     </section>
-    
 </div>
 
 <style>
@@ -757,9 +767,41 @@
         background-color: #f0f0f0; /* Placeholder background */
         margin: 10px 0;
     }
+    
+    button {
+        margin-top: 5px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .details {
+        margin-top: 10px;
+        background-color: #f9f9f9;
+        padding: 8px;
+        border-left: 4px solid #007BFF;
+        border-radius: 4px;
+    }
 </style>
 
-
+<script>
+    function toggleDetails(id) {
+        var element = document.getElementById(id);
+        if (element.style.display === "none") {
+            element.style.display = "block";
+        } else {
+            element.style.display = "none";
+        }
+    }
+</script>
     <!-- SCORES tab ------------------------------------------------------------- -->
     <div id="scores" class="content">
         <h1>Scores</h1>
