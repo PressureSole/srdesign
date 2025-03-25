@@ -444,9 +444,9 @@
         <div class="tab logo-tab" onclick="showPage('home')">
             <img src="PressureSoleLogo_FullTransp.png" alt="PressureSole Logo" class="logo-image"/>
         </div>
-        <div class="tab" onclick="showPage('data')">
+        <div class="tab" onclick="showPage('visualizations')">
             <i class="fas fa-chart-line"></i>
-            <span>Data</span>
+            <span>Visualizations</span>
         </div>
         <div class="tab" onclick="showPage('gait-mechanics')">
             <i class="fas fa-running"></i>
@@ -514,7 +514,7 @@
     -->
     
 <!--data tab-->
-<div id="data" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+<div id="visualizations" class="content" style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
     <h1 style="text-align: center; color: #333;">Score Visualizations</h1>
 
     <!-- Buttons for switching views and updating visualizations -->
@@ -739,6 +739,14 @@
         </div>
     </section>
     
+    <!-- Supination/Pronation section -->
+    <section id="supination/pronation">
+        <h2>Supination/Pronation</h2>
+        <p>If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. If you seee the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.</p>
+        <div class="graph-container">
+            <!-- Insert graph here -->
+        </div>
+    </section>
     
 </div>
 
