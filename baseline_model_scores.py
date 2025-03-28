@@ -6,12 +6,16 @@ Automatically converted from the Google Colab version.
 Now processes all CSV files in the "runData" folder.
 """
 
+import re
 import os
 import glob
 import pandas as pd
 import numpy as np
 from datetime import datetime
 from numpy import trapz
+
+# Regex pattern to match filenames like "Run_Data_yyyy-mm-dd_hh-mm-ss.csv"
+pattern = re.compile(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv")
 
 def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     """
@@ -25,9 +29,8 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     Returns:
         dict: A dictionary containing the refined scores.
     """
-    # Read CSV file (if you ever have an Excel file, you can add an if-statement here)
+    # Read CSV file
     data = pd.read_csv(filename)
-    
     time = data['Time'].values
 
     # Sum sensor values for each foot region.
@@ -58,7 +61,7 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
         if len(window_time) < 2:
             continue
 
-        # Determine the number of peaks (up to 10, but if the window is shorter then use that length)
+        # Use up to 10 peaks (or fewer if the window is short)
         num_peaks = min(10, len(window_R))
         R_peak_forces = np.partition(window_R, -num_peaks)[-num_peaks:]
         L_peak_forces = np.partition(window_L, -num_peaks)[-num_peaks:]
@@ -113,11 +116,13 @@ if __name__ == '__main__':
     if not run_files:
         print("No run data files found in the runData folder.")
     else:
+        # Sort files by timestamp extracted using the regex pattern (latest first)
+        run_files.sort(key=lambda f: datetime.strptime(pattern.match(os.path.basename(f)).group(1), "%Y-%m-%d_%H-%M-%S"), reverse=True)
+        
         for file in run_files:
             print(f"Processing file: {file}")
             scores = calculate_refined_scores(file)
             # Extract the timestamp part from the filename.
-            # Expected format: "Run_Data_yyyy-mm-dd_hh-mm-ss.csv"
             basename = os.path.basename(file)
             timestamp_part = basename[len("Run_Data_"):-len(".csv")]
             output_filename = os.path.join(scores_dir, f"scores_{timestamp_part}.txt")
