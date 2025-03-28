@@ -161,12 +161,41 @@
         }
             
         /* SCORES Page styling ------------------------------------------------------------- */
+        .scoresContainerMain {              /* This is for the container surrounding ALL FOUR scores */
+            display: flex;
+            flex-direction: column; /* Stacks items vertically */
+            align-items: center;
+            width: 100%;
+            margin: 50px 20px 0;
+        }
+
+        /* Container that holds each set of scores (two rows: header on top, circles below) */
+        .scoreBox {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* Header in the top row, left-justified */
+        .score-header {
+            text-align: left;
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        /* Your existing container for the circles */
         .scores-container {
             display: flex;
-            justify-content: space-evenly;  /* Distribute circles evenly */
-            width: 100%;                    /* Full width */
-            margin: 50px 20px 0;            /* Increased top margin to move the circles down */
-            align-items: center;            /* Vertically center the circles */
+            justify-content: space-evenly;
+            width: 100%;
+            align-items: center;
         }
 
         .score-circle {
@@ -805,7 +834,8 @@
     <!-- SCORES tab ------------------------------------------------------------- -->
     <div id="scores" class="content">
         <h1>Scores</h1>
-        
+        <div id="scoresContainer" class="scoresContainerMain"></div>
+
         <div class="scores-container">
             <!-- Stress Score -->
             <div class="score-item">
@@ -1163,9 +1193,70 @@
         }
 
         // Auto Score Load -----------------------------------------------------------------
-        async function loadScoresFromFile() {
+        // Helper: Convert a timestamp string ("YYYY-MM-DD_HH-MM-SS") to a formatted header string.
+        function formatTimestampFromFilename(timestampStr) {
+            // Split the string into date and time parts.
+            const parts = timestampStr.split('_'); // parts[0]: "YYYY-MM-DD", parts[1]: "HH-MM-SS"
+            const datePart = parts[0];
+            const timePart = parts[1].replace(/-/g, ':'); // change hyphens to colons
+            const dateObj = new Date(datePart + ' ' + timePart);
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            const dateFormatted = dateObj.toLocaleDateString(undefined, options);
+            const timeFormatted = dateObj.toLocaleTimeString();
+            return `<i class="fas fa-running"></i> ${dateFormatted} at ${timeFormatted}`;
+        }
+
+        // Helper: Determine color based on score and category.
+        function getColorForScore(score, category) {
+            // For symmetry, higher is better; for stress and fatigue, lower is better.
+            if (category === 'symmetry') {
+                if (score >= 70) return 'green';
+                else if (score >= 30) return 'yellow';
+                else return 'red';
+            } else {
+                if (score <= 29) return 'green';
+                else if (score <= 69) return 'yellow';
+                else return 'red';
+            }
+        }
+
+        // Helper: Create a single score circle element.
+        function createScoreCircle(label, score, categoryClass) {
+            const scoreItem = document.createElement('div');
+            scoreItem.classList.add('score-item');
+            const circleDiv = document.createElement('div');
+            circleDiv.classList.add('score-circle', categoryClass);
+            // Set the data-color attribute based on the score.
+            circleDiv.setAttribute('data-color', getColorForScore(score, categoryClass));
+            
+            // Create and append the label.
+            const labelDiv = document.createElement('div');
+            labelDiv.classList.add('label');
+            labelDiv.textContent = label;
+            circleDiv.appendChild(labelDiv);
+            
+            // Create the inner SVG and number.
+            const circleContent = document.createElement('div');
+            circleContent.classList.add('circle-content');
+            const perimeter = 251.2; // circumference for a circle with r=40
+            const dashoffset = perimeter - (score / 100 * perimeter);
+            circleContent.innerHTML = `
+                <svg width="200" height="200" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                    <g transform="rotate(-90,50,50)">
+                        <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="${getColorForScore(score, categoryClass)}" stroke-width="10" stroke-dasharray="${perimeter}" stroke-dashoffset="${dashoffset}" stroke-linecap="round" />
+                    </g>
+                </svg>
+                <div class="number">${score}</div>`;
+            circleDiv.appendChild(circleContent);
+            scoreItem.appendChild(circleDiv);
+            return scoreItem;
+        }
+
+        // Main function: Load all score files from the GitHub repo scores folder.
+        async function loadAllScores() {
             try {
-                // URL for the contents of the "scores" folder in your GitHub repo
+                // URL for the contents of the "scores" folder in your GitHub repo.
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
                 const response = await fetch(repoUrl);
                 if (!response.ok) {
@@ -1173,54 +1264,104 @@
                     return;
                 }
                 const files = await response.json();
-                // Filter for files that follow the naming convention: scores_YYYYMMDD_HHMMSS.txt
-                const scoreFiles = files.filter(file => /^scores_\d{8}_\d{6}\.txt$/.test(file.name));
+                // Filter files matching the pattern: scores_YYYY-MM-DD_HH-MM-SS.txt
+                const scoreFiles = files.filter(file =>
+                    /^scores_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.txt$/.test(file.name)
+                );
                 if (scoreFiles.length === 0) {
                     console.error('No score files found.');
                     return;
                 }
-                // Sort files descending (latest first) using the timestamp embedded in the filename
+                // Sort the files in reverse chronological order based on the timestamp in the filename.
                 scoreFiles.sort((a, b) => {
-                    const timestampA = a.name.match(/scores_(\d{8}_\d{6})\.txt/)[1];
-                    const timestampB = b.name.match(/scores_(\d{8}_\d{6})\.txt/)[1];
-                    return timestampB.localeCompare(timestampA);
+                    // Match files named like "scores_20250328_130124.txt"
+                    const matchA = a.name.match(/scores_(\d{8})_(\d{6})\.txt/);
+                    const matchB = b.name.match(/scores_(\d{8})_(\d{6})\.txt/);
+                    if (!matchA || !matchB) return 0;
+                    // Convert the first group (YYYYMMDD) into YYYY-MM-DD format
+                    const tsA = matchA[1].replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3") + " " + 
+                                matchA[2].replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
+                    const tsB = matchB[1].replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3") + " " + 
+                                matchB[2].replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
+                    const dateA = new Date(tsA);
+                    const dateB = new Date(tsB);
+                    return -(dateA - dateB); // descending: most recent first
                 });
-                // Get the latest file
-                const latestFile = scoreFiles[0];
-                // Fetch its content using the provided download URL
-                const fileResponse = await fetch(latestFile.download_url);
-                if (!fileResponse.ok) {
-                    console.error('Failed to fetch the latest score file.');
-                    return;
-                }
-                const text = await fileResponse.text();
-                // Parse the file content (assuming lines like "Stress Score: 55.23")
-                const lines = text.split('\n').filter(line => line.trim() !== '');
-                let newScores = {};
-                lines.forEach(line => {
-                    const parts = line.split(':');
-                    if (parts.length >= 2) {
-                        const key = parts[0].trim();
-                        const value = parseFloat(parts[1].trim());
-                        newScores[key] = value;
+                
+                // Get the main container in the scores page where we'll append each score container.
+                const scoresMainContainer = document.getElementById('scoresContainer');
+                scoresMainContainer.innerHTML = ''; // clear any existing content
+                
+                // Loop through each score file.
+                for (const file of scoreFiles) {
+                    // Fetch the file content.
+                    const fileResponse = await fetch(file.download_url);
+                    if (!fileResponse.ok) {
+                        console.error('Failed to fetch file:', file.name);
+                        continue;
                     }
-                });
-                // Update the global scoreValues array in the expected order:
-                // [Stress Score, Symmetry Score, Fatigue Score (Left), Fatigue Score (Right)]
-                scoreValues = [
-                    newScores["Stress Score"] || 0,
-                    newScores["Symmetry Score"] || 0,
-                    newScores["Fatigue Score (Left)"] || 0,
-                    newScores["Fatigue Score (Right)"] || 0
-                ];
-                // Update your UI accordingly
-                updateScoreCircles();
-                updateHomeRunStats();
-                updateRunHistory();
+                    const text = await fileResponse.text();
+                    // Parse the file content. Expected lines:
+                    // "Stress Score: 55.23"
+                    // "Symmetry Score: 85.00"
+                    // "Fatigue Score (Right): 30.00"
+                    // "Fatigue Score (Left): 28.00"
+                    const lines = text.split('\n').filter(line => line.trim() !== '');
+                    let newScores = {};
+                    lines.forEach(line => {
+                        const parts = line.split(':');
+                        if (parts.length >= 2) {
+                            const key = parts[0].trim();
+                            const value = parseFloat(parts[1].trim());
+                            newScores[key] = value;
+                        }
+                    });
+                    const scoreValues = [
+                        newScores["Stress Score"] || 0,
+                        newScores["Symmetry Score"] || 0,
+                        newScores["Fatigue Score (Left)"] || 0,
+                        newScores["Fatigue Score (Right)"] || 0
+                    ];
+                    // Extract the timestamp from the filename.
+                    // Example filename: "scores_2025-03-28_12-24-08.txt"
+                    const basename = file.name; 
+                    const timestampPart = basename.slice("scores_".length, -".txt".length);
+
+                    // Create a container for this set of scores (scoreBox) with two rows.
+                    const containerDiv = document.createElement('div');
+                    containerDiv.classList.add('scoreBox');
+
+                    // Create and append a header with the formatted timestamp to the top row.
+                    const headerDiv = document.createElement('div');
+                    headerDiv.classList.add('score-header');
+                    headerDiv.innerHTML = formatTimestampFromFilename(timestampPart);
+                    containerDiv.appendChild(headerDiv);
+
+                    // Create a div to hold the four score circles (this will be the second row).
+                    const circlesDiv = document.createElement('div');
+                    circlesDiv.classList.add('scores-container');
+
+                    // Append each score circle to the circles container.
+                    circlesDiv.appendChild(createScoreCircle('Stress', scoreValues[0], 'stress'));
+                    circlesDiv.appendChild(createScoreCircle('Symmetry', scoreValues[1], 'symmetry'));
+                    circlesDiv.appendChild(createScoreCircle('Fatigue (Left)', scoreValues[2], 'fatigue-left'));
+                    circlesDiv.appendChild(createScoreCircle('Fatigue (Right)', scoreValues[3], 'fatigue-right'));
+
+                    // Append the circles container (second row) to the main container.
+                    containerDiv.appendChild(circlesDiv);
+
+                    // Prepend this container to the main container so the most recent scores appear at the top.
+                    scoresMainContainer.prepend(containerDiv);
+                }
             } catch (error) {
                 console.error("Error loading scores:", error);
             }
         }
+
+        // Call loadAllScores when the document is ready.
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllScores();
+        });
 
         // HOME Page -----------------------------------------------------------------------
         function updateHomeRunStats() {
