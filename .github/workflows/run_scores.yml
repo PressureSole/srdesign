@@ -29,8 +29,8 @@ jobs:
         with:
           message: "Auto-update score file"
           add: "scores"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          #force: true
+          #github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
 
           
 
