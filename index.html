@@ -1253,6 +1253,59 @@
             return scoreItem;
         }
 
+        // Updated helper: Wraps a score circle with a details button and details box, and attaches the click event.
+        function createScoreItem(label, score, categoryClass) {
+            // Create the score circle element using your existing function.
+            const scoreItem = createScoreCircle(label, score, categoryClass);
+            
+            // Create the details button.
+            const detailsBtn = document.createElement('button');
+            detailsBtn.classList.add('details-btn');
+            detailsBtn.textContent = 'Details';
+            
+            // Create the details box.
+            const detailsBox = document.createElement('div');
+            detailsBox.classList.add('details-box');
+            detailsBox.style.display = 'none'; // hidden by default
+            
+            // Append the details button and details box to the score item.
+            scoreItem.appendChild(detailsBtn);
+            scoreItem.appendChild(detailsBox);
+            
+            // Attach the event listener that shows/hides the details.
+            detailsBtn.addEventListener('click', function() {
+                // Retrieve the score circle and its current color (set as data-color)
+                const scoreCircle = scoreItem.querySelector('.score-circle');
+                const scoreColor = scoreCircle.getAttribute('data-color') || "green";
+                
+                // Determine the category based on the class on the score circle.
+                let category = "";
+                if (scoreCircle.classList.contains('stress')) {
+                    category = "stress";
+                } else if (scoreCircle.classList.contains('symmetry')) {
+                    category = "symmetry";
+                } else if (scoreCircle.classList.contains('fatigue-left')) {
+                    category = "fatigueLeft";
+                } else if (scoreCircle.classList.contains('fatigue-right')) {
+                    category = "fatigueRight";
+                }
+                
+                // Toggle the display of the details box.
+                if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
+                    // Display the appropriate response.
+                    detailsBox.textContent = responses[category][scoreColor];
+                    detailsBox.style.display = 'block';
+                    detailsBtn.textContent = 'Close';
+                } else {
+                    // Hide the details.
+                    detailsBox.style.display = 'none';
+                    detailsBtn.textContent = 'Details';
+                }
+            });
+            
+            return scoreItem;
+        }
+
         // Main function: Load all score files from the GitHub repo scores folder.
         async function loadAllScores() {
             try {
@@ -1342,10 +1395,10 @@
                     circlesDiv.classList.add('scores-container');
 
                     // Append each score circle to the circles container.
-                    circlesDiv.appendChild(createScoreCircle('Stress', scoreValues[0], 'stress'));
-                    circlesDiv.appendChild(createScoreCircle('Symmetry', scoreValues[1], 'symmetry'));
-                    circlesDiv.appendChild(createScoreCircle('Fatigue (Left)', scoreValues[2], 'fatigue-left'));
-                    circlesDiv.appendChild(createScoreCircle('Fatigue (Right)', scoreValues[3], 'fatigue-right'));
+                    circlesDiv.appendChild(createScoreItem('Stress', scoreValues[0], 'stress'));
+                    circlesDiv.appendChild(createScoreItem('Symmetry', scoreValues[1], 'symmetry'));
+                    circlesDiv.appendChild(createScoreItem('Fatigue (Left)', scoreValues[2], 'fatigue-left'));
+                    circlesDiv.appendChild(createScoreItem('Fatigue (Right)', scoreValues[3], 'fatigue-right'));
 
                     // Append the circles container (second row) to the main container.
                     containerDiv.appendChild(circlesDiv);
