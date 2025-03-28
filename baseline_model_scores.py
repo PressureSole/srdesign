@@ -6,6 +6,7 @@ Automatically converted from the Google Colab version.
 """
 
 import os
+import re
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -16,14 +17,15 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     Calculates refined fatigue, stress, and symmetry scores from treadmill data.
 
     Args:
-        filename (str): Path to the Excel file.
+        filename (str): Path to the CSV file.
         body_weight (float, optional): Body weight in Newtons. Defaults to 700.
         window_size (float, optional): Size of the sliding window for fatigue analysis (as a fraction of total data). Defaults to 0.2.
 
     Returns:
         dict: A dictionary containing the refined scores.
     """
-    data = pd.read_excel(filename)
+    # Read CSV file instead of Excel file.
+    data = pd.read_csv(filename)
 
     time = data['Time'].values
 
@@ -35,7 +37,7 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     L_Heel = data[['Sensor_12', 'Sensor_13', 'Sensor_14']].sum(axis=1).values
     L_Midfoot = data[['Sensor_15', 'Sensor_16', 'Sensor_17', 'Sensor_18']].sum(axis=1).values
     L_Forefoot = data[['Sensor_19', 'Sensor_20', 'Sensor_21', 'Sensor_22']].sum(axis=1).values
-    
+
     R_Total = R_Heel + R_Midfoot + R_Forefoot
     L_Total = L_Heel + L_Midfoot + L_Forefoot
     total_time = time[-1] - time[0]
@@ -99,15 +101,26 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     }
 
 if __name__ == '__main__':
-    # Use the "Copy of test_lab shortening.xlsx" file from the repo.
-    filename = 'Copy of test_lab shortening.xlsx'
+    # Instead of using a fixed Excel file, find the latest run data CSV file in the "runData" folder.
+    run_data_dir = "runData"
+    pattern = re.compile(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv")
+    files = [f for f in os.listdir(run_data_dir) if pattern.match(f)]
+    if not files:
+        raise Exception("No run data files found in folder 'runData'.")
+    # Sort files by timestamp (latest first)
+    files.sort(key=lambda f: datetime.strptime(pattern.match(f).group(1), "%Y-%m-%d_%H-%M-%d"), reverse=True)
+    latest_file = files[0]
+    filename = os.path.join(run_data_dir, latest_file)
+    print(f"Processing file: {filename}")
+
+    # Calculate scores from the latest run data file.
     scores = calculate_refined_scores(filename)
 
     # Create a "scores" folder if it doesn't exist.
     scores_dir = "scores"
     os.makedirs(scores_dir, exist_ok=True)
 
-    # Generate a timestamped filename.
+    # Generate a timestamped filename for the score output.
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_filename = os.path.join(scores_dir, f"scores_{timestamp}.txt")
 
