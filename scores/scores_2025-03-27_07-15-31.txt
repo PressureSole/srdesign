@@ -1,4 +1,0 @@
-Stress Score: 100.00
-Symmetry Score: 99.77
-Fatigue Score (Right): 18.95
-Fatigue Score (Left): 18.29
