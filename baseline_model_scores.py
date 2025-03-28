@@ -31,6 +31,10 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     """
     # Read CSV file
     data = pd.read_csv(filename)
+    
+    # Strip any extra whitespace from column names
+    data.columns = data.columns.str.strip()
+    
     time = data['Time'].values
 
     # Sum sensor values for each foot region.
