@@ -3,10 +3,11 @@
 """Baseline Model Scores
 
 Automatically converted from the Google Colab version.
+Now processes all CSV files in the "runData" folder.
 """
 
 import os
-import re
+import glob
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -24,9 +25,9 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     Returns:
         dict: A dictionary containing the refined scores.
     """
-    # Read CSV file instead of Excel file.
+    # Read CSV file (if you ever have an Excel file, you can add an if-statement here)
     data = pd.read_csv(filename)
-
+    
     time = data['Time'].values
 
     # Sum sensor values for each foot region.
@@ -57,6 +58,7 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
         if len(window_time) < 2:
             continue
 
+        # Determine the number of peaks (up to 10, but if the window is shorter then use that length)
         num_peaks = min(10, len(window_R))
         R_peak_forces = np.partition(window_R, -num_peaks)[-num_peaks:]
         L_peak_forces = np.partition(window_L, -num_peaks)[-num_peaks:]
@@ -76,7 +78,6 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     L_Fatigue = np.mean(L_fatigue_changes) if L_fatigue_changes else 0
 
     # Refined Stress Calculation
-    stride_count = len(R_Total) / 2
     R_peak_force = np.max(R_Total)
     L_peak_force = np.max(L_Total)
 
@@ -101,39 +102,28 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     }
 
 if __name__ == '__main__':
-    # Instead of using a fixed Excel file, find the latest run data CSV file in the "runData" folder.
+    # Define the folders for run data and scores
     run_data_dir = "runData"
-    pattern = re.compile(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv")
-    files = [f for f in os.listdir(run_data_dir) if pattern.match(f)]
-    if not files:
-        raise Exception("No run data files found in folder 'runData'.")
-    # Sort files by timestamp (latest first)
-    files.sort(key=lambda f: datetime.strptime(pattern.match(f).group(1), "%Y-%m-%d_%H-%M-%d"), reverse=True)
-    latest_file = files[0]
-    filename = os.path.join(run_data_dir, latest_file)
-    print(f"Processing file: {filename}")
-
-    # Calculate scores from the latest run data file.
-    scores = calculate_refined_scores(filename)
-
-    # Create a "scores" folder if it doesn't exist.
     scores_dir = "scores"
     os.makedirs(scores_dir, exist_ok=True)
 
-    # Generate a timestamped filename for the score output.
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_filename = os.path.join(scores_dir, f"scores_{timestamp}.txt")
-
-    # Write the scores to the file.
-    with open(output_filename, "w") as f:
-        f.write(f"Stress Score: {scores['Stress_Score']:.2f}\n")
-        f.write(f"Symmetry Score: {scores['Symmetry_Score']:.2f}\n")
-        f.write(f"Fatigue Score (Right): {scores['Right_Fatigue']:.2f}\n")
-        f.write(f"Fatigue Score (Left): {scores['Left_Fatigue']:.2f}\n")
-
-    # Print the scores to the console.
-    print(f"Fatigue Score (Right): {scores['Right_Fatigue']:.2f}")
-    print(f"Fatigue Score (Left): {scores['Left_Fatigue']:.2f}")
-    print(f"Stress Score: {scores['Stress_Score']:.2f}")
-    print(f"Symmetry Score: {scores['Symmetry_Score']:.2f}")
-    print(f"Scores written to {output_filename}")
+    # Use glob to find all CSV files in the runData folder that match the naming convention.
+    run_files = glob.glob(os.path.join(run_data_dir, "Run_Data_*.csv"))
+    
+    if not run_files:
+        print("No run data files found in the runData folder.")
+    else:
+        for file in run_files:
+            print(f"Processing file: {file}")
+            scores = calculate_refined_scores(file)
+            # Extract the timestamp part from the filename.
+            # Expected format: "Run_Data_yyyy-mm-dd_hh-mm-ss.csv"
+            basename = os.path.basename(file)
+            timestamp_part = basename[len("Run_Data_"):-len(".csv")]
+            output_filename = os.path.join(scores_dir, f"scores_{timestamp_part}.txt")
+            with open(output_filename, "w") as f:
+                f.write(f"Stress Score: {scores['Stress_Score']:.2f}\n")
+                f.write(f"Symmetry Score: {scores['Symmetry_Score']:.2f}\n")
+                f.write(f"Fatigue Score (Right): {scores['Right_Fatigue']:.2f}\n")
+                f.write(f"Fatigue Score (Left): {scores['Left_Fatigue']:.2f}\n")
+            print(f"Scores written to {output_filename}")
