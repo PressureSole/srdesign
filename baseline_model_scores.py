@@ -34,6 +34,7 @@ def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
     
     # Strip any extra whitespace from column names
     data.columns = data.columns.str.strip()
+    print("Columns in file", filename, ":", data.columns.tolist())
     
     time = data['Time'].values
 
