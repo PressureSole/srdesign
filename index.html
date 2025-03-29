@@ -166,15 +166,15 @@
             flex-direction: column; /* Stacks items vertically */
             align-items: center;
             width: 100%;
-            margin: 50px 20px 0;
+            margin-top: 20px;
         }
 
         /* Container that holds each set of scores (two rows: header on top, circles below) */
         .scoreBox {
             display: flex;
             flex-direction: column;
-            width: 100%;
-            margin-bottom: 20px;
+            width: calc(100% - 60px); /* Adjust width to account for left/right margins */
+            margin: 0 20px 10px 20px; /* Top: 0, Right: 20px, Bottom: 10px, Left: 20px */
             padding: 20px;
             background-color: white;
             border-radius: 8px;
@@ -184,9 +184,9 @@
         /* Header in the top row, left-justified */
         .score-header {
             text-align: left;
-            font-size: 14px;
+            font-size: 15px;
             color: #000;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             width: 100%;
         }
 
