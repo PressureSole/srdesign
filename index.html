@@ -281,6 +281,7 @@
             justify-content: space-evenly;
             width: 100%;
             align-items: center;*/
+            margin-top: 20px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);  /* Create 4 equal-width columns */
             gap: 20px;       /* Adjust gap between score items as needed */
@@ -417,9 +418,6 @@
         /* Details Box styling - now absolutely positioned so it doesn't shift other elements */
         .details-box {
             position: relative;
-            top: 100%;           /* Immediately below the score item content */
-            left: 50%;
-            transform: translateX(-50%);
             width: 90%;         /* Expand wider than the score item; adjust as needed */
             max-width: 500px;    /* Cap the width so it doesn't get too wide on a moderately large screen */
             background-color: #eaeaea;
@@ -1671,12 +1669,12 @@
 
         document.querySelectorAll('.details-btn').forEach(button => {
             button.addEventListener('click', function() {
-                // Get the parent container (.score-item) and required elements
-                const scoreItem = this.closest('.score-item');
-                const detailsBox = scoreItem.querySelector('.details-box');
-                const scoreCircle = scoreItem.querySelector('.score-circle');
+                // Get the parent container (.score-item)
+                const container = this.closest('.score-item');
+                const detailsBox = container.querySelector('.details-box');
+                const scoreCircle = container.querySelector('.score-circle');
                 const scoreColor = scoreCircle.getAttribute('data-color');
-
+                
                 // Determine category based on score-circle's classes
                 let category = "";
                 if (scoreCircle.classList.contains('stress')) {
@@ -1688,31 +1686,17 @@
                 } else if (scoreCircle.classList.contains('fatigue-right')) {
                     category = "fatigueRight";
                 }
-
-                // Look for an existing placeholder; if none exists, create one.
-                let placeholder = scoreItem.querySelector('.details-placeholder');
-                if (!placeholder) {
-                    placeholder = document.createElement('div');
-                    placeholder.classList.add('details-placeholder');
-                    // Append the placeholder at the end of the score item
-                    scoreItem.appendChild(placeholder);
-                }
-
-                // Toggle the details box
+                
+                // Toggle the details box visibility and update button text
                 if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
-                    // Show the details box and set its content
+                    // Show details and update the button label to "Close"
                     detailsBox.textContent = responses[category][scoreColor];
                     detailsBox.style.display = 'block';
-                    // Force reflow so we can measure the details box height
-                    const detailsHeight = detailsBox.offsetHeight;
-                    // Set the placeholder height to reserve space in the layout
-                    placeholder.style.height = detailsHeight + 'px';
-                    this.textContent = 'Close';
+                    this.textContent = "Close";
                 } else {
-                    // Hide the details box and reset the placeholder height
+                    // Hide details and revert button text to "Details"
                     detailsBox.style.display = 'none';
-                    placeholder.style.height = '0';
-                    this.textContent = 'Details';
+                    this.textContent = "Details";
                 }
             });
         });
