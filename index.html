@@ -403,18 +403,18 @@
         /* Details Box styling - now absolutely positioned so it doesn't shift other elements */
         .details-box {
             position: absolute;
-            top: 100%; 
+            top: 100%;           /* Immediately below the score item content */
             left: 50%;
             transform: translateX(-50%);
-            width: 90vw;       /* 90% of the viewport width */
-            max-width: 800px;  /* Optional: cap the maximum width */
+            width: 150%;         /* Expand wider than the score item; adjust as needed */
+            max-width: 300px;    /* Cap the width so it doesn't get too wide on a moderately large screen */
             background-color: #eaeaea;
             color: #333;
             border: 1px solid #ccc;
             padding: 10px;
             border-radius: 4px;
             font-size: 16px;
-            display: none;     /* Hidden by default */
+            display: none;       /* Hidden by default */
             z-index: 10;
         }    
         
