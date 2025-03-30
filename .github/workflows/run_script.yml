@@ -1,7 +1,10 @@
 name: Run Visualization Update
 
 on:
-  workflow_dispatch:  # Allows manual triggering via API
+  push:
+    paths:
+      - "runData/**"
+  workflow_dispatch:
 
 permissions:
   contents: write  # Allows pushing changes to the repository
@@ -27,7 +30,7 @@ jobs:
       - name: Run Python Script
         env:
           GITHUB_TOKEN: ${{ secrets.EUGENIA_TOKEN }}
-        run: python dynamic_symmetry_fatigue_score_combined.py "Copy of test_lab shortening.xslx"
+        run: python dynamic_symmetry_fatigue_score_combined.py
 
       - name: Pull Latest Changes from Remote
         run: |
