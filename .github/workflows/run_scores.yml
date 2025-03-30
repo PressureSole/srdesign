@@ -1,6 +1,9 @@
 name: Run Score Calculation
 
 on:
+  push:
+    paths:
+      - 'runData/**'
   workflow_dispatch:  # Allows manual triggering from the Actions tab
 
 jobs:
