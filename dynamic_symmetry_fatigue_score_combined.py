@@ -129,7 +129,7 @@ def generate_plots(pressure_values, method, output_prefix):
         cbar_rbf.set_label('Pressure Value (Normalized)')
         
         # Save RBF plot
-        rbf_output_file = f"{output_prefix}_gradient.png"
+        rbf_output_file = f"images/{output_prefix}_gradient.png"
         fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
         plt.close(fig_rbf)
         print(f"Saved RBF plot: {rbf_output_file}")
@@ -146,7 +146,7 @@ def generate_plots(pressure_values, method, output_prefix):
         cbar_grid.set_label('Pressure Value (Normalized)')
         
         # Save GridData plot
-        grid_output_file = f"{output_prefix}_section.png"
+        grid_output_file = f"images/{output_prefix}_section.png"
         fig_grid.savefig(grid_output_file, bbox_inches='tight')
         plt.close(fig_grid)
         print(f"Saved GridData plot: {grid_output_file}")
