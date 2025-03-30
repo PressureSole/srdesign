@@ -90,7 +90,7 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     plt.yticks([])
     plt.xlabel('X Position (mm)')
     plt.ylabel('Y Position (mm)')
-    plt.title(f'Center of Pressure Visualization for {label}')
+    #plt.title(f'Center of Pressure Visualization for {label}')
     plt.axis('equal')
     
     # Save plot to prosupvisual folder
