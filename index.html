@@ -416,7 +416,7 @@
 
         /* Details Box styling - now absolutely positioned so it doesn't shift other elements */
         .details-box {
-            position: absolute;
+            position: relative;
             top: 100%;           /* Immediately below the score item content */
             left: 50%;
             transform: translateX(-50%);
@@ -430,7 +430,12 @@
             font-size: 16px;
             display: none;       /* Hidden by default */
             z-index: 10;
-        }    
+        }
+        
+        .details-placeholder {
+            height: 0;
+            transition: height 0.3s ease;
+        }
         
         /* PROFILE Page styling -------------------------------------------------------------- */
         .profile-container {
@@ -761,7 +766,7 @@
                 const timestampA = a.name.match(/(\d{14})/);
                 const timestampB = b.name.match(/(\d{14})/);
                 if (timestampA && timestampB) {
-                    return timestampA[1] < timestampB[1] ? -1 : 1;
+                    return timestampB[1] < timestampA[1] ? -1 : 1;
                 }
                 return 0;
             });
@@ -1666,12 +1671,12 @@
 
         document.querySelectorAll('.details-btn').forEach(button => {
             button.addEventListener('click', function() {
-                // Get the parent container (.score-item)
-                const container = this.closest('.score-item');
-                const detailsBox = container.querySelector('.details-box');
-                const scoreCircle = container.querySelector('.score-circle');
+                // Get the parent container (.score-item) and required elements
+                const scoreItem = this.closest('.score-item');
+                const detailsBox = scoreItem.querySelector('.details-box');
+                const scoreCircle = scoreItem.querySelector('.score-circle');
                 const scoreColor = scoreCircle.getAttribute('data-color');
-                
+
                 // Determine category based on score-circle's classes
                 let category = "";
                 if (scoreCircle.classList.contains('stress')) {
@@ -1683,40 +1688,33 @@
                 } else if (scoreCircle.classList.contains('fatigue-right')) {
                     category = "fatigueRight";
                 }
-                
-                // Toggle the details box visibility and update button text
+
+                // Look for an existing placeholder; if none exists, create one.
+                let placeholder = scoreItem.querySelector('.details-placeholder');
+                if (!placeholder) {
+                    placeholder = document.createElement('div');
+                    placeholder.classList.add('details-placeholder');
+                    // Append the placeholder at the end of the score item
+                    scoreItem.appendChild(placeholder);
+                }
+
+                // Toggle the details box
                 if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
-                    // Show details and update the button label to "Close ^"
+                    // Show the details box and set its content
                     detailsBox.textContent = responses[category][scoreColor];
                     detailsBox.style.display = 'block';
-                    this.textContent = "Close";
+                    // Force reflow so we can measure the details box height
+                    const detailsHeight = detailsBox.offsetHeight;
+                    // Set the placeholder height to reserve space in the layout
+                    placeholder.style.height = detailsHeight + 'px';
+                    this.textContent = 'Close';
                 } else {
-                    // Hide details and revert button text to "Details"
+                    // Hide the details box and reset the placeholder height
                     detailsBox.style.display = 'none';
-                    this.textContent = "Details";
+                    placeholder.style.height = '0';
+                    this.textContent = 'Details';
                 }
             });
-        });
-
-        detailsBtn.addEventListener('click', function() {
-            // Get the parent container (.score-item) and its details box
-            const scoreItem = this.closest('.score-item');
-            const detailsBox = scoreItem.querySelector('.details-box');
-            
-            if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
-                // Show the details box
-                detailsBox.style.display = 'block';
-                // Force a reflow so we can measure its height accurately
-                const extraHeight = detailsBox.offsetHeight;
-                // Add extra bottom padding to the parent container to "make room"
-                scoreItem.style.paddingBottom = extraHeight + 'px';
-                this.textContent = 'Close';
-            } else {
-                // Hide the details box and remove extra padding
-                detailsBox.style.display = 'none';
-                scoreItem.style.paddingBottom = '';
-                this.textContent = 'Details';
-            }
         });
 
         // TEMPORARY function to prompt for new SCORES
