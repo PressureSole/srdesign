@@ -403,20 +403,20 @@
         /* Details Box styling - now absolutely positioned so it doesn't shift other elements */
         .details-box {
             position: absolute;
-            /* flex-direction: column; /* TESTING CHANGES (delete) */
-            /* align-items: center; /* TESTING CHANGES (delete) */
-            top: 100%;  /* Position immediately below the score-item content */
-            /*left: 0;*/ 
-            width: 150%; /* TESTING CHANGES (100%) */
+            top: 100%; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90vw;       /* 90% of the viewport width */
+            max-width: 800px;  /* Optional: cap the maximum width */
             background-color: #eaeaea;
             color: #333;
             border: 1px solid #ccc;
             padding: 10px;
             border-radius: 4px;
             font-size: 16px;
-            display: none; /* Hidden by default */
-            z-index: 10; /* Ensures it overlays content if needed */
-        }
+            display: none;     /* Hidden by default */
+            z-index: 10;
+        }    
         
         /* PROFILE Page styling -------------------------------------------------------------- */
         .profile-container {
@@ -1682,6 +1682,27 @@
                     this.textContent = "Details";
                 }
             });
+        });
+
+        detailsBtn.addEventListener('click', function() {
+            // Get the parent container (.score-item) and its details box
+            const scoreItem = this.closest('.score-item');
+            const detailsBox = scoreItem.querySelector('.details-box');
+            
+            if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
+                // Show the details box
+                detailsBox.style.display = 'block';
+                // Force a reflow so we can measure its height accurately
+                const extraHeight = detailsBox.offsetHeight;
+                // Add extra bottom padding to the parent container to "make room"
+                scoreItem.style.paddingBottom = extraHeight + 'px';
+                this.textContent = 'Close';
+            } else {
+                // Hide the details box and remove extra padding
+                detailsBox.style.display = 'none';
+                scoreItem.style.paddingBottom = '';
+                this.textContent = 'Details';
+            }
         });
 
         // TEMPORARY function to prompt for new SCORES
