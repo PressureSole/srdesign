@@ -141,6 +141,14 @@
             margin-bottom: 10px;
         }
 
+        .runstats-timestamp-header {
+            text-align: center;
+            font-size: 15px;
+            color: #000;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
         .stats {
             display: flex;
             justify-content: space-between;
@@ -699,24 +707,36 @@
     </div>
 
     <script>
-        function formatTimestamp(filename) {
-            // Extract the timestamp part from the filename
-            const timestampMatch = filename.match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
-            
-            if (!timestampMatch) {
-                return "Invalid timestamp format";
-            }
-            
-            // Destructure the matched groups
-            const [, year, month, day, hours, minutes, seconds] = timestampMatch;
-            
-            // Create a Date object 
-            // Note: Month is 0-indexed in JavaScript Date, so subtract 1 from month
-            const date = new Date(year, month - 1, day, hours, minutes, seconds);
-            
-            // Use toLocaleString for local formatting
-            return date.toLocaleString();
+    function formatTimestamp(filename) {
+        // Extract the timestamp part from the filename
+        const timestampMatch = filename.match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+        
+        if (!timestampMatch) {
+            return "Invalid timestamp format";
         }
+        
+        // Destructure the matched groups
+        const [, year, month, day, hours, minutes, seconds] = timestampMatch;
+        
+        // Create a Date object 
+        // Note: Month is 0-indexed in JavaScript Date, so subtract 1 from month
+        const date = new Date(year, month - 1, day, hours - 4, minutes, seconds);
+        
+        // Use toLocaleString for local formatting with options for desired format
+        const options = {
+            year: 'numeric',
+            month: 'long', // Full month name (e.g., March)
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true, // 12-hour format
+        };
+
+        return date.toLocaleString('en-US', options)
+    }
+
+        
         
 
         // Fetch the latest image based on the prefix and category
@@ -794,7 +814,7 @@
                 const timestamp = image.name.match(/(\d{14})/);
                 if (timestamp) {
                     const timestampElement = document.createElement('p');
-                    timestampElement.textContent = "Timestamp: " + formatTimestamp(timestamp[0]);
+                    timestampElement.textContent = formatTimestamp(timestamp[0]);
                     timestampElement.style = 'color: #333;';
                     section.appendChild(timestampElement);
                 } else {
@@ -936,6 +956,7 @@
         }
     }
 </script>
+
     <!-- SCORES tab ------------------------------------------------------------- -->
     <div id="scores" class="content">
         <h1>Scores</h1>
@@ -943,56 +964,55 @@
 
         <div class="scores-container">
             <!-- Stress Score -->
-            <div class="score-item">
-                <div class="score-circle stress" data-color="green"> <!-- Added the "stress" class -->
+            <!--<div class="score-item">
+                <div class="score-circle stress" data-color="green"> 
                     <div class="label">Stress</div>
                     <div class="circle-content">
-                        <svg width="200" height="200" viewBox="0 0 100 100">
+                        <svg width="200" height="200" viewBox="0 0 100 100">-->
                             <!-- Background Circle -->
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                            <!--<circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />-->
                             
                             <!-- Wrap the foreground circle in a group with an inline transform -->
-                            <g transform="rotate(-90,50,50)">
+                            <!--<g transform="rotate(-90,50,50)">
                                 <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
                                     stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
                             </g>
                         </svg>
-                        <div class="number">0</div>
+                        <div class="number">0</div>-->
                         <!-- <div class="number">6</div> -->
-                    </div>
-                </div>
+                    <!--</div>
+                </div>-->
                 <!-- Details button and box -->
-                <button class="details-btn">Details</button>
+                <!--<button class="details-btn">Details</button>
                 <div class="details-box"></div>
-            </div>
+            </div>-->
             
 
             <!-- Symmetry Score -->
-            <div class="score-item">
-                <div class="score-circle symmetry" data-color="green"> <!-- Added the "symmetry" class -->
+            <!--<div class="score-item">
+                <div class="score-circle symmetry" data-color="green"> 
                     <div class="label">Symmetry</div>
                     <div class="circle-content">
-                        <svg width="200" height="200" viewBox="0 0 100 100">
+                        <svg width="200" height="200" viewBox="0 0 100 100">-->
                             <!-- Background Circle -->
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                            <!--<circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />-->
                             
                             <!-- Wrap the foreground circle in a group with an inline transform -->
-                            <g transform="rotate(-90,50,50)">
+                            <!--<g transform="rotate(-90,50,50)">
                                 <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
                                     stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
                             </g>
                         </svg>
                         <div class="number">0</div>
-                        <!-- <div class="number">85</div> -->
                     </div>
-                </div>
+                </div>-->
                 <!-- Details button and box -->
-                <button class="details-btn">Details</button>
+                <!--<button class="details-btn">Details</button>
                 <div class="details-box"></div>
-            </div>
+            </div>-->
 
             <!-- Fatigue (Left) Score -->
-            <div class="score-item">
+            <!--<div class="score-item">
                 <div class="score-circle fatigue-left" data-color="green">
                     <div class="label">Fatigue (Left)</div>
                     <div class="circle-content">
@@ -1008,10 +1028,10 @@
                 </div>
                 <button class="details-btn">Details</button>
                 <div class="details-box"></div>
-            </div>
+            </div>-->
             
             <!-- Fatigue (Right) Score -->
-            <div class="score-item">
+            <!--<div class="score-item">
                 <div class="score-circle fatigue-right" data-color="green">
                     <div class="label">Fatigue (Right)</div>
                     <div class="circle-content">
@@ -1027,7 +1047,7 @@
                 </div>
                 <button class="details-btn">Details</button>
                 <div class="details-box"></div>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -1449,6 +1469,9 @@
                 // Get the main container in the scores page where we'll append each score container.
                 const scoresMainContainer = document.getElementById('scoresContainer');
                 scoresMainContainer.innerHTML = ''; // clear any existing content
+
+                // Flag to update home stats only once (using the most recent file)
+                //let isFirst = true;
                 
                 // Loop through each score file.
                 for (const file of scoreFiles) {
@@ -1480,6 +1503,14 @@
                         newScores["Fatigue Score (Left)"] || 0,
                         newScores["Fatigue Score (Right)"] || 0
                     ];
+
+                    // Update the home page stats with the most recent score file only
+                    //if (isFirst) {
+                    //    scoreValues = currentScoreValues;
+                    //    updateHomeRunStats();
+                    //    isFirst = false;
+                    //}
+                    
                     // Extract the timestamp from the filename.
                     // Example filename: "scores_2025-03-28_12-24-08.txt"
                     const basename = file.name; 
