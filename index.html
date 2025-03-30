@@ -277,10 +277,16 @@
 
         /* Your existing container for the circles */
         .scores-container {
-            display: flex;
+            /*display: flex;
             justify-content: space-evenly;
             width: 100%;
-            align-items: center;
+            align-items: center;*/
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);  /* Create 4 equal-width columns */
+            gap: 20px;       /* Adjust gap between score items as needed */
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 20px; /* Optional: add side padding if desired */
         }
 
         .score-circle {
@@ -375,11 +381,19 @@
         /* Details Button styling */
         /* Container for each score item */
         .score-item {
-            position: relative; /* Makes it the reference for absolute positioning */
+            position: relative; /* So that absolutely positioned children (like .details-box) are relative to this container */
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 20px;
+            width: 100%;     /* Fills its grid cell */
+            box-sizing: border-box;
+            margin: 0;       /* Remove any extra margin since grid gap handles spacing */            
+            
+            /* position: relative; /* Makes it the reference for absolute positioning */
+            /* display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px; */
         }
 
         /* Details Button styling (remains similar) */
@@ -406,7 +420,7 @@
             top: 100%;           /* Immediately below the score item content */
             left: 50%;
             transform: translateX(-50%);
-            width: 150%;         /* Expand wider than the score item; adjust as needed */
+            width: 90%;         /* Expand wider than the score item; adjust as needed */
             max-width: 300px;    /* Cap the width so it doesn't get too wide on a moderately large screen */
             background-color: #eaeaea;
             color: #333;
