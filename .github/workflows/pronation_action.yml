@@ -26,5 +26,5 @@ jobs:
 
     - name: Run pronationsupination.py
       env:
-        GITHUB_TOKEN: ${{ secrets.EUG_SECRET }}
+        GITHUB_TOKEN: ${{ secrets.EUGENIA_TOKEN }}
       run: python pronationsupination.py
