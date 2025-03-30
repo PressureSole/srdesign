@@ -121,7 +121,7 @@ def generate_plots(pressure_values, method, output_prefix):
     
         # RBF plot (Gradient)
         fig_rbf, ax_rbf = plt.subplots(figsize=(8, 8))
-        ax_grid.tick_params(axis='both', which='both', length=0, labelleft=False, labelbottom=False, labeltop=False, labelright=False)
+        ax_rbf.tick_params(axis='both', which='both', length=0, labelleft=False, labelbottom=False, labeltop=False, labelright=False)
         pressure_img_rbf = ax_rbf.imshow(normalized_pressure_rbf, extent=[min_x, max_x, min_y, max_y], origin='lower', cmap="YlOrRd", vmin=0, vmax=1)
         ax_rbf.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="black", lw=2, label="Right Foot")
         ax_rbf.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="black", lw=2, label="Left Foot")
@@ -135,7 +135,7 @@ def generate_plots(pressure_values, method, output_prefix):
         fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
         plt.close(fig_rbf)
         print(f"Saved RBF plot: {rbf_output_file}")
-
+        
         # GridData plot (Section)
         fig_grid, ax_grid = plt.subplots(figsize=(8, 8))
         ax_grid.tick_params(axis='both', which='both', length=0, labelleft=False, labelbottom=False, labeltop=False, labelright=False)
@@ -152,6 +152,7 @@ def generate_plots(pressure_values, method, output_prefix):
         fig_grid.savefig(grid_output_file, bbox_inches='tight')
         plt.close(fig_grid)
         print(f"Saved GridData plot: {grid_output_file}")
+
 
         return True
 
