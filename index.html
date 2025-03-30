@@ -765,14 +765,17 @@
     <script>
     // Helper function to format a timestamp (14-digit string) into a human‑readable format.
     function formatTimestamp(timestampStr) {
-        // For example, use similar formatting as in your scores page:
-        const year = timestampStr.slice(0,4);
-        const month = timestampStr.slice(4,6);
-        const day = timestampStr.slice(6,8);
-        const hour = timestampStr.slice(8,10);
-        const minute = timestampStr.slice(10,12);
-        const second = timestampStr.slice(12,14);
+        // Extract timestamp using the new regex format
+        const timestampMatch = timestampStr.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
+        if (!timestampMatch) {
+            return "Invalid timestamp format";
+        }
+        // Split into date and time parts
+        const [datePart, timePart] = timestampMatch[1].split('_');
+        const [year, month, day] = datePart.split('-');
+        const [hour, minute, second] = timePart.split('-');
         const date = new Date(year, month - 1, day, hour, minute, second);
+        
         const options = {
             year: 'numeric',
             month: 'long',
@@ -780,7 +783,7 @@
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: true,
+            hour12: true
         };
         const dateFormatted = date.toLocaleString('en-US', options);
         return `<i class="fas fa-running"></i> ${dateFormatted}`;
@@ -804,7 +807,7 @@
             // Group files by timestamp (assuming a 14-digit timestamp in the filename)
             const groups = {};
             filteredFiles.forEach(file => {
-                const match = file.name.match(/(\d{14})/);
+                const match = file.name.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
                 if (match) {
                     const timestamp = match[1];
                     if (!groups[timestamp]) {
@@ -957,9 +960,86 @@
             If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.
             overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury. 
         </p>
-        <div class="graph-container">
-            <!-- Insert graph here -->
+
+        <div class="graph-container" id="image-container">
+            <!-- Images will be inserted here by JavaScript -->
         </div>
+    </section>
+
+    <script>
+        // Fetch the image data from GitHub API
+        async function fetchImages() {
+            const repoOwner = 'PressureSole';
+            const repoName = 'srdesign';
+            const folderPath = 'prosupvisual';
+
+            const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
+
+            try {
+                const response = await fetch(url);
+                const files = await response.json();
+
+                // Filter out non-image files (e.g., .png files)
+                const imageFiles = files.filter(file => file.name.endsWith(".png"));
+
+                // Process and sort the images by timestamp (newest first)
+                const imageData = imageFiles.map(file => {
+                    // Extract timestamp from the filename
+                    const filename = file.name;
+                    const timestampStr = filename.split('_')[2] + "_" + filename.split('_')[3];
+                    const timestamp = new Date(timestampStr.replace(/-/g, '/').replace(/_/g, ' '));
+
+                    const formattedTimestamp = timestamp.toLocaleString('en-US', {
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                    });
+
+                    return {
+                        filename: file.name,
+                        timestamp: formattedTimestamp,
+                        url: file.download_url
+                    };
+                });
+
+                // Sort images by timestamp (newest first)
+                imageData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                // Display images and their timestamps
+                displayImages(imageData);
+            } catch (error) {
+                console.error('Error fetching images:', error);
+            }
+        }
+
+        // Function to display images
+        function displayImages(images) {
+            const container = document.getElementById('image-container');
+            container.innerHTML = ''; // Clear any existing content
+
+            // Loop through each image and create the HTML for it
+            images.forEach(image => {
+                const imageElement = document.createElement('div');
+                imageElement.classList.add('image-item');
+
+                const timestamp = document.createElement('p');
+                timestamp.classList.add('timestamp');
+                timestamp.textContent = image.timestamp;
+
+                const img = document.createElement('img');
+                img.src = image.url;  // Image URL
+                img.alt = image.filename; // Optional alt text
+                img.classList.add('image');
+
+                // Append timestamp and image to the container
+                imageElement.appendChild(timestamp);
+                imageElement.appendChild(img);
+                container.appendChild(imageElement);
+            });
+        }
+
+        // Fetch and display images when the page loads
+        fetchImages();
+    </script>
     </section>
 </div>
 
