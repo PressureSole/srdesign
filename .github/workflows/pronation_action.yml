@@ -1,0 +1,29 @@
+name: Run Pronation Supination Analysis
+
+on:
+  push:
+    paths:
+      - 'runData/*.csv'  # Trigger only when new CSV files are added to runData
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'  # Use the correct version of Python
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy pandas matplotlib scipy PyGithub
+
+    - name: Run pronationsupination.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.EUG_SECRET }}
+      run: python pronationsupination.py
