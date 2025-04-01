@@ -9,6 +9,7 @@ Now processes all CSV files in the "runData" folder.
 import re
 import os
 import glob
+import json
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -17,13 +18,37 @@ from numpy import trapz
 # Regex pattern to match filenames like "Run_Data_yyyy-mm-dd_hh-mm-ss.csv"
 pattern = re.compile(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv")
 
-def calculate_refined_scores(filename, body_weight=700, window_size=0.2):
+def get_user_weight_newtons(profile_path="user_profile.json", default_lbs=150):
+    """
+    Retrieve the user's weight from the profile file, convert it from lbs to Newtons.
+    
+    Args:
+        profile_path (str): Path to the JSON profile file.
+        default_lbs (float): Default weight in lbs if retrieval fails.
+        
+    Returns:
+        float: Weight in Newtons.
+    """
+    try:
+        with open(profile_path, "r") as f:
+            profile = json.load(f)
+        # Assume the profile has a key "weight_lbs"
+        weight_lbs = profile.get("weight_lbs", default_lbs)
+    except Exception as e:
+        print("Error retrieving user weight, using default value:", e)
+        weight_lbs = default_lbs
+    
+    weight_kg = weight_lbs * 0.45359237  # lbs to kg
+    weight_newtons = weight_kg * 9.81      # kg to Newtons
+    return weight_newtons
+
+def calculate_refined_scores(filename, body_weight=weight_newtons, window_size=0.2):
     """
     Calculates refined fatigue, stress, and symmetry scores from treadmill data.
 
     Args:
         filename (str): Path to the CSV file.
-        body_weight (float, optional): Body weight in Newtons. Defaults to 700.
+        body_weight (float, optional): Body weight in Newtons. Pulls from Profile on web-app.
         window_size (float, optional): Size of the sliding window for fatigue analysis (as a fraction of total data). Defaults to 0.2.
 
     Returns:
@@ -115,6 +140,9 @@ if __name__ == '__main__':
     scores_dir = "scores"
     os.makedirs(scores_dir, exist_ok=True)
 
+    # Retrieve user weight in Newtons from the profile
+    user_weight_newtons = get_user_weight_newtons()
+
     # Use glob to find all CSV files in the runData folder that match the naming convention.
     run_files = glob.glob(os.path.join(run_data_dir, "Run_Data_*.csv"))
     
@@ -126,7 +154,8 @@ if __name__ == '__main__':
         
         for file in run_files:
             print(f"Processing file: {file}")
-            scores = calculate_refined_scores(file)
+            # Pass the user's weight into the score calculation
+            scores = calculate_refined_scores(file, body_weight=user_weight_newtons)
             # Extract the timestamp part from the filename.
             basename = os.path.basename(file)
             timestamp_part = basename[len("Run_Data_"):-len(".csv")]
