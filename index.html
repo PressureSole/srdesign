@@ -6,7 +6,7 @@
     <title>PressureSole App</title>
     <!--<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style> /*TEST TEST TEST*/
+    <style>
         body {
             height: 100%;
             margin: 0;
@@ -730,14 +730,23 @@
     
 <!-- VISUALIZAIONS tab ----------------------------------------------------------------------------->
     <div id="visualizations" class="content">
-        <h1>Score Visualizations</h1>
-        <div class="view-toggle">
-            <button id="switch-view-btn" onclick="switchView()">Switch to Gradient View</button>
+        <!-- Auth Prompt: Shown if the user is not logged in -->
+        <div id="visualizations-auth" class="auth-prompt">
+            <h1>Score Visualizations</h1>
+            <button class="cta-button" onclick="showPage('profile')">Sign Up / Log In</button>
         </div>
-        <!-- Section View Container -->
-        <div id="section-view" class="visualization-main"></div>
-        <!-- Gradient View Container -->
-        <div id="gradient-view" class="visualization-main" style="display: none;"></div>
+
+        <!-- Main Content: Shown only when the user is logged in -->
+        <div id="visualizations-content">
+            <h1>Score Visualizations</h1>
+            <div class="view-toggle">
+                <button id="switch-view-btn" onclick="switchView()">Switch to Gradient View</button>
+            </div>
+            <!-- Section View Container -->
+            <div id="section-view" class="visualization-main"></div>
+            <!-- Gradient View Container -->
+            <div id="gradient-view" class="visualization-main" style="display: none;"></div>
+        </div>
 
         <!-- <h1>Score Visualizations</h1>
         <div class="view-toggle">
@@ -785,209 +794,216 @@
         </div>
     </div>-->
 
-    <script>
-    // Helper function to format a timestamp (14-digit string) into a human‑readable format.
-    function formatTimestamp(timestampStr) {
-        // Extract timestamp using the new regex format
-        const timestampMatch = timestampStr.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
-        if (!timestampMatch) {
-            return "Invalid timestamp format";
-        }
-        // Split into date and time parts
-        const [datePart, timePart] = timestampMatch[1].split('_');
-        const [year, month, day] = datePart.split('-');
-        const [hour, minute, second] = timePart.split('-');
-        const date = new Date(year, month - 1, day, hour, minute, second);
-        
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-        const dateFormatted = date.toLocaleString('en-US', options);
-        return `<i class="fas fa-running"></i> ${dateFormatted}`;
-    }
-
-    // Function to load and display visualizations for a given view (either 'section' or 'gradient')
-    async function loadVisualizations(viewType) {
-        const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/images';
-        try {
-            const response = await fetch(repoUrl);
-            if (!response.ok) {
-                console.error('Failed to fetch images.');
-                return;
+        <script>
+        // Helper function to format a timestamp (14-digit string) into a human‑readable format.
+        function formatTimestamp(timestampStr) {
+            // Extract timestamp using the new regex format
+            const timestampMatch = timestampStr.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
+            if (!timestampMatch) {
+                return "Invalid timestamp format";
             }
-            const files = await response.json();
-            // Filter files that contain the viewType (e.g., "section" or "gradient") and either "symmetry" or "fatigue"
-            const filteredFiles = files.filter(file =>
-                file.name.includes(viewType) && (file.name.includes('symmetry') || file.name.includes('fatigue'))
-            );
+            // Split into date and time parts
+            const [datePart, timePart] = timestampMatch[1].split('_');
+            const [year, month, day] = datePart.split('-');
+            const [hour, minute, second] = timePart.split('-');
+            const date = new Date(year, month - 1, day, hour, minute, second);
+            
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            const dateFormatted = date.toLocaleString('en-US', options);
+            return `<i class="fas fa-running"></i> ${dateFormatted}`;
+        }
 
-            // Group files by timestamp (assuming a 14-digit timestamp in the filename)
-            const groups = {};
-            filteredFiles.forEach(file => {
-                const match = file.name.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
-                if (match) {
-                    const timestamp = match[1];
-                    if (!groups[timestamp]) {
-                        groups[timestamp] = [];
+        // Function to load and display visualizations for a given view (either 'section' or 'gradient')
+        async function loadVisualizations(viewType) {
+            const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/images';
+            try {
+                const response = await fetch(repoUrl);
+                if (!response.ok) {
+                    console.error('Failed to fetch images.');
+                    return;
+                }
+                const files = await response.json();
+                // Filter files that contain the viewType (e.g., "section" or "gradient") and either "symmetry" or "fatigue"
+                const filteredFiles = files.filter(file =>
+                    file.name.includes(viewType) && (file.name.includes('symmetry') || file.name.includes('fatigue'))
+                );
+
+                // Group files by timestamp (assuming a 14-digit timestamp in the filename)
+                const groups = {};
+                filteredFiles.forEach(file => {
+                    const match = file.name.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
+                    if (match) {
+                        const timestamp = match[1];
+                        if (!groups[timestamp]) {
+                            groups[timestamp] = [];
+                        }
+                        groups[timestamp].push(file);
                     }
-                    groups[timestamp].push(file);
-                }
-            });
-            // Sort timestamps in descending order so the most recent is first
-            const sortedTimestamps = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+                });
+                // Sort timestamps in descending order so the most recent is first
+                const sortedTimestamps = Object.keys(groups).sort((a, b) => b.localeCompare(a));
 
-            // Select the proper container based on viewType
-            const containerElement = document.getElementById(viewType + '-view'); // e.g. section-view or gradient-view
-            containerElement.innerHTML = ''; // clear any existing content
+                // Select the proper container based on viewType
+                const containerElement = document.getElementById(viewType + '-view'); // e.g. section-view or gradient-view
+                containerElement.innerHTML = ''; // clear any existing content
 
-            // Create a visualization container for each timestamp group
-            sortedTimestamps.forEach(timestamp => {
-                const groupFiles = groups[timestamp];
-                // Find the symmetry image (assume one image per group)
-                const symmetryImage = groupFiles.find(file => file.name.includes('symmetry'));
-                // Get up to three fatigue images
-                const fatigueImages = groupFiles.filter(file => file.name.includes('fatigue')).slice(0, 3);
+                // Create a visualization container for each timestamp group
+                sortedTimestamps.forEach(timestamp => {
+                    const groupFiles = groups[timestamp];
+                    // Find the symmetry image (assume one image per group)
+                    const symmetryImage = groupFiles.find(file => file.name.includes('symmetry'));
+                    // Get up to three fatigue images
+                    const fatigueImages = groupFiles.filter(file => file.name.includes('fatigue')).slice(0, 3);
 
-                // Create the outer container
-                const visContainer = document.createElement('div');
-                visContainer.classList.add('visualization-container');
+                    // Create the outer container
+                    const visContainer = document.createElement('div');
+                    visContainer.classList.add('visualization-container');
 
-                // Create header with formatted timestamp (similar to the scores header)
-                const headerDiv = document.createElement('div');
-                headerDiv.classList.add('visualization-header');
-                headerDiv.innerHTML = formatTimestamp(timestamp);
-                visContainer.appendChild(headerDiv);
+                    // Create header with formatted timestamp (similar to the scores header)
+                    const headerDiv = document.createElement('div');
+                    headerDiv.classList.add('visualization-header');
+                    headerDiv.innerHTML = formatTimestamp(timestamp);
+                    visContainer.appendChild(headerDiv);
 
-                // Create the container for graphs
-                const graphsDiv = document.createElement('div');
-                graphsDiv.classList.add('graphs-container');
+                    // Create the container for graphs
+                    const graphsDiv = document.createElement('div');
+                    graphsDiv.classList.add('graphs-container');
 
-                // Create the symmetry group (left column)
-                const symmetryDiv = document.createElement('div');
-                symmetryDiv.classList.add('graph-group', 'symmetry');
-                const symmetryHeader = document.createElement('h2');
-                symmetryHeader.classList.add('visualization-card-header');
-                symmetryHeader.textContent = 'Symmetry';
-                symmetryDiv.appendChild(symmetryHeader);
-                if (symmetryImage) {
-                    const img = document.createElement('img');
-                    img.src = `https://raw.githubusercontent.com/PressureSole/srdesign/main/${symmetryImage.path}`;
-                    img.alt = symmetryImage.name;
-                    symmetryDiv.appendChild(img);
-                } else {
-                    symmetryDiv.innerHTML += '<p>No symmetry image</p>';
-                }
-
-                // Create the fatigue group (right three columns)
-                const fatigueDiv = document.createElement('div');
-                fatigueDiv.classList.add('graph-group', 'fatigue');
-                const fatigueHeader = document.createElement('h2');
-                fatigueHeader.classList.add('visualization-card-header');
-                fatigueHeader.textContent = 'Fatigue';
-                fatigueDiv.appendChild(fatigueHeader);
-                const fatigueGraphsDiv = document.createElement('div');
-                fatigueGraphsDiv.classList.add('fatigue-graphs');
-                if (fatigueImages.length > 0) {
-                    fatigueImages.forEach(file => {
+                    // Create the symmetry group (left column)
+                    const symmetryDiv = document.createElement('div');
+                    symmetryDiv.classList.add('graph-group', 'symmetry');
+                    const symmetryHeader = document.createElement('h2');
+                    symmetryHeader.classList.add('visualization-card-header');
+                    symmetryHeader.textContent = 'Symmetry';
+                    symmetryDiv.appendChild(symmetryHeader);
+                    if (symmetryImage) {
                         const img = document.createElement('img');
-                        img.src = `https://raw.githubusercontent.com/PressureSole/srdesign/main/${file.path}`;
-                        img.alt = file.name;
-                        fatigueGraphsDiv.appendChild(img);
-                    });
-                } else {
-                    fatigueGraphsDiv.innerHTML = '<p>No fatigue images</p>';
-                }
-                fatigueDiv.appendChild(fatigueGraphsDiv);
+                        img.src = `https://raw.githubusercontent.com/PressureSole/srdesign/main/${symmetryImage.path}`;
+                        img.alt = symmetryImage.name;
+                        symmetryDiv.appendChild(img);
+                    } else {
+                        symmetryDiv.innerHTML += '<p>No symmetry image</p>';
+                    }
 
-                // Append both graph groups to the graphs container
-                graphsDiv.appendChild(symmetryDiv);
-                graphsDiv.appendChild(fatigueDiv);
-                visContainer.appendChild(graphsDiv);
+                    // Create the fatigue group (right three columns)
+                    const fatigueDiv = document.createElement('div');
+                    fatigueDiv.classList.add('graph-group', 'fatigue');
+                    const fatigueHeader = document.createElement('h2');
+                    fatigueHeader.classList.add('visualization-card-header');
+                    fatigueHeader.textContent = 'Fatigue';
+                    fatigueDiv.appendChild(fatigueHeader);
+                    const fatigueGraphsDiv = document.createElement('div');
+                    fatigueGraphsDiv.classList.add('fatigue-graphs');
+                    if (fatigueImages.length > 0) {
+                        fatigueImages.forEach(file => {
+                            const img = document.createElement('img');
+                            img.src = `https://raw.githubusercontent.com/PressureSole/srdesign/main/${file.path}`;
+                            img.alt = file.name;
+                            fatigueGraphsDiv.appendChild(img);
+                        });
+                    } else {
+                        fatigueGraphsDiv.innerHTML = '<p>No fatigue images</p>';
+                    }
+                    fatigueDiv.appendChild(fatigueGraphsDiv);
 
-                // Append the visualization container to the main container for the view
-                containerElement.appendChild(visContainer);
-            });
-        } catch (error) {
-            console.error('Error fetching visualization images:', error);
+                    // Append both graph groups to the graphs container
+                    graphsDiv.appendChild(symmetryDiv);
+                    graphsDiv.appendChild(fatigueDiv);
+                    visContainer.appendChild(graphsDiv);
+
+                    // Append the visualization container to the main container for the view
+                    containerElement.appendChild(visContainer);
+                });
+            } catch (error) {
+                console.error('Error fetching visualization images:', error);
+            }
         }
-    }
 
-    // Toggle between section and gradient views (update button text and reload visualizations)
-    function switchView() {
-        const sectionView = document.getElementById('section-view');
-        const gradientView = document.getElementById('gradient-view');
-        const button = document.getElementById('switch-view-btn');
+        // Toggle between section and gradient views (update button text and reload visualizations)
+        function switchView() {
+            const sectionView = document.getElementById('section-view');
+            const gradientView = document.getElementById('gradient-view');
+            const button = document.getElementById('switch-view-btn');
 
-        if (sectionView.style.display === "none") {
-            sectionView.style.display = "block";
-            gradientView.style.display = "none";
-            button.innerHTML = "Switch to Gradient View";
+            if (sectionView.style.display === "none") {
+                sectionView.style.display = "block";
+                gradientView.style.display = "none";
+                button.innerHTML = "Switch to Gradient View";
+                loadVisualizations('section');
+            } else {
+                sectionView.style.display = "none";
+                gradientView.style.display = "block";
+                button.innerHTML = "Switch to Section View";
+                loadVisualizations('gradient');
+            }
+        }
+
+        // When the page loads, default to the section view
+        window.onload = function() {
             loadVisualizations('section');
-        } else {
-            sectionView.style.display = "none";
-            gradientView.style.display = "block";
-            button.innerHTML = "Switch to Section View";
-            loadVisualizations('gradient');
-        }
-    }
-
-    // When the page loads, default to the section view
-    window.onload = function() {
-        loadVisualizations('section');
-    };
-    </script>
-</div>
+        };
+        </script>
+    </div>
 
 
 
 <!-- GAIT MECH tab ------------------------------------------------------------------- -->
-<div id="gait-mechanics" class="content">    
-    <h1>Gait Mechanics</h1>
-    
-    <!-- Cadence Section -->
-    <section id="cadence">
-        <h2>Cadence</h2>
-        <button onclick="toggleDetails('cadence-details')">Details</button>
-        <p id="cadence-details" class="details" style="display:none;">
-            The number of steps taken per unit of time, expressed in steps per minute. A good running cadence typically falls around 170-180 steps per minute (SPM) for most runners. A cadence lower than 160 SPM often indicates overstriding, which can increase impact forces and elevate the risk of injuries such as shin splints or knee pain. Conversely, a cadence significantly higher than 190 SPM may suggest a short, inefficient stride that can lead to excessive muscular fatigue. To improve cadence, runners can focus on strength training, especially targeting the core, glutes, and hip flexors to improve stability and control. Incorporating dynamic stretching and mobility work can help improve flexibility and range of motion, allowing for a more efficient stride. Doing short intervals at a higher cadence can also help runners safely reach and maintain an optimal cadence.
-        </p>
-        <div class="graph-container">
-            <!-- Insert graph here -->
-        </div>
-    </section>
-    
-    <!-- Ground Contact Time Section -->
-    <section id="stance-time">
-        <h2>Stance Time</h2>
-        <button onclick="toggleDetails('stance-details')">Details</button>
-        <p id="stance-details" class="details" style="display:none;">
-            The duration for which a foot remains in contact with the ground during a gait cycle. Stance time, the amount of time a foot stays in contact with the ground during running, is typically around 200-300 milliseconds for most runners. A longer stance time (above 300 ms) often indicates inefficient mechanics, such as overstriding or weak push-off, which can increase the risk of injuries like plantar fasciitis or Achilles tendinopathy. On the other hand, a very short stance time (below 200 ms) may suggest insufficient shock absorption, leading to increased stress on the joints and muscles. To improve stance time, runners can work on strength training, particularly focusing on the glutes, calves, and hamstrings to generate a stronger, more efficient push-off. Incorporating plyometric exercises and single-leg balance drills can enhance foot strength and neuromuscular coordination. Additionally, practicing running drills that promote a quick, light foot strike, such as high knees and quick cadence strides, can help reduce stance time and improve running efficiency.
-        </p>
-        <div class="graph-container">
-            <!-- Insert graph here -->
-        </div>
-    </section>
-    
-    <!-- Supination/Pronation Section -->
-    <section id="supination/pronation">
-        <h2>Supination/Pronation</h2>
-        <button onclick="toggleDetails('supination-details')">Details</button>
-        <p id="supination-details" class="details" style="display:none;">
-            If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
-            If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.
-            overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury. 
-        </p>
+<div id="gait-mechanics" class="content">
+    <!-- Auth Prompt -->
+    <div id="gait-mechanics-auth" class="auth-prompt">
+        <h1>Gait Mechanics</h1>
+        <button class="cta-button" onclick="showPage('profile')">Sign Up / Log In</button>
+    </div>    
 
-        <div class="graph-container" id="image-container">
-            <!-- Images will be inserted here by JavaScript -->
-        </div>
-    </section>
+    <div id="gait-mechanics-content">
+        <h1>Gait Mechanics</h1>
+        <!-- Cadence Section -->
+        <section id="cadence">
+            <h2>Cadence</h2>
+            <button onclick="toggleDetails('cadence-details')">Details</button>
+            <p id="cadence-details" class="details" style="display:none;">
+                The number of steps taken per unit of time, expressed in steps per minute. A good running cadence typically falls around 170-180 steps per minute (SPM) for most runners. A cadence lower than 160 SPM often indicates overstriding, which can increase impact forces and elevate the risk of injuries such as shin splints or knee pain. Conversely, a cadence significantly higher than 190 SPM may suggest a short, inefficient stride that can lead to excessive muscular fatigue. To improve cadence, runners can focus on strength training, especially targeting the core, glutes, and hip flexors to improve stability and control. Incorporating dynamic stretching and mobility work can help improve flexibility and range of motion, allowing for a more efficient stride. Doing short intervals at a higher cadence can also help runners safely reach and maintain an optimal cadence.
+            </p>
+            <div class="graph-container">
+                <!-- Insert graph here -->
+            </div>
+        </section>
+        
+        <!-- Ground Contact Time Section -->
+        <section id="stance-time">
+            <h2>Stance Time</h2>
+            <button onclick="toggleDetails('stance-details')">Details</button>
+            <p id="stance-details" class="details" style="display:none;">
+                The duration for which a foot remains in contact with the ground during a gait cycle. Stance time, the amount of time a foot stays in contact with the ground during running, is typically around 200-300 milliseconds for most runners. A longer stance time (above 300 ms) often indicates inefficient mechanics, such as overstriding or weak push-off, which can increase the risk of injuries like plantar fasciitis or Achilles tendinopathy. On the other hand, a very short stance time (below 200 ms) may suggest insufficient shock absorption, leading to increased stress on the joints and muscles. To improve stance time, runners can work on strength training, particularly focusing on the glutes, calves, and hamstrings to generate a stronger, more efficient push-off. Incorporating plyometric exercises and single-leg balance drills can enhance foot strength and neuromuscular coordination. Additionally, practicing running drills that promote a quick, light foot strike, such as high knees and quick cadence strides, can help reduce stance time and improve running efficiency.
+            </p>
+            <div class="graph-container">
+                <!-- Insert graph here -->
+            </div>
+        </section>
+        
+        <!-- Supination/Pronation Section -->
+        <section id="supination/pronation">
+            <h2>Supination/Pronation</h2>
+            <button onclick="toggleDetails('supination-details')">Details</button>
+            <p id="supination-details" class="details" style="display:none;">
+                If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
+                If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.
+                overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury. 
+            </p>
+
+            <div class="graph-container" id="image-container">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </section>
+    </div>
 
     <script>
         // Fetch the image data from GitHub API
@@ -1063,7 +1079,6 @@
         // Fetch and display images when the page loads
         fetchImages();
     </script>
-    </section>
 </div>
 
 <style>
@@ -1107,94 +1122,101 @@
 
     <!-- SCORES tab ------------------------------------------------------------- -->
     <div id="scores" class="content">
-        <h1>Scores</h1>
-        <div id="scoresContainer" class="scoresContainerMain"></div>
-        <div class="scores-container">
-            <!-- Stress Score -->
-            <!--<div class="score-item">
-                <div class="score-circle stress" data-color="green"> 
-                    <div class="label">Stress</div>
-                    <div class="circle-content">
-                        <svg width="200" height="200" viewBox="0 0 100 100">-->
-                            <!-- Background Circle -->
-                            <!--<circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />-->
-                            
-                            <!-- Wrap the foreground circle in a group with an inline transform -->
-                            <!--<g transform="rotate(-90,50,50)">
-                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
-                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
-                            </g>
-                        </svg>
-                        <div class="number">0</div>-->
-                        <!-- <div class="number">6</div> -->
-                    <!--</div>
-                </div>-->
-                <!-- Details button and box -->
-                <!--<button class="details-btn">Details</button>
-                <div class="details-box"></div>
-            </div>-->
-            
+        <!-- Auth Prompt -->
+        <div id="scores-auth" class="auth-prompt">
+            <h1>Scores</h1>
+            <button class="cta-button" onclick="showPage('profile')">Sign Up / Log In</button>
+        </div>
 
-            <!-- Symmetry Score -->
-            <!--<div class="score-item">
-                <div class="score-circle symmetry" data-color="green"> 
-                    <div class="label">Symmetry</div>
-                    <div class="circle-content">
-                        <svg width="200" height="200" viewBox="0 0 100 100">-->
-                            <!-- Background Circle -->
-                            <!--<circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />-->
-                            
-                            <!-- Wrap the foreground circle in a group with an inline transform -->
-                            <!--<g transform="rotate(-90,50,50)">
-                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
-                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
-                            </g>
-                        </svg>
-                        <div class="number">0</div>
-                    </div>
+        <div id="scores-content">
+            <h1>Scores</h1>
+            <div id="scoresContainer" class="scoresContainerMain"></div>
+            <div class="scores-container">
+                <!-- Stress Score -->
+                <!--<div class="score-item">
+                    <div class="score-circle stress" data-color="green"> 
+                        <div class="label">Stress</div>
+                        <div class="circle-content">
+                            <svg width="200" height="200" viewBox="0 0 100 100">-->
+                                <!-- Background Circle -->
+                                <!--<circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />-->
+                                
+                                <!-- Wrap the foreground circle in a group with an inline transform -->
+                                <!--<g transform="rotate(-90,50,50)">
+                                    <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                        stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                                </g>
+                            </svg>
+                            <div class="number">0</div>-->
+                            <!-- <div class="number">6</div> -->
+                        <!--</div>
+                    </div>-->
+                    <!-- Details button and box -->
+                    <!--<button class="details-btn">Details</button>
+                    <div class="details-box"></div>
                 </div>-->
-                <!-- Details button and box -->
-                <!--<button class="details-btn">Details</button>
-                <div class="details-box"></div>
-            </div>-->
 
-            <!-- Fatigue (Left) Score -->
-            <!--<div class="score-item">
-                <div class="score-circle fatigue-left" data-color="green">
-                    <div class="label">Fatigue (Left)</div>
-                    <div class="circle-content">
-                        <svg width="200" height="200" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
-                            <g transform="rotate(-90,50,50)">
-                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                <!-- Symmetry Score -->
+                <!--<div class="score-item">
+                    <div class="score-circle symmetry" data-color="green"> 
+                        <div class="label">Symmetry</div>
+                        <div class="circle-content">
+                            <svg width="200" height="200" viewBox="0 0 100 100">-->
+                                <!-- Background Circle -->
+                                <!--<circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />-->
+                                
+                                <!-- Wrap the foreground circle in a group with an inline transform -->
+                                <!--<g transform="rotate(-90,50,50)">
+                                    <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
                                         stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
-                            </g>
-                        </svg>
-                        <div class="number">0</div>
+                                </g>
+                            </svg>
+                            <div class="number">0</div>
+                        </div>
+                    </div>-->
+                    <!-- Details button and box -->
+                    <!--<button class="details-btn">Details</button>
+                    <div class="details-box"></div>
+                </div>-->
+
+                <!-- Fatigue (Left) Score -->
+                <!--<div class="score-item">
+                    <div class="score-circle fatigue-left" data-color="green">
+                        <div class="label">Fatigue (Left)</div>
+                        <div class="circle-content">
+                            <svg width="200" height="200" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                                <g transform="rotate(-90,50,50)">
+                                    <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                            stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                                </g>
+                            </svg>
+                            <div class="number">0</div>
+                        </div>
                     </div>
-                </div>
-                <button class="details-btn">Details</button>
-                <div class="details-box"></div>
-            </div>-->
-            
-            <!-- Fatigue (Right) Score -->
-            <!--<div class="score-item">
-                <div class="score-circle fatigue-right" data-color="green">
-                    <div class="label">Fatigue (Right)</div>
-                    <div class="circle-content">
-                        <svg width="200" height="200" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
-                            <g transform="rotate(-90,50,50)">
-                                <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
-                                        stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
-                            </g>
-                        </svg>
-                        <div class="number">0</div>
+                    <button class="details-btn">Details</button>
+                    <div class="details-box"></div>
+                </div>-->
+                
+                <!-- Fatigue (Right) Score -->
+                <!--<div class="score-item">
+                    <div class="score-circle fatigue-right" data-color="green">
+                        <div class="label">Fatigue (Right)</div>
+                        <div class="circle-content">
+                            <svg width="200" height="200" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#ddd" stroke-width="10" />
+                                <g transform="rotate(-90,50,50)">
+                                    <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="green" stroke-width="10"
+                                            stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                                </g>
+                            </svg>
+                            <div class="number">0</div>
+                        </div>
                     </div>
-                </div>
-                <button class="details-btn">Details</button>
-                <div class="details-box"></div>
-            </div> -->
+                    <button class="details-btn">Details</button>
+                    <div class="details-box"></div>
+                </div> -->
+            </div>
         </div>
     </div>
 
@@ -1459,6 +1481,11 @@
             var pageToShow = document.getElementById(pageId);
             if (pageToShow) {
                 pageToShow.classList.add('active');
+
+                // If this is one of the pages that depend on authentication, check auth.
+                if (['visualizations', 'gait-mechanics', 'scores'].includes(pageId)) {
+                    checkAuth(pageId);
+                }
                 // If the home page is being shown, update the home button
                 if (pageId === 'home') {
                     updateHomeProfileButton();
@@ -1468,8 +1495,26 @@
             }
         }
 
+        // Check AUTH (User must be logged in) -------------------------------------------------------
+        function checkAuth(pageId) {
+            if (['visualizations', 'gait-mechanics', 'scores'].includes(pageId)) {
+                const isLoggedIn = localStorage.getItem('currentUser');
+                const authDiv = document.getElementById(pageId + '-auth');
+                const contentDiv = document.getElementById(pageId + '-content');
+                
+                if (!isLoggedIn) {
+                    authDiv.style.display = 'block';
+                    contentDiv.style.display = 'none';
+                } else {
+                    authDiv.style.display = 'none';
+                    contentDiv.style.display = 'block';
+                }
+            }
+        }
+
         // Auto Score Load -----------------------------------------------------------------
         // Helper: Convert a timestamp string ("YYYY-MM-DD_HH-MM-SS") to a formatted header string.
+        let latestTimestamp = ''; // Global variable to hold the latest timestamp from your score file
         function formatTimestampFromFilename(timestampStr) {
             // Split the string into date and time parts.
             const parts = timestampStr.split('_'); // parts[0]: "YYYY-MM-DD", parts[1]: "HH-MM-SS"
@@ -1669,6 +1714,7 @@
                     // For the most recent file only, update the home stats.
                     if (isFirst) {
                         scoreValues = latestScoreValues;
+                        latestTimestamp = timestampPart;  // Save the timestamp from the score file
                         // Pass the extracted timestamp string to updateHomeRunStats.
                         updateHomeRunStats(timestampPart);
                         isFirst = false;
@@ -1726,10 +1772,34 @@
 
         // Ensure the button state is correct when the page loads.
         document.addEventListener('DOMContentLoaded', function() {
+            localStorage.removeItem('currentUser');
             updateHomeProfileButton();
         });
         
         function updateHomeRunStats(timestampPart) {
+            const homeTimestampCst = document.getElementById('home-timestamp');
+            // Check if a user is logged in
+            if (!localStorage.getItem('currentUser')) {
+                // User is not logged in: set default values
+                homeTimestampCst.innerHTML = `<i class="fas fa-running"></i> –––`;
+                document.getElementById('home-stress').querySelector('span').textContent = "0";
+                document.getElementById('home-symmetry').querySelector('span').textContent = "0";
+                document.getElementById('home-fatigue-left').querySelector('span').textContent = "0";
+                document.getElementById('home-fatigue-right').querySelector('span').textContent = "0";
+                return; // exit the function without doing any further updates
+            }
+            
+            // If a timestamp is provided, use it.
+            if (timestampPart) {
+                homeTimestampCst.innerHTML = formatTimestampFromFilename(timestampPart);
+            } else if (latestTimestamp) {
+                // If no parameter but we have a stored timestamp, use that.
+                homeTimestampCst.innerHTML = formatTimestampFromFilename(latestTimestamp);
+            } else {
+                // Fallback placeholder if no timestamp is available.
+                homeTimestampCst.innerHTML = `<i class="fas fa-running"></i> –––`;
+            }
+
             // Get the stat items from the home page.
             const homeStress = document.getElementById('home-stress');
             const homeSymmetry = document.getElementById('home-symmetry');
@@ -2007,6 +2077,14 @@
                 alert("Incorrect password.");
                 return;
                 }
+
+                // Set the currentUser flag.
+                localStorage.setItem('currentUser', username);
+                // Immediately update the UI on the affected pages
+                ['visualizations', 'gait-mechanics', 'scores'].forEach(checkAuth);
+                // Also update the home run stats explicitly:
+                updateHomeRunStats();
+
                 document.getElementById('signup-login-container').style.display = 'none';
                 document.getElementById('display-username').value = profileData.username;
                 document.getElementById('display-password').value = profileData.password;
@@ -2048,6 +2126,14 @@
                 gender: gender
                 };
                 localStorage.setItem('profile_' + username, JSON.stringify(profileData));
+
+                // Set the currentUser flag.
+                localStorage.setItem('currentUser', username);
+                // Immediately update the UI on the affected pages
+                ['visualizations', 'gait-mechanics', 'scores'].forEach(checkAuth);
+                // Also update the home run stats explicitly:
+                updateHomeRunStats();
+
                 document.getElementById('signup-login-container').style.display = 'none';
                 document.getElementById('display-username').value = username;
                 document.getElementById('display-password').value = password;
