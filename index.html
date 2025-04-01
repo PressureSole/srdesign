@@ -105,13 +105,35 @@
 
         .left-half h1 {
             font-size: 42px;
+            color: #000;
+            margin-bottom: 0;
+        }
+
+        .left-half h2 {
             color: #333;
+            margin-bottom: 0;
         }
 
         .left-half p {
             font-size: 18px;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 0;
+        }
+
+        #home-profile-btn {
+            background-color: grey;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 50%;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .cta-button {
@@ -665,6 +687,7 @@
                 <h2>Real-time Gait Tracking</h2>
                 <p>Monitor your running mechanics with live feedback and optimize your performance.</p>
                 <!-- I want the Sign Up / Log In button here -->
+                <button id="home-profile-btn">Go to Profile</button>
             </div>
             <!-- Right Half - "Your Last Run" Stats -->
             <div class="right-half">
@@ -1436,6 +1459,10 @@
             var pageToShow = document.getElementById(pageId);
             if (pageToShow) {
                 pageToShow.classList.add('active');
+                // If the home page is being shown, update the home button
+                if (pageId === 'home') {
+                    updateHomeProfileButton();
+                }
             } else {
                 console.error("No page found with id:", pageId);
             }
@@ -1684,6 +1711,24 @@
         });
 
         // HOME Page -----------------------------------------------------------------------
+        // Set up the click event on the home page button.
+        document.getElementById('home-profile-btn').addEventListener('click', function() {
+            if (localStorage.getItem('currentUser')) {
+                // If user is logged in, show the profile tab and display the user's profile.
+                showPage('profile');
+                document.getElementById('signup-login-container').style.display = 'none';
+                document.getElementById('your-profile').style.display = 'block';
+            } else {
+                // If not logged in, take user to the profile tab (which shows sign up / log in forms).
+                showPage('profile');
+            }
+        });
+
+        // Ensure the button state is correct when the page loads.
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHomeProfileButton();
+        });
+        
         function updateHomeRunStats(timestampPart) {
             // Get the stat items from the home page.
             const homeStress = document.getElementById('home-stress');
@@ -1971,8 +2016,10 @@
                 document.getElementById('display-gender').value = profileData.gender;
                 document.getElementById('your-profile').style.display = 'block';
 
+                // Update the home button so it turns red and changes its label.
+                updateHomeProfileButton();
                 // **NEW LINE: Update the Run History with the stored test scores**
-                updateRunHistory();
+                // updateRunHistory(); Not needed right now
             });
             
             // Sign Up functionality
