@@ -80,12 +80,12 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
     # Plot COP with color mapped to time
-    plt.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='viridis', marker='.', label=f'COP Trajectory (Left) {label}')
-    plt.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='viridis', marker='.', label=f'COP Trajectory (Right) {label}')
+    plt.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Left) {label}')
+    plt.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Right) {label}')
 
     # Add a colorbar to represent time
     cbar = plt.colorbar()
-    cbar.set_label('Time (Yellow most recent)')
+    cbar.set_label('Time (Red most recent)')
     plt.xticks([])
     plt.yticks([])
     plt.xlabel('X Position (mm)')
