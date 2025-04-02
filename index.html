@@ -1128,6 +1128,8 @@
             <button class="cta-button" onclick="showPage('profile')">Sign Up / Log In</button>
         </div>
 
+        <!--    Total_Stress = min(((R_Stress + L_Stress) / 2), 100)  -->
+
         <div id="scores-content">
             <h1>Scores</h1>
             <div id="scoresContainer" class="scoresContainerMain"></div>
@@ -1513,6 +1515,16 @@
         }
 
         // Auto Score Load -----------------------------------------------------------------
+
+        // Global variable to hold the raw scores loaded from file
+        let rawScores = {
+            R_Stress: 0,
+            L_Stress: 0,
+            Symmetry_Score: 0,
+            Right_Fatigue: 0,
+            Left_Fatigue: 0
+        };
+
         // Helper: Convert a timestamp string ("YYYY-MM-DD_HH-MM-SS") to a formatted header string.
         let latestTimestamp = ''; // Global variable to hold the latest timestamp from your score file
         function formatTimestampFromFilename(timestampStr) {
@@ -1627,11 +1639,67 @@
             return scoreItem;
         }
 
-        // Main function: Load all score files from the GitHub repo scores folder.
+        // Helper: Retrieve the current user's profile from localStorage.
+        function getUserProfile() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) return null;
+            const profileJSON = localStorage.getItem('profile_' + currentUser);
+            return profileJSON ? JSON.parse(profileJSON) : null;
+        }
+
+        // Helper: Retrieve the user's weight (in Newtons) from the profile.
+        function getUserWeightNewtons() {
+            const profile = getUserProfile();
+            if (profile && profile.weight) {
+                    const weightKg = Number(profile.weight) * 0.45359237;
+                    return weightKg * 9.81;
+            }
+            return null;
+        }
+
+        // Recalculate Total_Stress for the home page using the globally stored rawScores.
+        // This is used to update the home run stats box.
+        // This function assumes that rawScores has been updated from the most recent file.
+        function updateFinalStressScores() {
+            // Retrieve the user's weight from the profile display (or storage)
+            const profile = getUserProfile();
+            if (!profile || !profile.weight) {
+                console.error("User profile or weight not available; cannot compute Total_Stress.");
+                return;
+            }
+            // Convert weight (in lbs) to kg then to Newtons.
+            const weightKg = Number(profile.weight) * 0.45359237;
+            const bodyweight_newtons = weightKg * 9.81;
+            
+            // Calculate the stress contributions from the raw scores.
+            const R_Stress_final = rawScores.R_Stress / bodyweight_newtons;
+            const L_Stress_final = rawScores.L_Stress / bodyweight_newtons;
+            const totalStress = Math.min((R_Stress_final + L_Stress_final) / 2, 100);
+            
+            // Update the global scoreValues array:
+            // [0] = Total_Stress, [1] = Symmetry_Score, [2] = Left_Fatigue, [3] = Right_Fatigue
+            scoreValues = [
+                totalStress,
+                rawScores.Symmetry_Score || 0,
+                rawScores.Left_Fatigue || 0,
+                rawScores.Right_Fatigue || 0
+            ];
+            
+            // Update the Home page's Stress display.
+            const homeStressEl = document.getElementById('home-stress').querySelector('span');
+            if (homeStressEl) {
+                homeStressEl.textContent = totalStress.toFixed(2);
+            }
+            
+            console.log("updateFinalStressScores: Total_Stress =", totalStress);
+        }
+
+        // --- Build/Rebuild the Scores Page ---
+        // When a user is logged in, we want to use our recalculated Total_Stress from scoreValues[0].
+        // Otherwise, we fall back to using the raw average from the file.
         async function loadAllScores() {
-            console.log("loadAllScores function triggered");
+            console.log("loadAllScores triggered");
             try {
-                // URL for the contents of the "scores" folder in your GitHub repo.
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
                 const response = await fetch(repoUrl);
                 if (!response.ok) {
@@ -1639,7 +1707,7 @@
                     return;
                 }
                 const files = await response.json();
-                // Filter files matching the pattern: scores_YYYY-MM-DD_HH-MM-SS.txt
+                // Filter files matching the pattern
                 const scoreFiles = files.filter(file =>
                     /^scores_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.txt$/.test(file.name)
                 );
@@ -1647,104 +1715,104 @@
                     console.error('No score files found.');
                     return;
                 }
-                // Sort the files in reverse chronological order.
-                // File name format: "scores_YYYY-MM-DD_hh-mm-ss.txt"
+
+                // Sort newest → oldest by parsing timestamps
+                //scoreFiles.sort((a, b) => {
+                //    const tsA = a.name.slice("scores_".length, -".txt".length); 
+                //    const tsB = b.name.slice("scores_".length, -".txt".length);
+                //    const dateA = new Date(tsA.replace('_','T').replace(/-/g,':'));
+                //    const dateB = new Date(tsB.replace('_','T').replace(/-/g,':'));
+                //    return dateB - dateA;  // descending
+                //});
+
                 scoreFiles.sort((a, b) => {
                     const tsA = a.name.slice("scores_".length, -".txt".length); // e.g. "2025-03-30_12-00-00"
                     const tsB = b.name.slice("scores_".length, -".txt".length);
-
-                    // Split into date and time parts.
-                    const partsA = tsA.split('_'); // partsA[0] = "2025-03-30", partsA[1] = "12-00-00"
-                    const partsB = tsB.split('_');
-                    
-                    // Convert the time parts to colon-separated format and create ISO strings.
-                    const isoA = partsA[0] + 'T' + partsA[1].replace(/-/g, ':'); // "2025-03-30T12:00:00"
-                    const isoB = partsB[0] + 'T' + partsB[1].replace(/-/g, ':');
-                    
-                    const dateA = new Date(isoA);
-                    const dateB = new Date(isoB);
-                    return dateB - dateA;
+                    // Convert to ISO format by replacing '_' with 'T'
+                    const dateA = new Date(tsA.replace('_', 'T'));
+                    const dateB = new Date(tsB.replace('_', 'T'));
+                    return dateB - dateA; // Newest first
                 });
-                
-                // Get the main container in the scores page where we'll append each score container.
-                const scoresMainContainer = document.getElementById('scoresContainer');
-                scoresMainContainer.innerHTML = ''; // clear any existing content
 
-                // Flag to update home stats only once (using the most recent file)
+                const scoresMainContainer = document.getElementById('scoresContainer');
+                scoresMainContainer.innerHTML = '';
+
                 let isFirst = true;
-                
-                // Loop through each score file.
                 for (const file of scoreFiles) {
-                    // Fetch the file content.
                     const fileResponse = await fetch(file.download_url);
                     if (!fileResponse.ok) {
                         console.error('Failed to fetch file:', file.name);
                         continue;
                     }
                     const text = await fileResponse.text();
-                    // Parse the file content. Expected lines:
-                    // "Stress Score: 55.23"
-                    // "Symmetry Score: 85.00"
-                    // "Fatigue Score (Right): 30.00"
-                    // "Fatigue Score (Left): 28.00"
                     const lines = text.split('\n').filter(line => line.trim() !== '');
                     let newScores = {};
                     lines.forEach(line => {
                         const parts = line.split(':');
                         if (parts.length >= 2) {
-                            const key = parts[0].trim();
-                            const value = parseFloat(parts[1].trim());
-                            newScores[key] = value;
+                            newScores[parts[0].trim()] = parseFloat(parts[1].trim());
                         }
                     });
-                    
-                    // Extract the timestamp from the filename.
-                    // Example filename: "scores_2025-03-28_12-24-08.txt"
-                    const basename = file.name; 
-                    const timestampPart = basename.slice("scores_".length, -".txt".length);
 
-                    // Declare latestScoreValues for this file.
-                    const latestScoreValues = [
-                        newScores["Stress Score"] || 0,
-                        newScores["Symmetry Score"] || 0,
-                        newScores["Fatigue Score (Left)"] || 0,
-                        newScores["Fatigue Score (Right)"] || 0
-                    ];
-
-                    // For the most recent file only, update the home stats.
+                    // For the *most recent* file, update global rawScores for the home page
                     if (isFirst) {
-                        scoreValues = latestScoreValues;
-                        latestTimestamp = timestampPart;  // Save the timestamp from the score file
-                        // Pass the extracted timestamp string to updateHomeRunStats.
-                        updateHomeRunStats(timestampPart);
+                        rawScores = {
+                            R_Stress: newScores["R_Stress"] || 0,
+                            L_Stress: newScores["L_Stress"] || 0,
+                            Symmetry_Score: newScores["Symmetry_Score"] || 0,
+                            Right_Fatigue: newScores["Right_Fatigue"] || 0,
+                            Left_Fatigue: newScores["Left_Fatigue"] || 0
+                        };
+                        latestTimestamp = file.name.slice("scores_".length, -".txt".length);
                         isFirst = false;
                     }
 
-                    // Create a container for this set of scores (scoreBox) with two rows.
+                    // Build the DOM elements for this file
                     const containerDiv = document.createElement('div');
                     containerDiv.classList.add('scoreBox');
 
-                    // Create and append a header with the formatted timestamp to the top row.
                     const headerDiv = document.createElement('div');
                     headerDiv.classList.add('score-header');
-                    headerDiv.innerHTML = formatTimestampFromFilename(timestampPart);
+                    headerDiv.innerHTML = formatTimestampFromFilename(
+                        file.name.slice("scores_".length, -".txt".length)
+                    );
                     containerDiv.appendChild(headerDiv);
 
-                    // Create a div to hold the four score circles (this will be the second row).
                     const circlesDiv = document.createElement('div');
                     circlesDiv.classList.add('scores-container');
 
-                    // Append each score circle to the circles container.
-                    circlesDiv.appendChild(createScoreItem('Stress', latestScoreValues[0], 'stress'));
-                    circlesDiv.appendChild(createScoreItem('Symmetry', latestScoreValues[1], 'symmetry'));
-                    circlesDiv.appendChild(createScoreItem('Fatigue (Left)', latestScoreValues[2], 'fatigue-left'));
-                    circlesDiv.appendChild(createScoreItem('Fatigue (Right)', latestScoreValues[3], 'fatigue-right'));
+                    // Compute stress for THIS file's data
+                    let stressValue = 0;
+                    if (localStorage.getItem('currentUser')) {
+                        const weightNewtons = getUserWeightNewtons();
+                        if (weightNewtons) {
+                            const R = newScores["R_Stress"] || 0;
+                            const L = newScores["L_Stress"] || 0;
+                            const R_Stress_final = R / weightNewtons;
+                            const L_Stress_final = L / weightNewtons;
+                            stressValue = Math.min((R_Stress_final + L_Stress_final) / 2, 100);
+                        } else {
+                            stressValue = ((newScores["R_Stress"]||0)+(newScores["L_Stress"]||0))/2;
+                        }
+                    } else {
+                        // Not logged in: raw average
+                        stressValue = ((newScores["R_Stress"]||0)+(newScores["L_Stress"]||0))/2;
+                    }
 
-                    // Append the circles container (second row) to the main container.
+                    circlesDiv.appendChild(createScoreItem('Stress', stressValue, 'stress'));
+                    circlesDiv.appendChild(
+                        createScoreItem('Symmetry', newScores["Symmetry_Score"]||0, 'symmetry')
+                    );
+                    circlesDiv.appendChild(
+                        createScoreItem('Fatigue (Left)', newScores["Left_Fatigue"]||0, 'fatigue-left')
+                    );
+                    circlesDiv.appendChild(
+                        createScoreItem('Fatigue (Right)', newScores["Right_Fatigue"]||0, 'fatigue-right')
+                    );
+
                     containerDiv.appendChild(circlesDiv);
-
-                    // Prepend this container to the main container so the most recent scores appear at the top.
-                    scoresMainContainer.appendChild(containerDiv);
+                    // Append so the first file remains on top, older ones go below
+                    scoresMainContainer.prepend(containerDiv);
                 }
             } catch (error) {
                 console.error("Error loading scores:", error);
@@ -2063,7 +2131,7 @@
             //});
 
             // Log In functionality
-            document.getElementById('login-form').addEventListener('submit', function(event) {
+            document.getElementById('login-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
                 const username = document.getElementById('login-username').value.trim();
                 const password = document.getElementById('login-password').value.trim();
@@ -2082,8 +2150,6 @@
                 localStorage.setItem('currentUser', username);
                 // Immediately update the UI on the affected pages
                 ['visualizations', 'gait-mechanics', 'scores'].forEach(checkAuth);
-                // Also update the home run stats explicitly:
-                updateHomeRunStats();
 
                 document.getElementById('signup-login-container').style.display = 'none';
                 document.getElementById('display-username').value = profileData.username;
@@ -2094,14 +2160,16 @@
                 document.getElementById('display-gender').value = profileData.gender;
                 document.getElementById('your-profile').style.display = 'block';
 
-                // Update the home button so it turns red and changes its label.
-                updateHomeProfileButton();
-                // **NEW LINE: Update the Run History with the stored test scores**
-                // updateRunHistory(); Not needed right now
+                // After setting up the profile fields:
+                updateFinalStressScores();       // Recalculate Total_Stress and update scoreValues.
+                updateHomeRunStats();            // Update the home page stats.
+                await loadAllScores();           // Rebuild the scores page (wait for it to complete).
+                //updateScoreCircles();            // Update any score circle visuals.
+                updateHomeProfileButton();       // Update the home button appearance.
             });
             
             // Sign Up functionality
-            document.getElementById('signup-form').addEventListener('submit', function(event) {
+            document.getElementById('signup-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
                 const username = document.getElementById('signup-username').value.trim();
                 const password = document.getElementById('signup-password').value.trim();
@@ -2131,8 +2199,6 @@
                 localStorage.setItem('currentUser', username);
                 // Immediately update the UI on the affected pages
                 ['visualizations', 'gait-mechanics', 'scores'].forEach(checkAuth);
-                // Also update the home run stats explicitly:
-                updateHomeRunStats();
 
                 document.getElementById('signup-login-container').style.display = 'none';
                 document.getElementById('display-username').value = username;
@@ -2142,6 +2208,13 @@
                 document.getElementById('display-weight').value = weight;
                 document.getElementById('display-gender').value = gender;
                 document.getElementById('your-profile').style.display = 'block';
+
+                // After setting up the profile fields:
+                updateFinalStressScores();       // Recalculate Total_Stress and update scoreValues.
+                updateHomeRunStats();            // Update the home page stats.
+                await loadAllScores();           // Rebuild the scores page (wait for it to complete).
+                //updateScoreCircles();            // Update any score circle visuals.
+                updateHomeProfileButton();       // Update the home button appearance.
             });
             
             // Toggle between Edit and Save Profile modes on the "Your Profile" page
