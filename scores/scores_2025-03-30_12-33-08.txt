@@ -1,0 +1,5 @@
+R_Stress: 1427.50
+L_Stress: 1427.50
+Symmetry_Score: 91.27
+Right_Fatigue: -0.00
+Left_Fatigue: 0.25
