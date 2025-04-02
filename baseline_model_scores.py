@@ -18,41 +18,18 @@ from numpy import trapz
 # Regex pattern to match filenames like "Run_Data_yyyy-mm-dd_hh-mm-ss.csv"
 pattern = re.compile(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv")
 
-def get_user_weight_newtons(profile_path="user_profile.json", default_lbs=150):
-    """
-    Retrieve the user's weight from the profile file, convert it from lbs to Newtons.
-    
-    Args:
-        profile_path (str): Path to the JSON profile file.
-        default_lbs (float): Default weight in lbs if retrieval fails.
-        
-    Returns:
-        float: Weight in Newtons.
-    """
-    try:
-        with open(profile_path, "r") as f:
-            profile = json.load(f)
-        # Assume the profile has a key "weight_lbs"
-        weight_lbs = profile.get("weight_lbs", default_lbs)
-    except Exception as e:
-        print("Error retrieving user weight, using default value:", e)
-        weight_lbs = default_lbs
-    
-    weight_kg = weight_lbs * 0.45359237  # lbs to kg
-    weight_newtons = weight_kg * 9.81      # kg to Newtons
-    return weight_newtons
-
-def calculate_refined_scores(filename, body_weight=weight_newtons, window_size=0.2):
+def calculate_refined_scores(filename, window_size=0.2):
     """
     Calculates refined fatigue, stress, and symmetry scores from treadmill data.
-
+    Note: The stress scores are now calculated without factoring in body weight.
+    
     Args:
         filename (str): Path to the CSV file.
-        body_weight (float, optional): Body weight in Newtons. Pulls from Profile on web-app.
         window_size (float, optional): Size of the sliding window for fatigue analysis (as a fraction of total data). Defaults to 0.2.
 
     Returns:
         dict: A dictionary containing the refined scores.
+              Keys: "Right_Fatigue", "Left_Fatigue", "R_Stress", "L_Stress", "Symmetry_Score"
     """
     # Read CSV file
     data = pd.read_csv(filename)
@@ -110,17 +87,15 @@ def calculate_refined_scores(filename, body_weight=weight_newtons, window_size=0
     R_Fatigue = np.mean(R_fatigue_changes) if R_fatigue_changes else 0
     L_Fatigue = np.mean(L_fatigue_changes) if L_fatigue_changes else 0
 
-    # Refined Stress Calculation
+    # Refined Stress Calculation without body weight factor.
     R_peak_force = np.max(R_Total)
     L_peak_force = np.max(L_Total)
 
     R_impact_rate = np.max(np.diff(R_Total) / np.diff(time))
     L_impact_rate = np.max(np.diff(L_Total) / np.diff(time))
 
-    R_Stress = (R_peak_force / body_weight) * R_impact_rate * (total_time / 600) * 100
-    L_Stress = (L_peak_force / body_weight) * L_impact_rate * (total_time / 600) * 100
-
-    Total_Stress = min(((R_Stress + L_Stress) / 2), 100)
+    R_Stress = R_peak_force * R_impact_rate * (total_time / 600) * 100
+    L_Stress = L_peak_force * L_impact_rate * (total_time / 600) * 100
 
     # Symmetry Calculation
     step_differences = np.abs(R_Total - L_Total)
@@ -130,7 +105,8 @@ def calculate_refined_scores(filename, body_weight=weight_newtons, window_size=0
     return {
         "Right_Fatigue": R_Fatigue,
         "Left_Fatigue": L_Fatigue,
-        "Stress_Score": Total_Stress,
+        "R_Stress": R_Stress,
+        "L_Stress": L_Stress,
         "Symmetry_Score": Symmetry,
     }
 
@@ -139,9 +115,6 @@ if __name__ == '__main__':
     run_data_dir = "runData"
     scores_dir = "scores"
     os.makedirs(scores_dir, exist_ok=True)
-
-    # Retrieve user weight in Newtons from the profile
-    user_weight_newtons = get_user_weight_newtons()
 
     # Use glob to find all CSV files in the runData folder that match the naming convention.
     run_files = glob.glob(os.path.join(run_data_dir, "Run_Data_*.csv"))
@@ -154,15 +127,15 @@ if __name__ == '__main__':
         
         for file in run_files:
             print(f"Processing file: {file}")
-            # Pass the user's weight into the score calculation
-            scores = calculate_refined_scores(file, body_weight=user_weight_newtons)
+            scores = calculate_refined_scores(file)
             # Extract the timestamp part from the filename.
             basename = os.path.basename(file)
             timestamp_part = basename[len("Run_Data_"):-len(".csv")]
             output_filename = os.path.join(scores_dir, f"scores_{timestamp_part}.txt")
             with open(output_filename, "w") as f:
-                f.write(f"Stress Score: {scores['Stress_Score']:.2f}\n")
-                f.write(f"Symmetry Score: {scores['Symmetry_Score']:.2f}\n")
-                f.write(f"Fatigue Score (Right): {scores['Right_Fatigue']:.2f}\n")
-                f.write(f"Fatigue Score (Left): {scores['Left_Fatigue']:.2f}\n")
+                f.write(f"R_Stress: {scores['R_Stress']:.2f}\n")
+                f.write(f"L_Stress: {scores['L_Stress']:.2f}\n")
+                f.write(f"Symmetry_Score: {scores['Symmetry_Score']:.2f}\n")
+                f.write(f"Right_Fatigue: {scores['Right_Fatigue']:.2f}\n")
+                f.write(f"Left_Fatigue: {scores['Left_Fatigue']:.2f}\n")
             print(f"Scores written to {output_filename}")
