@@ -114,7 +114,7 @@ def generate_plots(pressure_values, method, output_prefix):
         ax_grid.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=50)
         #ax_grid.set_title(f"Pressure Mapping (Section View) - {output_prefix}")
         cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
-        cbar_rbf.set_label('Pressure Value (Normalized)', fontsize=14)
+        cbar_grid.set_label('Pressure Value (Normalized)', fontsize=14)
         
         grid_output_file = f"images/{output_prefix}_section.png"
         fig_grid.savefig(grid_output_file, bbox_inches='tight')
