@@ -39,8 +39,8 @@ def load_data(file_path):
 def calculate_cadence(df):
     try:
         time_column = df.columns[0]
-        left_foot_sensors = df.columns[1:12]  # First 11 columns
-        right_foot_sensors = df.columns[12:23]  # Next 11 columns
+        right_foot_sensors = df.columns[1:12]  # First 11 columns
+        left_foot_sensors = df.columns[12:23]  # Next 11 columns
 
         df["Left_Total_Pressure"] = df[left_foot_sensors].sum(axis=1)
         df["Right_Total_Pressure"] = df[right_foot_sensors].sum(axis=1)
