@@ -96,9 +96,9 @@ def generate_plots(pressure_values, method, output_prefix):
         ax_rbf.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="black", lw=2)
         ax_rbf.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="black", lw=2)
         ax_rbf.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=50)
-        ax_rbf.set_title(f"Pressure Mapping (Gradient View) - {output_prefix}")
+        #ax_rbf.set_title(f"Pressure Mapping (Gradient View) - {output_prefix}")
         cbar_rbf = fig_rbf.colorbar(pressure_img_rbf, ax=ax_rbf)
-        cbar_rbf.set_label('Pressure Value (Normalized)')
+        cbar_rbf.set_label('Pressure Value (Normalized)', fontsize=14)
         
         rbf_output_file = f"images/{output_prefix}_gradient.png"
         fig_rbf.savefig(rbf_output_file, bbox_inches='tight')
@@ -112,9 +112,9 @@ def generate_plots(pressure_values, method, output_prefix):
         ax_grid.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], color="black", lw=2)
         ax_grid.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], color="black", lw=2)
         ax_grid.scatter(sensor_coords[:, 0], sensor_coords[:, 1], color="black", s=50)
-        ax_grid.set_title(f"Pressure Mapping (Section View) - {output_prefix}")
+        #ax_grid.set_title(f"Pressure Mapping (Section View) - {output_prefix}")
         cbar_grid = fig_grid.colorbar(pressure_img_grid, ax=ax_grid)
-        cbar_grid.set_label('Pressure Value (Normalized)')
+        cbar_rbf.set_label('Pressure Value (Normalized)', fontsize=14)
         
         grid_output_file = f"images/{output_prefix}_section.png"
         fig_grid.savefig(grid_output_file, bbox_inches='tight')
