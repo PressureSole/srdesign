@@ -24,7 +24,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Define input and output folders relative to the script's location
 input_folder = os.path.join(script_dir, 'runData')
-output_folder = os.path.join(script_dir, 'prosupvisual')
+output_folder = os.path.join(script_dir, 'cadence')
 
 # Load the data
 def load_data(file_path):
