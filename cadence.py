@@ -1,16 +1,14 @@
-
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import os
-from scipy.interpolate import splprep, splev
+from scipy.signal import find_peaks, savgol_filter
 from github import Github
 
 # GitHub repository and token
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Set the GitHub Personal Access Token as an environment variable
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Ensure this is set as an environment variable
 REPO_NAME = "PressureSole/srdesign"
 
-# Ensure GitHub connection
+# Connect to GitHub repository
 try:
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
@@ -19,137 +17,95 @@ except Exception as e:
     print(f"GitHub connection error: {e}")
     exit(1)
 
-# Get the absolute path of the current script directory
+# Get script directory and define input/output folders
 script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Define input and output folders relative to the script's location
 input_folder = os.path.join(script_dir, 'runData')
 output_folder = os.path.join(script_dir, 'cadence')
 
-# Load the data
+# Ensure folders exist
+os.makedirs(input_folder, exist_ok=True)
+os.makedirs(output_folder, exist_ok=True)
+
+# Load data function
 def load_data(file_path):
-    data = pd.read_csv(file_path)
-    return data
+    try:
+        data = pd.read_csv(file_path)
+        return data
+    except Exception as e:
+        print(f"Error loading {file_path}: {e}")
+        return None
 
-# Sensor coordinates (already provided by you)
-sensor_coords = np.array([
-    [5.9, 16.4], [5, 7.5], [7.5, 7.5], [5, 3], [7.5, 3], [5, 12], [7.5, 12], [3.2, 17.7], [8, 15.5], [6.5, 18.9], [4.2, 20.4],
-    [-5.9, 16.4], [-5, 7.5], [-7.5, 7.5], [-5, 3], [-7.5, 3], [-5, 12], [-7.5, 12], [-3.2, 17.7], [-8, 15.5], [-6.5, 18.9], [-4.2, 20.4]
-])
+# Main cadence calculation
+def calculate_cadence(df):
+    try:
+        time_column = df.columns[0]
+        left_foot_sensors = df.columns[1:12]  # First 11 columns
+        right_foot_sensors = df.columns[12:23]  # Next 11 columns
 
-# Foot outline coordinates (already provided by you)
-foot_outline = np.array([
-    [6, 0.4], [3.3, 2.2], [3.7, 7], [3, 10.8], [2.2, 15.7], [2.3, 19.8],
-    [4, 23.6], [7, 22], [8.5, 19.2], [9.2, 15.2], [9, 11.5], [8.5, 6.6],
-    [8.4, 2.3], [7.9, 0.9], [6, 0.4]
-])
+        df["Left_Total_Pressure"] = df[left_foot_sensors].sum(axis=1)
+        df["Right_Total_Pressure"] = df[right_foot_sensors].sum(axis=1)
 
-# Generate a smooth Bézier curve for the foot outline
-tck, u = splprep(foot_outline.T, s=2)
-u_fine = np.linspace(0, 1, 300)
-smooth_foot_outline = np.array(splev(u_fine, tck)).T
-left_foot_outline = smooth_foot_outline.copy()
-left_foot_outline[:, 0] *= -1
+        # Apply Savitzky-Golay filter for smoothing
+        window_size = 15  # Must be odd
+        poly_order = 3
+        df["Left_Smoothed"] = savgol_filter(df["Left_Total_Pressure"], window_size, poly_order)
+        df["Right_Smoothed"] = savgol_filter(df["Right_Total_Pressure"], window_size, poly_order)
 
-# Calculate Center of Pressure (COP) using sensor data
-def calculate_cop_from_sensors(sensor_data, sensor_coords):
-    force = np.sum(sensor_data, axis=1)
-    cop_x = np.sum(sensor_data * sensor_coords[:, 0], axis=1) / (force + 1e-6)
-    cop_y = np.sum(sensor_data * sensor_coords[:, 1], axis=1) / (force + 1e-6)
-    return cop_x, cop_y
+        # Detect peaks (heel strikes)
+        left_peaks, _ = find_peaks(df["Left_Smoothed"], height=14, distance=10)
+        right_peaks, _ = find_peaks(df["Right_Smoothed"], height=14, distance=10)
 
-# Plot COP trajectory on foot outline with timestamp-based brightness
-def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    plt.figure(figsize=(8, 10))
+        # Compute total time
+        total_time = df[time_column].iloc[-1] - df[time_column].iloc[0]  # In seconds
 
-    # Plot foot outline
-    plt.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-', label='Right Foot Outline')
-    plt.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-', label='Left Foot Outline')
+        # Compute cadence (steps per minute)
+        left_cadence = (len(left_peaks) * 60) / total_time
+        right_cadence = (len(right_peaks) * 60) / total_time
+        average_cadence = round((left_cadence + right_cadence) / 2)
 
-    # Calculate center X positions for right and left feet
-    center_right_x = np.mean(smooth_foot_outline[:, 0])
-    center_left_x = np.mean(left_foot_outline[:, 0])
+        print(f"Average Cadence: {average_cadence} steps/min")
+        return average_cadence
+    except Exception as e:
+        print(f"Error calculating cadence: {e}")
+        return None
 
-    # Plot vertical lines at the center of each foot
-    plt.axvline(x=center_right_x, color='gray', linestyle='--', alpha=0.8)
-    plt.axvline(x=center_left_x, color='gray', linestyle='--', alpha=0.8)
-
-    # Plot sensor locations
-    plt.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', label='Sensor Locations')
-
-    # Normalize the time to range from 0 to 1
-    norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
-
-    # Plot COP with color mapped to time
-    plt.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Left) {label}')
-    plt.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Right) {label}')
-
-    # Add a colorbar to represent time
-    cbar = plt.colorbar()
-    cbar.set_label('Time (Red most recent)')
-    plt.xticks([])
-    plt.yticks([])
-    plt.xlabel('X Position (mm)')
-    plt.ylabel('Y Position (mm)')
-    #plt.title(f'Center of Pressure Visualization for {label}')
-    plt.axis('equal')
-    
-    # Save plot to prosupvisual folder
-    output_path = os.path.join(output_folder, f'{label}_cop_plot.png')
-    plt.savefig(output_path)
-    plt.close()
-
-# Main analysis
-def main(file_path, output_folder):
-    data = load_data(file_path)
-    time = data['Time'].values
-
-    # Sensor data from CSV (Sensor_1 to Sensor_22)
-    sensor_data = data.iloc[:, 1:23].values
-    right_sensor_data = sensor_data[:, :11]
-    left_sensor_data = sensor_data[:, 11:]
-
-    # Calculate and plot COP from sensor data
-    l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:])
-    r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11])
-
-    # Get the file name without extension for labeling
-    label = os.path.splitext(os.path.basename(file_path))[0]
-    plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder)
-
-# Upload image to GitHub
+# Upload .txt files to GitHub
 def upload_to_github(output_folder):
     for file_name in os.listdir(output_folder):
-        if file_name.endswith('.png'):
+        if file_name.endswith('.txt'):
             file_path = os.path.join(output_folder, file_name)
-            with open(file_path, 'rb') as f:
+            with open(file_path, 'r') as f:
                 content = f.read()
-            
-            # Define the path in the GitHub repo
-            github_path = f'prosupvisual/{file_name}'
-            
-            # Try to get the existing file to update it
+
+            github_path = f'cadence/{file_name}'  # Define GitHub repo folder path
+
             try:
                 existing_file = repo.get_contents(github_path)
                 repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
                 print(f"Updated {file_name} on GitHub.")
-            except:
-                repo.create_file(github_path, f"Add {file_name}", content)
-                print(f"Uploaded {file_name} to GitHub.")
+            except Exception:
+                try:
+                    repo.create_file(github_path, f"Add {file_name}", content)
+                    print(f"Uploaded {file_name} to GitHub.")
+                except Exception as err:
+                    print(f"Failed to upload {file_name}: {err}")
 
-# Process all files in the runData folder
+# Process files in input folder
 def process_all_files(input_folder, output_folder):
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
     for file_name in os.listdir(input_folder):
         if file_name.endswith('.csv'):
             file_path = os.path.join(input_folder, file_name)
-            main(file_path, output_folder)
+            data = load_data(file_path)
+            if data is not None:
+                cadence = calculate_cadence(data)
+                if cadence is not None:
+                    output_file = os.path.join(output_folder, f"{os.path.splitext(file_name)[0]}.txt")
+                    with open(output_file, 'w') as f:
+                        f.write(str(cadence))
 
-    # Upload all generated plots to GitHub
+    # Upload results to GitHub
     upload_to_github(output_folder)
 
-# Run the script on all files in runData
+# Run the script
 if __name__ == '__main__':
     process_all_files(input_folder, output_folder)
