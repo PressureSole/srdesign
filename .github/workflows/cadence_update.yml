@@ -1,4 +1,4 @@
-name: Run Pronation Supination Analysis
+name: Run Cadence Workflow
 
 on:
   push:
