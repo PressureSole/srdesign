@@ -254,6 +254,31 @@
             border-radius: 8px;
         }
 
+        .period-headers-container {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .period-header {
+            flex: 1;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .fatigue-images-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .fatigue-images-container img {
+            flex: 1;
+            max-width: 32%;
+            margin: 0 5px;
+        }
+
+
         /* Toggle Button Styling */
         .view-toggle {
             text-align: center;
@@ -884,6 +909,18 @@
                     symmetryHeader.classList.add('visualization-card-header');
                     symmetryHeader.textContent = 'Symmetry';
                     symmetryDiv.appendChild(symmetryHeader);
+
+                    // Insert empty placeholder headers for spacing (three empty elements)
+                    const symmetryPlaceholderContainer = document.createElement('div');
+                    symmetryPlaceholderContainer.classList.add('period-headers-container');
+                    for (let i = 0; i < 3; i++) {
+                        const emptyHeader = document.createElement('div');
+                        emptyHeader.classList.add('period-header');
+                        emptyHeader.innerHTML = '&nbsp;';  // Non-breaking space to preserve height
+                        symmetryPlaceholderContainer.appendChild(emptyHeader);
+                    }
+                    symmetryDiv.appendChild(symmetryPlaceholderContainer);
+                    
                     if (symmetryImage) {
                         const img = document.createElement('img');
                         img.src = `https://raw.githubusercontent.com/PressureSole/srdesign/main/${symmetryImage.path}`;
@@ -900,6 +937,19 @@
                     fatigueHeader.classList.add('visualization-card-header');
                     fatigueHeader.textContent = 'Fatigue';
                     fatigueDiv.appendChild(fatigueHeader);
+
+                    // New container for the three additional period headers beneath the Fatigue header
+                    const periodHeadersContainer = document.createElement('div');
+                    periodHeadersContainer.classList.add('period-headers-container');
+                    const fatiguePeriodHeaders = ["1st Period", "2nd Period", "3rd Period"];
+                    fatiguePeriodHeaders.forEach(text => {
+                        const headerDiv = document.createElement('div');
+                        headerDiv.classList.add('period-header');
+                        headerDiv.textContent = text;
+                        periodHeadersContainer.appendChild(headerDiv);
+                    });
+                    fatigueDiv.appendChild(periodHeadersContainer);
+
                     const fatigueGraphsDiv = document.createElement('div');
                     fatigueGraphsDiv.classList.add('fatigue-graphs');
                     if (fatigueImages.length > 0) {
@@ -965,148 +1015,549 @@
 
     <div id="gait-mechanics-content">
         <h1>Gait Mechanics</h1>
+
         <!-- Cadence Section -->
         <section id="cadence">
             <h2>Cadence</h2>
-            <button onclick="toggleDetails('cadence-details')">Details</button>
-            <p id="cadence-details" class="details" style="display:none;">
-                The number of steps taken per unit of time, expressed in steps per minute. A good running cadence typically falls around 170-180 steps per minute (SPM) for most runners. A cadence lower than 160 SPM often indicates overstriding, which can increase impact forces and elevate the risk of injuries such as shin splints or knee pain. Conversely, a cadence significantly higher than 190 SPM may suggest a short, inefficient stride that can lead to excessive muscular fatigue. To improve cadence, runners can focus on strength training, especially targeting the core, glutes, and hip flexors to improve stability and control. Incorporating dynamic stretching and mobility work can help improve flexibility and range of motion, allowing for a more efficient stride. Doing short intervals at a higher cadence can also help runners safely reach and maintain an optimal cadence.
-            </p>
-            <div class="graph-container">
-                <!-- Insert graph here -->
+            <div class="graph-container" id="cadence-scales">
+                <!-- Placeholder for scale visualizations -->
             </div>
+            <div id="cadence-message" class="message-box"></div> <!-- Placeholder for cadence messages -->
         </section>
-        
-        
+
         <!-- Supination/Pronation Section -->
-        <section id="supination/pronation">
+        <section id="supination-pronation">
             <h2>Supination/Pronation</h2>
-            <button onclick="toggleDetails('supination-details')">Details</button>
-            <p id="supination-details" class="details" style="display:none;">
-                If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
-                If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.
-                overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury. 
-            </p>
+            <button class="detail-toggle" onclick="toggleDetails('supination-details')">Details</button>
+            <div id="supination-details" class="details" style="display:none;">
+                <p>If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
+                If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.</p>
+                
+                <p>Overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome.</p>
+                
+                <p>To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.</p>
+            </div>
 
             <div class="graph-container" id="image-container">
                 <!-- Images will be inserted here by JavaScript -->
             </div>
         </section>
     </div>
-
-    <script>
-        // Fetch the image data from GitHub API
-        async function fetchImages() {
-            const repoOwner = 'PressureSole';
-            const repoName = 'srdesign';
-            const folderPath = 'prosupvisual';
-
-            const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
-
-            try {
-                const response = await fetch(url);
-                const files = await response.json();
-
-                // Filter out non-image files (e.g., .png files)
-                const imageFiles = files.filter(file => file.name.endsWith(".png"));
-
-                // Process and sort the images by timestamp (newest first)
-                const imageData = imageFiles.map(file => {
-                    // Extract timestamp from the filename
-                    const filename = file.name;
-                    const timestampStr = filename.split('_')[2] + "_" + filename.split('_')[3];
-                    const timestamp = new Date(timestampStr.replace(/-/g, '/').replace(/_/g, ' '));
-
-                    const formattedTimestamp = timestamp.toLocaleString('en-US', {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-                    });
-
-                    return {
-                        filename: file.name,
-                        timestamp: formattedTimestamp,
-                        url: file.download_url
-                    };
-                });
-
-                // Sort images by timestamp (newest first)
-                imageData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-                // Display images and their timestamps
-                displayImages(imageData);
-            } catch (error) {
-                console.error('Error fetching images:', error);
-            }
-        }
-
-        // Function to display images
-        function displayImages(images) {
-            const container = document.getElementById('image-container');
-            container.innerHTML = ''; // Clear any existing content
-
-            // Loop through each image and create the HTML for it
-            images.forEach(image => {
-                const imageElement = document.createElement('div');
-                imageElement.classList.add('image-item');
-
-                const timestamp = document.createElement('p');
-                timestamp.classList.add('timestamp');
-                timestamp.textContent = image.timestamp;
-
-                const img = document.createElement('img');
-                img.src = image.url;  // Image URL
-                img.alt = image.filename; // Optional alt text
-                img.classList.add('image');
-
-                // Append timestamp and image to the container
-                imageElement.appendChild(timestamp);
-                imageElement.appendChild(img);
-                container.appendChild(imageElement);
-            });
-        }
-
-        // Fetch and display images when the page loads
-        fetchImages();
-    </script>
 </div>
 
 <style>
-    .graph-container {
-        width: 100%;
-        height: 200px; /* Adjust as needed */
-        background-color: #f0f0f0; /* Placeholder background */
-        margin: 10px 0;
+    /* General styles */
+    #gait-mechanics {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
     }
     
-    button {
+    #gait-mechanics h1 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    #gait-mechanics h2 {
+        color: #444;
+        margin: 30px 0 15px;
+        border-bottom: 2px solid #007BFF;
+        padding-bottom: 8px;
+    }
+    
+    #gait-mechanics section {
+        margin-bottom: 40px;
+    }
+    
+    /* Auth prompt styles */
+    .auth-prompt {
+        background-color: #f8f9fa;
+        padding: 30px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .cta-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .cta-button:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Graph container styles */
+    .graph-container {
+        width: 100%;
+        min-height: 200px;
+        background-color: #f9f9f9;
+        margin: 15px 0;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+    
+    /* Cadence scales styling */
+    #cadence-scales {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+    
+    .cadence-scale {
+        text-align: center;
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .cadence-scale h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #555;
+    }
+    
+    .cadence-scale canvas {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    /* Message box styling */
+    .message-box {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 6px;
+        background-color: #f8f9fa;
+        border-left: 4px solid #ccc;
+        line-height: 1.5;
+    }
+    
+    .message-box.green {
+        border-left-color: #28a745;
+        background-color: #e8f5e9;
+    }
+    
+    .message-box.yellow {
+        border-left-color: #ffc107;
+        background-color: #fff8e1;
+    }
+    
+    .message-box.red {
+        border-left-color: #dc3545;
+        background-color: #ffebee;
+    }
+    
+    /* Detail toggle button */
+    .detail-toggle {
         margin-top: 5px;
-        padding: 5px 10px;
+        padding: 6px 12px;
         font-size: 14px;
         cursor: pointer;
         background-color: #007BFF;
         color: white;
         border: none;
         border-radius: 5px;
+        transition: background-color 0.2s;
     }
-
+    
+    .detail-toggle:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Details box */
     .details {
-        margin-top: 10px;
+        margin-top: 15px;
         background-color: #f9f9f9;
-        padding: 8px;
+        padding: 15px;
         border-left: 4px solid #007BFF;
-        border-radius: 4px;
+        border-radius: 6px;
+        line-height: 1.5;
+    }
+    
+    .details p {
+        margin: 0 0 15px 0;
+    }
+    
+    .details p:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Image items */
+    .image-item {
+        margin-bottom: 30px;
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .image-item .timestamp {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .image-item .image {
+        max-width: 100%;
+        border-radius: 6px;
+        display: block;
+        margin: 0 auto;
     }
 </style>
 
 <script>
+    // Toggle details visibility
     function toggleDetails(id) {
-        var element = document.getElementById(id);
+        const element = document.getElementById(id);
         if (element.style.display === "none") {
             element.style.display = "block";
         } else {
             element.style.display = "none";
         }
     }
+
+    // Global variable for average cadence
+    let avgCadence = 0;
+
+    // Fetch files from the GitHub repo using GitHub API for cadence data
+    async function fetchCadenceData() {
+        const repoOwner = 'PressureSole';
+        const repoName = 'srdesign';
+        const folderPath = 'cadence';
+
+        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
+
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const files = await response.json();
+
+            // Filter out non-TXT files
+            const txtFiles = files.filter(file => file.name.endsWith('.txt'));
+
+            // Clear existing content
+            const container = document.getElementById('cadence-scales');
+            container.innerHTML = '';
+
+            // Process each file
+            const allCadenceValues = [];
+            
+            for (let file of txtFiles) {
+                try {
+                    const fileContent = await fetchFileContent(file.download_url);
+                    const cadenceValues = parseCadenceData(fileContent);
+                    
+                    if (cadenceValues.length > 0) {
+                        allCadenceValues.push(...cadenceValues);
+                        drawScale(file.name, cadenceValues);
+                    }
+                } catch (error) {
+                    console.error(`Error processing file ${file.name}:`, error);
+                }
+            }
+            
+            // Calculate overall average cadence
+            if (allCadenceValues.length > 0) {
+                avgCadence = allCadenceValues.reduce((sum, val) => sum + val, 0) / allCadenceValues.length;
+                displayCadenceMessage(avgCadence);
+            } else {
+                document.getElementById('cadence-message').innerHTML = 
+                    '<p>No cadence data available. Please go for a run to collect data.</p>';
+            }
+            
+        } catch (error) {
+            console.error('Error fetching cadence data from GitHub:', error);
+            document.getElementById('cadence-scales').innerHTML = 
+                '<div class="error-message">Unable to load cadence data. Please try again later.</div>';
+        }
+    }
+
+    // Fetch file content using the download URL
+    async function fetchFileContent(downloadUrl) {
+        const response = await fetch(downloadUrl);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const content = await response.text();
+        return content;
+    }
+
+    // Parse cadence data from file content
+    function parseCadenceData(content) {
+        // Assume each line in the file represents a cadence value
+        return content.split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .map(line => parseFloat(line))
+            .filter(value => !isNaN(value));
+    }
+
+    // Draw the scale for each file
+    function drawScale(fileName, cadenceValues) {
+        if (cadenceValues.length === 0) return;
+        
+        const container = document.getElementById('cadence-scales');
+        
+        // Calculate file's average cadence
+        const fileCadence = cadenceValues.reduce((sum, val) => sum + val, 0) / cadenceValues.length;
+
+        // Create a div for this file's scale
+        const scaleDiv = document.createElement('div');
+        scaleDiv.classList.add('cadence-scale');
+        
+        // Create title with cleaned up file name (remove .txt and format nicely)
+        const title = document.createElement('h3');
+        const cleanTitle = fileName.replace('.txt', '').replace(/_/g, ' ');
+        title.textContent = cleanTitle;
+        scaleDiv.appendChild(title);
+
+        // Create a canvas for the scale
+        const canvas = document.createElement('canvas');
+        canvas.width = 60;    // Width of the canvas
+        canvas.height = 400;  // Height of the canvas
+        scaleDiv.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const scaleMin = 0;
+        const scaleMax = 380;
+        
+        // Draw background
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Define the color ranges
+        const colorRanges = [
+            { min: 0, max: 160, color: '#ff6b6b' },     // Red
+            { min: 160, max: 170, color: '#feca57' },   // Yellow
+            { min: 170, max: 180, color: '#54a0ff' },   // Blue (optimal)
+            { min: 180, max: 190, color: '#feca57' },   // Yellow
+            { min: 190, max: 380, color: '#ff6b6b' }    // Red
+        ];
+
+        // Draw the scale with color ranges
+        colorRanges.forEach(range => {
+            const startY = canvas.height - (range.min / scaleMax * canvas.height);
+            const endY = canvas.height - (range.max / scaleMax * canvas.height);
+            ctx.fillStyle = range.color;
+            ctx.fillRect(0, endY, canvas.width, startY - endY);
+        });
+
+        // Draw borders
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+        // Draw scale values
+        ctx.fillStyle = '#333';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'right';
+        
+        // Draw markers every 50 units
+        for (let i = 0; i <= scaleMax; i += 50) {
+            const y = canvas.height - (i / scaleMax * canvas.height);
+            
+            // Draw tick mark
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(10, y);
+            ctx.stroke();
+            
+            // Draw value
+            ctx.fillText(i.toString(), 35, y + 4);
+        }
+
+        // Draw this file's cadence value indicator
+        if (fileCadence > 0) {
+            const valueY = canvas.height - (fileCadence / scaleMax * canvas.height);
+            
+            // Draw line across the scale
+            ctx.beginPath();
+            ctx.moveTo(0, valueY);
+            ctx.lineTo(canvas.width, valueY);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Add value text
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${fileCadence.toFixed(1)}`, canvas.width / 2, valueY - 10);
+        }
+
+        // Append the scale div to the container
+        container.appendChild(scaleDiv);
+    }
+
+    // Display the cadence message based on the cadence value
+    function displayCadenceMessage(cadence) {
+        const messageElement = document.getElementById('cadence-message');
+        messageElement.className = 'message-box'; // Reset class
+
+        let message = '';
+        let colorClass = '';
+
+        if (cadence < 160) {
+            message = "<strong>Your cadence is too low.</strong> A cadence lower than 160 steps per minute (SPM) often indicates overstriding, which can increase impact forces and elevate the risk of injuries such as shin splints or knee pain. To improve:<ul>" +
+                    "<li><strong>Increase stride frequency</strong>: Focus on taking shorter, quicker steps to reduce impact forces.</li>" +
+                    "<li><strong>Strengthen key muscles</strong>: Target the core, glutes, and hip flexors to improve stability and control.</li>" +
+                    "<li><strong>Incorporate dynamic stretching</strong>: Improve flexibility in hip flexors, hamstrings, and calves.</li>" +
+                    "<li><strong>Use cadence drills</strong>: Practice running at 170-180 SPM using a metronome or cadence app.</li></ul>";
+            colorClass = 'red';
+        } else if (cadence > 190) {
+            message = "<strong>Your cadence is too high.</strong> A cadence above 190 SPM may suggest a short, inefficient stride that can lead to excessive muscular fatigue. To improve:<ul>" +
+                    "<li><strong>Increase stride length</strong>: Focus on lengthening your stride rather than just increasing step rate.</li>" +
+                    "<li><strong>Strengthen key muscles</strong>: Target the core, glutes, and hip flexors to improve stability and control.</li>" +
+                    "<li><strong>Incorporate dynamic stretching</strong>: Enhance flexibility for stride efficiency.</li>" +
+                    "<li><strong>Practice interval training</strong>: Include intervals at 170-180 SPM to gradually adjust your rhythm.</li></ul>";
+            colorClass = 'red';
+        } else if (cadence >= 170 && cadence <= 180) {
+            message = "<strong>Your cadence is optimal!</strong> Your current cadence of " + cadence.toFixed(1) + " SPM falls within the ideal range of 170-180 steps per minute, which is associated with efficient running form and reduced injury risk.";
+            colorClass = 'green';
+        } else {
+            message = "<strong>Your cadence is approaching suboptimal levels.</strong> Your current cadence of " + cadence.toFixed(1) + " SPM is close to the edges of the ideal range (170-180 SPM). Consider minor adjustments to your running form to optimize efficiency and reduce injury risk.";
+            colorClass = 'yellow';
+        }
+
+        messageElement.innerHTML = message;
+        messageElement.classList.add(colorClass);
+    }
+
+    // Fetch and display supination/pronation images
+    async function fetchSupinationImages() {
+        const repoOwner = 'PressureSole';
+        const repoName = 'srdesign';
+        const folderPath = 'prosupvisual';
+
+        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
+
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const files = await response.json();
+
+            // Filter out non-image files (e.g., .png files)
+            const imageFiles = files.filter(file => file.name.endsWith(".png"));
+
+            if (imageFiles.length === 0) {
+                document.getElementById('image-container').innerHTML = 
+                    '<div class="no-data-message">No pronation/supination data available yet. Please go for a run to collect data.</div>';
+                return;
+            }
+
+            // Process and sort the images by timestamp (newest first)
+            const imageData = imageFiles.map(file => {
+                // Extract timestamp from the filename
+                const filename = file.name;
+                const parts = filename.split('_');
+                
+                // Safety check for filename format
+                if (parts.length < 4) return { 
+                    filename, 
+                    timestamp: new Date(0), // Default to epoch start
+                    url: file.download_url 
+                };
+                
+                const timestampStr = parts[2] + "_" + parts[3];
+                // Convert timestamp string to Date object
+                const timestamp = new Date(timestampStr.replace(/-/g, '/').replace(/_/g, ' '));
+
+                const formattedTimestamp = timestamp.toLocaleString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                });
+
+                return {
+                    filename: filename,
+                    timestamp: formattedTimestamp,
+                    url: file.download_url
+                };
+            });
+
+            // Sort images by timestamp (newest first)
+            imageData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            // Display images and their timestamps
+            displayImages(imageData);
+        } catch (error) {
+            console.error('Error fetching supination/pronation images:', error);
+            document.getElementById('image-container').innerHTML = 
+                '<div class="error-message">Unable to load pronation/supination data. Please try again later.</div>';
+        }
+    }
+
+    // Function to display images
+    function displayImages(images) {
+        const container = document.getElementById('image-container');
+        container.innerHTML = ''; // Clear any existing content
+
+        // Loop through each image and create the HTML for it
+        images.forEach(image => {
+            const imageElement = document.createElement('div');
+            imageElement.classList.add('image-item');
+
+            const timestamp = document.createElement('p');
+            timestamp.classList.add('timestamp');
+            timestamp.textContent = image.timestamp;
+
+            const img = document.createElement('img');
+            img.src = image.url;  // Image URL
+            img.alt = "Foot pressure analysis from " + image.timestamp; // Better alt text
+            img.classList.add('image');
+            
+            // Add loading state
+            img.loading = "lazy";
+            
+            // Handle image loading errors
+            img.onerror = function() {
+                img.src = ""; // Remove broken image icon
+                img.alt = "Image failed to load";
+                img.style.height = "150px";
+                img.style.display = "flex";
+                img.style.alignItems = "center";
+                img.style.justifyContent = "center";
+                img.style.backgroundColor = "#f8f9fa";
+                img.style.border = "1px dashed #ccc";
+                
+                const errorMsg = document.createElement('div');
+                errorMsg.textContent = "Image could not be loaded";
+                errorMsg.style.color = "#666";
+                imageElement.appendChild(errorMsg);
+            };
+
+            // Append timestamp and image to the container
+            imageElement.appendChild(timestamp);
+            imageElement.appendChild(img);
+            container.appendChild(imageElement);
+        });
+    }
+
+    // Initialize both data types when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchCadenceData();
+        fetchSupinationImages();
+    });
 </script>
 
     <!-- SCORES tab ------------------------------------------------------------- -->
@@ -1297,15 +1748,6 @@
                             <label for="weight">Weight (lbs):</label>
                             <input type="number" id="weight" name="weight">
                         </div>
-                        <div class="form-group">
-                            <label for="gender">Gender:</label>
-                            <select id="gender" name="gender">
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
                     </div>
                     <button type="submit">Sign up</button>
                 </form>
@@ -1366,15 +1808,6 @@
                     <div class="form-group">
                         <label for="display-weight">Weight (lbs):</label>
                         <input type="number" id="display-weight" name="weight" readonly style="background-color: #eaeaea;">
-                    </div>
-                    <div class="form-group">
-                        <label for="display-gender">Gender:</label>
-                        <select id="display-gender" name="gender" disabled style="background-color: #eaeaea;">
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
                     </div>
                 </div>
                 <button type="button" id="edit-profile-btn" style="width: calc(100% - 10px); padding: 10px; background-color: #ff5500; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px;">Edit Profile</button>
@@ -1454,6 +1887,18 @@
                         <h3>How is data transmitted from the insole to the web app? </h3>
                         <div class="faq-answer">Pressure data is collected via the embedded sensors and transmitted wirelessly to the web app through a Bluetooth-enabled PCB, where it is processed and displayed in real time.</div>
                     </div>
+                    <div class="faq-box">
+                        <h3>What do "first period", "second period", and "third period" refer to under "fatigue" on the visualizations page? </h3>
+                        <div class="faq-answer">The purpose of the fatique visualization is to display the changes in forcing throughout a run. "First period" refers to the distribution of forcing for the first third of the run (33%). "Second period" refers to the distrubiton of forcing for the second third of the runn (33%-66%) and so on.</div>
+                    </div>
+                    <div class="faq-box"></div>
+                        <h3>How do I interpret the pronation/supination visualization in the Gait Mechanics tab?</h3>
+                        <div class="faq-answer">If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
+                            If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.
+                            overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. 
+                            Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. 
+                            To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. 
+                            For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.</div>
                 </div>
             </div>
         </div>
@@ -1474,7 +1919,7 @@
                 pageToShow.classList.add('active');
 
                 // If this is one of the pages that depend on authentication, check auth.
-                if (['visualizations', 'gait-mechanics', 'scores'].includes(pageId)) {
+                if (['visualizations', 'scores'].includes(pageId)) { // add back 'gait-mechanics'
                     checkAuth(pageId);
                 }
                 // If the home page is being shown, update the home button
@@ -1718,8 +2163,14 @@
                     const tsA = a.name.slice("scores_".length, -".txt".length); // e.g. "2025-03-30_12-00-00"
                     const tsB = b.name.slice("scores_".length, -".txt".length);
                     // Convert to ISO format by replacing '_' with 'T'
-                    const dateA = new Date(tsA.replace('_', 'T'));
-                    const dateB = new Date(tsB.replace('_', 'T'));
+                    //const dateA = new Date(tsA.replace('_', 'T'));
+                    //const dateB = new Date(tsB.replace('_', 'T'));
+                    const [dateAString, timeAString] = tsA.split('_');
+                    const [dateBString, timeBString] = tsB.split('_');
+                    
+                    // Convert the time part from "HH-MM-SS" to "HH:MM:SS"
+                    const dateA = new Date(`${dateAString}T${timeAString.replace(/-/g, ':')}`);
+                    const dateB = new Date(`${dateBString}T${timeBString.replace(/-/g, ':')}`);
                     return dateB - dateA; // Newest first
                 });
 
@@ -1801,7 +2252,7 @@
 
                     containerDiv.appendChild(circlesDiv);
                     // Append so the first file remains on top, older ones go below
-                    scoresMainContainer.prepend(containerDiv);
+                    scoresMainContainer.appendChild(containerDiv);
                 }
             } catch (error) {
                 console.error("Error loading scores:", error);
@@ -2150,9 +2601,9 @@
                 document.getElementById('your-profile').style.display = 'block';
 
                 // After setting up the profile fields:
+                await loadAllScores();           // Rebuild the scores page (wait for it to complete).
                 updateFinalStressScores();       // Recalculate Total_Stress and update scoreValues.
                 updateHomeRunStats();            // Update the home page stats.
-                await loadAllScores();           // Rebuild the scores page (wait for it to complete).
                 //updateScoreCircles();            // Update any score circle visuals.
                 updateHomeProfileButton();       // Update the home button appearance.
             });
@@ -2166,7 +2617,7 @@
                 const lastName = document.getElementById('last-name').value.trim();
                 const weight = document.getElementById('weight').value.trim();
                 const gender = document.getElementById('gender').value.trim();
-                if (!username || !password || !firstName || !lastName || !weight || !gender) {
+                if (!username || !password || !firstName || !lastName || !weight) {
                 alert("Please fill out all fields.");
                 return;
                 }
@@ -2199,9 +2650,10 @@
                 document.getElementById('your-profile').style.display = 'block';
 
                 // After setting up the profile fields:
+
+                await loadAllScores();           // Rebuild the scores page (wait for it to complete).
                 updateFinalStressScores();       // Recalculate Total_Stress and update scoreValues.
                 updateHomeRunStats();            // Update the home page stats.
-                await loadAllScores();           // Rebuild the scores page (wait for it to complete).
                 //updateScoreCircles();            // Update any score circle visuals.
                 updateHomeProfileButton();       // Update the home button appearance.
             });
