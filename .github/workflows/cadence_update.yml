@@ -27,4 +27,4 @@ jobs:
     - name: Run cadence.py
       env:
         GITHUB_TOKEN: ${{ secrets.EUGENIA_TOKEN }}
-      run: python pronationsupination.py
+      run: python cadence.py
