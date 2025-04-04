@@ -1610,29 +1610,34 @@
         };
         leftCol.appendChild(img);
 
-        // RIGHT COLUMN: Two vertical containers for Pronation and Supination
+        // RIGHT COLUMN: Split into two vertical containers for Pronation and Supination.
         const rightCol = document.createElement('div');
         rightCol.style.flex = '1';
         rightCol.style.display = 'flex';
         rightCol.style.flexDirection = 'column';
-        rightCol.style.gap = '20px'; // gap between the two containers
+        // Use a vertical gap between the two containers.
+        rightCol.style.gap = '20px';
 
         // --- Top Container: Pronation ---
         const pronationContainer = document.createElement('div');
+        pronationContainer.style.height = "50%";
         pronationContainer.style.display = 'flex';
         pronationContainer.style.flexDirection = 'column';
         pronationContainer.style.alignItems = 'center';
-
+        
+        // Header for Pronation
         const pronationHeader = document.createElement('h3');
         pronationHeader.textContent = "Pronation: Excessive inner foot loading";
         pronationHeader.style.marginBottom = "5px";
         pronationContainer.appendChild(pronationHeader);
-
+        
+        // Pronation button
         const pronationBtn = document.createElement('button');
         pronationBtn.classList.add("detail-toggle");
         pronationBtn.textContent = "Pronation";
         pronationContainer.appendChild(pronationBtn);
-
+        
+        // Pronation details container
         const pronationDetails = document.createElement('div');
         pronationDetails.classList.add("details");
         pronationDetails.style.display = "none";
@@ -1642,7 +1647,8 @@
         pronationDetails.style.paddingLeft = "10px";
         pronationDetails.textContent = "Pro text";
         pronationContainer.appendChild(pronationDetails);
-
+        
+        // Toggle functionality for pronation button
         pronationBtn.addEventListener('click', function() {
             if (pronationDetails.style.display === "none" || pronationDetails.style.display === "") {
                 pronationDetails.style.display = "block";
@@ -1655,20 +1661,24 @@
 
         // --- Bottom Container: Supination ---
         const supinationContainer = document.createElement('div');
+        supinationContainer.style.height = "50%";
         supinationContainer.style.display = 'flex';
         supinationContainer.style.flexDirection = 'column';
         supinationContainer.style.alignItems = 'center';
-
+        
+        // Header for Supination
         const supinationHeader = document.createElement('h3');
         supinationHeader.textContent = "Supination: Excessive outer foot loading";
         supinationHeader.style.marginBottom = "5px";
         supinationContainer.appendChild(supinationHeader);
-
+        
+        // Supination button
         const supinationBtn = document.createElement('button');
         supinationBtn.classList.add("detail-toggle");
         supinationBtn.textContent = "Supination";
         supinationContainer.appendChild(supinationBtn);
-
+        
+        // Supination details container
         const supinationDetails = document.createElement('div');
         supinationDetails.classList.add("details");
         supinationDetails.style.display = "none";
@@ -1678,7 +1688,8 @@
         supinationDetails.style.paddingLeft = "10px";
         supinationDetails.textContent = "Sup text";
         supinationContainer.appendChild(supinationDetails);
-
+        
+        // Toggle functionality for supination button
         supinationBtn.addEventListener('click', function() {
             if (supinationDetails.style.display === "none" || supinationDetails.style.display === "") {
                 supinationDetails.style.display = "block";
@@ -1688,12 +1699,12 @@
                 supinationBtn.textContent = "Supination";
             }
         });
-
+        
         // Append the two containers into the right column.
         rightCol.appendChild(pronationContainer);
         rightCol.appendChild(supinationContainer);
 
-        // Append the left and right columns into the main container.
+        // Append left and right columns to the main container.
         containerDiv.appendChild(leftCol);
         containerDiv.appendChild(rightCol);
 
