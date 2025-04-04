@@ -1559,7 +1559,8 @@
         detailsContainer.classList.add("details");
         detailsContainer.style.display = "none";
         detailsContainer.style.textAlign = "left";
-        detailsContainer.style.marginTop = "10px";
+        detailsContainer.style.margin = "10px auto 0 auto";
+        detailsContainer.style.width = "75%";
 
         // Set the side border color to match the score color.
         detailsContainer.style.borderLeft = "5px solid " + scoreColor;
@@ -1594,7 +1595,7 @@
         containerDiv.style.display = 'flex';
         containerDiv.style.gap = '20px';
 
-        // LEFT COLUMN: ProSup Image
+        // LEFT COLUMN: ProSup Image (remains unchanged)
         const leftCol = document.createElement('div');
         leftCol.style.flex = '1';
 
@@ -1609,30 +1610,29 @@
         };
         leftCol.appendChild(img);
 
-        // RIGHT COLUMN: Controls for Pronation and Supination.
+        // RIGHT COLUMN: Two vertical containers for Pronation and Supination
         const rightCol = document.createElement('div');
         rightCol.style.flex = '1';
         rightCol.style.display = 'flex';
         rightCol.style.flexDirection = 'column';
-        rightCol.style.justifyContent = 'center';
-        rightCol.style.gap = '20px'; // Add gap between the two controls
+        rightCol.style.gap = '20px'; // gap between the two containers
 
-        // --- Pronation Controls ---
+        // --- Top Container: Pronation ---
         const pronationContainer = document.createElement('div');
         pronationContainer.style.display = 'flex';
         pronationContainer.style.flexDirection = 'column';
         pronationContainer.style.alignItems = 'center';
-        
+
         const pronationHeader = document.createElement('h3');
         pronationHeader.textContent = "Pronation: Excessive inner foot loading";
         pronationHeader.style.marginBottom = "5px";
         pronationContainer.appendChild(pronationHeader);
-        
+
         const pronationBtn = document.createElement('button');
         pronationBtn.classList.add("detail-toggle");
         pronationBtn.textContent = "Pronation";
         pronationContainer.appendChild(pronationBtn);
-        
+
         const pronationDetails = document.createElement('div');
         pronationDetails.classList.add("details");
         pronationDetails.style.display = "none";
@@ -1642,8 +1642,7 @@
         pronationDetails.style.paddingLeft = "10px";
         pronationDetails.textContent = "Pro text";
         pronationContainer.appendChild(pronationDetails);
-        
-        // Attach event listener to toggle pronation details.
+
         pronationBtn.addEventListener('click', function() {
             if (pronationDetails.style.display === "none" || pronationDetails.style.display === "") {
                 pronationDetails.style.display = "block";
@@ -1654,22 +1653,22 @@
             }
         });
 
-        // --- Supination Controls ---
+        // --- Bottom Container: Supination ---
         const supinationContainer = document.createElement('div');
         supinationContainer.style.display = 'flex';
         supinationContainer.style.flexDirection = 'column';
         supinationContainer.style.alignItems = 'center';
-        
+
         const supinationHeader = document.createElement('h3');
         supinationHeader.textContent = "Supination: Excessive outer foot loading";
         supinationHeader.style.marginBottom = "5px";
         supinationContainer.appendChild(supinationHeader);
-        
+
         const supinationBtn = document.createElement('button');
         supinationBtn.classList.add("detail-toggle");
         supinationBtn.textContent = "Supination";
         supinationContainer.appendChild(supinationBtn);
-        
+
         const supinationDetails = document.createElement('div');
         supinationDetails.classList.add("details");
         supinationDetails.style.display = "none";
@@ -1679,8 +1678,7 @@
         supinationDetails.style.paddingLeft = "10px";
         supinationDetails.textContent = "Sup text";
         supinationContainer.appendChild(supinationDetails);
-        
-        // Attach event listener to toggle supination details.
+
         supinationBtn.addEventListener('click', function() {
             if (supinationDetails.style.display === "none" || supinationDetails.style.display === "") {
                 supinationDetails.style.display = "block";
@@ -1690,17 +1688,18 @@
                 supinationBtn.textContent = "Supination";
             }
         });
-        
-        // Append both control containers to the right column.
+
+        // Append the two containers into the right column.
         rightCol.appendChild(pronationContainer);
         rightCol.appendChild(supinationContainer);
 
-        // Append left and right columns to the main container.
+        // Append the left and right columns into the main container.
         containerDiv.appendChild(leftCol);
         containerDiv.appendChild(rightCol);
 
         return containerDiv;
     }
+
 
     // --- Main function to load and group runs by timestamp ---
     async function loadGaitMechanicsRuns() {
