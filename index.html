@@ -146,6 +146,7 @@
             border-radius: 10px;
             display: inline-block;
             margin-top: 20px;
+            border: none; /* Remove default button border */
         }
 
         /* Right Half - Run Stats */
@@ -602,7 +603,7 @@
         .profile-form button {
             width: calc(100% - 10px);
             padding: 10px;
-            background-color: #ff5500; /* Strava's orange */
+            background-color: red; /* Strava's orange */
             color: white;
             border: none;
             border-radius: 5px;
@@ -612,7 +613,7 @@
         }
 
         .profile-form button:hover {
-            background-color: #e04a00;
+            background-color: red;
         }
         
         input[type="password"]::-ms-reveal,
@@ -1006,95 +1007,85 @@
 
 
 <!-- GAIT MECH tab ------------------------------------------------------------------- -->
-<div id="gait-mechanics" class="content">
-    <!-- Auth Prompt -->
-    <div id="gait-mechanics-auth" class="auth-prompt">
-        <h1>Gait Mechanics</h1>
-        <button class="cta-button" onclick="showPage('profile')">Sign Up / Log In</button>
-    </div>    
+    <div id="gait-mechanics" class="content">
+        <!-- Auth Prompt -->
+        <div id="gait-mechanics-auth" class="auth-prompt">
+            <h1>Gait Mechanics</h1>
+            <button class="cta-button" onclick="showPage('profile')">Sign Up / Log In</button>
+        </div>    
 
-    <div id="gait-mechanics-content">
-        <h1>Gait Mechanics</h1>
+        <div id="gait-mechanics-content">
+            <h1>Gait Mechanics</h1>
+            <!-- Container where run groups (each with cadence scale and pro/sup image) will be added -->
+            <div id="run-groups-container"></div>
+        </div>
 
-        <!-- Cadence Section -->
-        <section id="cadence">
-            <h2>Cadence</h2>
-            <div class="graph-container" id="cadence-scales">
-                <!-- Placeholder for scale visualizations -->
-            </div>
-            <div id="cadence-message" class="message-box"></div> <!-- Placeholder for cadence messages -->
-        </section>
+        <!--<div id="gait-mechanics-content">
+            <h1>Gait Mechanics</h1>
 
-        <!-- Supination/Pronation Section -->
-        <section id="supination-pronation">
-            <h2>Supination/Pronation</h2>
-            <button class="detail-toggle" onclick="toggleDetails('supination-details')">Details</button>
-            <div id="supination-details" class="details" style="display:none;">
-                <p>If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
-                If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.</p>
-                
-                <p>Overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome.</p>
-                
-                <p>To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.</p>
-            </div>
+            <section id="cadence">
+                <h2>Cadence</h2>
+                <div class="graph-container" id="cadence-scales"></div>
+                <div id="cadence-message" class="message-box"></div> 
+            </section>
 
-            <div class="graph-container" id="image-container">
-                <!-- Images will be inserted here by JavaScript -->
-            </div>
-        </section>
+            <section id="supination-pronation">
+                <h2>Supination/Pronation</h2>
+                <button class="detail-toggle" onclick="toggleDetails('supination-details')">Details</button>
+                <div id="supination-details" class="details" style="display:none;">
+                    <p>If you see the center of pressure dot drift towards the inside of the foot, this is indicative of possible pronation. 
+                    If you see the center of pressure dot drift towards the outside of the foot, this is indicative of possible supination.</p>
+
+                    <p>Overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome.</p>
+
+                    <p>To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.</p>
+                </div>
+
+                <div class="graph-container" id="image-container">
+                </div>
+            </section>
+        </div>-->
     </div>
-</div>
 
 <style>
     /* General styles */
-    #gait-mechanics {
-        font-family: Arial, sans-serif;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    
-    #gait-mechanics h1 {
-        color: #333;
-        margin-bottom: 20px;
-    }
-    
-    #gait-mechanics h2 {
-        color: #444;
-        margin: 30px 0 15px;
-        border-bottom: 2px solid #007BFF;
-        padding-bottom: 8px;
-    }
-    
-    #gait-mechanics section {
-        margin-bottom: 40px;
-    }
-    
-    /* Auth prompt styles */
-    .auth-prompt {
-        background-color: #f8f9fa;
-        padding: 30px;
+    .gait-container {
+        border: 1px solid #ccc;
+        margin: 20px auto;
+        padding: 15px;
         border-radius: 8px;
-        text-align: center;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-width: 1000px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    
-    .cta-button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
+
+    .gait-container-header {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin-bottom: 10px;
     }
-    
-    .cta-button:hover {
-        background-color: #0056b3;
+
+    .gait-container-header .run-icon {
+        margin-right: 5px;
     }
-    
+
+    .gait-row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .gait-left, .gait-right {
+        flex: 1;
+        margin: 0 10px;
+    }
+
+    .section-title {
+        text-align: left;
+        border-bottom: 2px solid red;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+
     /* Graph container styles */
     .graph-container {
         width: 100%;
@@ -1105,7 +1096,7 @@
         border-radius: 8px;
         box-shadow: 0 1px 5px rgba(0,0,0,0.05);
     }
-    
+
     /* Cadence scales styling */
     #cadence-scales {
         display: flex;
@@ -1214,349 +1205,344 @@
         display: block;
         margin: 0 auto;
     }
+
+    .run-group {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .run-group-header {
+        font-size: 16px;
+        margin-bottom: 15px;
+        color: #555;
+    }
+    
+    .run-group-content {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .cadence-panel, .prosup-panel {
+        flex: 1;
+        min-width: 280px;
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    /* New header for each panel */
+    .panel-header {
+        text-align: center;
+        /*font-size: 16px;*/
+        color: black;
+        border-bottom: 2px solid red;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .cadence-panel h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #555;
+        font-size: 14px;
+    }
+    
+    .cadence-panel canvas {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .prosup-panel img {
+        max-width: 100%;
+        border-radius: 6px;
+        display: block;
+        margin: 0 auto;
+    }
 </style>
 
 <script>
-    // Toggle details visibility
-    function toggleDetails(id) {
-        const element = document.getElementById(id);
-        if (element.style.display === "none") {
-            element.style.display = "block";
-        } else {
-            element.style.display = "none";
+    // --- Helper to extract the raw timestamp from filenames ---
+    // For cadence files ("Run_Data_2025-03-27_07-15-31.txt") and
+    // prosup files ("Run_Data_2025-03-27_07-15-31_cop_plot.png")
+    function getRawTimestamp(fileName) {
+        let ts = fileName;
+        if(ts.startsWith("Run_Data_")) {
+            ts = ts.substring("Run_Data_".length);
         }
+        if(ts.endsWith("_cop_plot.png")) {
+            ts = ts.substring(0, ts.length - "_cop_plot.png".length);
+        } else if(ts.toLowerCase().endsWith(".txt")) {
+            ts = ts.substring(0, ts.length - ".txt".length);
+        }
+        return ts; // e.g., "2025-03-27_07-15-31"
     }
 
-    // Global variable for average cadence
-    let avgCadence = 0;
+    // --- Helper to format a raw timestamp (YYYY-MM-DD_HH-MM-SS) ---
+    function formatRawTimestamp(rawTs) {
+        const [datePart, timePart] = rawTs.split('_');
+        const formattedTime = timePart.replace(/-/g, ':');
+        const dateObj = new Date(datePart + ' ' + formattedTime);
+        return dateObj.toLocaleString();
+    }
 
-    // Fetch files from the GitHub repo using GitHub API for cadence data
+    // --- Helper to parse a raw timestamp into a Date object ---
+    function parseRawTimestamp(rawTs) {
+        const [datePart, timePart] = rawTs.split('_');
+        const formattedTime = timePart.replace(/-/g, ':');
+        return new Date(datePart + ' ' + formattedTime);
+    }
+
+    // --- Fetch cadence data ---
+    // Returns an array of objects: { rawTimestamp, cadenceValues, fileName }
     async function fetchCadenceData() {
         const repoOwner = 'PressureSole';
         const repoName = 'srdesign';
         const folderPath = 'cadence';
-
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
-
         try {
             const response = await fetch(url);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const files = await response.json();
-
-            // Filter out non-TXT files
-            const txtFiles = files.filter(file => file.name.endsWith('.txt'));
-
-            // Clear existing content
-            const container = document.getElementById('cadence-scales');
-            container.innerHTML = '';
-
-            // Process each file
-            const allCadenceValues = [];
-            
+            // Use a case-insensitive filter
+            const txtFiles = files.filter(file => file.name.toLowerCase().endsWith('.txt'));
+            const cadenceArray = [];
             for (let file of txtFiles) {
+                console.log("Fetching cadence file from URL:", file.download_url); // Debug log
                 try {
-                    const fileContent = await fetchFileContent(file.download_url);
-                    const cadenceValues = parseCadenceData(fileContent);
-                    
-                    if (cadenceValues.length > 0) {
-                        allCadenceValues.push(...cadenceValues);
-                        drawScale(file.name, cadenceValues);
+                    const content = await fetch(file.download_url, { mode: 'cors' }).then(r => r.text());
+                    const values = content.split('\n')
+                        .map(line => parseFloat(line.trim()))
+                        .filter(val => !isNaN(val));
+                    if (values.length > 0) {
+                        cadenceArray.push({
+                            rawTimestamp: getRawTimestamp(file.name),
+                            cadenceValues: values,
+                            fileName: file.name
+                        });
                     }
-                } catch (error) {
-                    console.error(`Error processing file ${file.name}:`, error);
+                } catch (err) {
+                    console.error(`Error processing ${file.name}:`, err);
                 }
             }
-            
-            // Calculate overall average cadence
-            if (allCadenceValues.length > 0) {
-                avgCadence = allCadenceValues.reduce((sum, val) => sum + val, 0) / allCadenceValues.length;
-                displayCadenceMessage(avgCadence);
-            } else {
-                document.getElementById('cadence-message').innerHTML = 
-                    '<p>No cadence data available. Please go for a run to collect data.</p>';
-            }
-            
+            return cadenceArray;
         } catch (error) {
-            console.error('Error fetching cadence data from GitHub:', error);
-            document.getElementById('cadence-scales').innerHTML = 
-                '<div class="error-message">Unable to load cadence data. Please try again later.</div>';
+            console.error('Error fetching cadence data:', error);
+            return [];
         }
     }
 
-    // Fetch file content using the download URL
-    async function fetchFileContent(downloadUrl) {
-        const response = await fetch(downloadUrl);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+    // --- Fetch prosup image data ---
+    // Returns an array of objects: { rawTimestamp, url, fileName }
+    async function fetchProSupData() {
+        const repoOwner = 'PressureSole';
+        const repoName = 'srdesign';
+        const folderPath = 'prosupvisual';
+        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const files = await response.json();
+            // Use a case-insensitive filter for PNG files.
+            const imageFiles = files.filter(file => file.name.toLowerCase().endsWith('.png'));
+            const prosupArray = imageFiles.map(file => ({
+                rawTimestamp: getRawTimestamp(file.name),
+                url: file.download_url,
+                fileName: file.name
+            }));
+            return prosupArray;
+        } catch (error) {
+            console.error('Error fetching prosup data:', error);
+            return [];
         }
-        
-        const content = await response.text();
-        return content;
     }
 
-    // Parse cadence data from file content
-    function parseCadenceData(content) {
-        // Assume each line in the file represents a cadence value
-        return content.split('\n')
-            .map(line => line.trim())
-            .filter(line => line.length > 0)
-            .map(line => parseFloat(line))
-            .filter(value => !isNaN(value));
-    }
-
-    // Draw the scale for each file
-    function drawScale(fileName, cadenceValues) {
-        if (cadenceValues.length === 0) return;
-        
-        const container = document.getElementById('cadence-scales');
-        
-        // Calculate file's average cadence
-        const fileCadence = cadenceValues.reduce((sum, val) => sum + val, 0) / cadenceValues.length;
-
-        // Create a div for this file's scale
+    // --- Function to draw a cadence scale canvas ---
+    // Returns a DOM element (a div containing a title and canvas)
+    function createCadenceScaleElement(fileName, cadenceValues) {
+        // Calculate average cadence for this file.
+        const avgForFile = cadenceValues.reduce((sum, val) => sum + val, 0) / cadenceValues.length;
         const scaleDiv = document.createElement('div');
-        scaleDiv.classList.add('cadence-scale');
+        scaleDiv.classList.add('cadence-panel');
         
-        // Create title with cleaned up file name (remove .txt and format nicely)
-        const title = document.createElement('h3');
-        const cleanTitle = fileName.replace('.txt', '').replace(/_/g, ' ');
-        title.textContent = cleanTitle;
-        scaleDiv.appendChild(title);
 
-        // Create a canvas for the scale
+        // Create a canvas for the scale.
         const canvas = document.createElement('canvas');
-        canvas.width = 60;    // Width of the canvas
-        canvas.height = 400;  // Height of the canvas
+        canvas.width = 60;
+        canvas.height = 400;
         scaleDiv.appendChild(canvas);
-
+        
         const ctx = canvas.getContext('2d');
-        const scaleMin = 0;
         const scaleMax = 380;
         
-        // Draw background
-        ctx.fillStyle = '#f5f5f5';
+        // Create a vertical linear gradient (from bottom to top)
+        const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+        // Lower side: remain red until 165, then transition from red to yellow between 165 and 170.
+        gradient.addColorStop(0, "red");
+        gradient.addColorStop(165 / scaleMax, "red");       // Constant red until 165
+        gradient.addColorStop(170 / scaleMax, "yellow");      // Transition to yellow by 170
+        // Middle: from 170 to 180, the color is green.
+        gradient.addColorStop(180 / scaleMax, "green");
+        // Upper side: transition from green to yellow between 180 and 185.
+        gradient.addColorStop(185 / scaleMax, "yellow");
+        // Finally, red from 185 to the top (380).
+        gradient.addColorStop(1, "red");
+        
+        // Fill the canvas with the gradient.
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Define the color ranges
-        const colorRanges = [
-            { min: 0, max: 160, color: '#ff6b6b' },     // Red
-            { min: 160, max: 170, color: '#feca57' },   // Yellow
-            { min: 170, max: 180, color: '#228B22' },   // Blue (optimal)
-            { min: 180, max: 190, color: '#feca57' },   // Yellow
-            { min: 190, max: 380, color: '#ff6b6b' }    // Red
-        ];
-
-        // Draw the scale with color ranges
-        colorRanges.forEach(range => {
-            const startY = canvas.height - (range.min / scaleMax * canvas.height);
-            const endY = canvas.height - (range.max / scaleMax * canvas.height);
-            ctx.fillStyle = range.color;
-            ctx.fillRect(0, endY, canvas.width, startY - endY);
-        });
-
-        // Draw borders
+        
+        // Draw a border.
         ctx.strokeStyle = '#ddd';
         ctx.lineWidth = 1;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-        // Draw scale values
+        
+        // Draw scale markers.
         ctx.fillStyle = '#333';
         ctx.font = '12px Arial';
         ctx.textAlign = 'right';
-        
-        // Draw markers every 50 units
         for (let i = 0; i <= scaleMax; i += 50) {
             const y = canvas.height - (i / scaleMax * canvas.height);
-            
-            // Draw tick mark
             ctx.beginPath();
             ctx.moveTo(0, y);
             ctx.lineTo(10, y);
             ctx.stroke();
-            
-            // Draw value
             ctx.fillText(i.toString(), 35, y + 4);
         }
-
-        // Draw this file's cadence value indicator
-        if (fileCadence > 0) {
-            const valueY = canvas.height - (fileCadence / scaleMax * canvas.height);
-            
-            // Draw line across the scale
+        
+        // Draw the average cadence indicator.
+        if (avgForFile > 0) {
+            const valueY = canvas.height - (avgForFile / scaleMax * canvas.height);
             ctx.beginPath();
             ctx.moveTo(0, valueY);
             ctx.lineTo(canvas.width, valueY);
             ctx.strokeStyle = '#333';
             ctx.lineWidth = 2;
             ctx.stroke();
-            
-            // Add value text
             ctx.fillStyle = '#333';
             ctx.font = '14px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`${fileCadence.toFixed(1)}`, canvas.width / 2, valueY - 10);
+            ctx.fillText(avgForFile.toFixed(1), canvas.width / 2, valueY - 10);
         }
-
-        // Append the scale div to the container
-        container.appendChild(scaleDiv);
+        
+        return scaleDiv;
     }
 
-    // Display the cadence message based on the cadence value
-    function displayCadenceMessage(cadence) {
-        const messageElement = document.getElementById('cadence-message');
-        messageElement.className = 'message-box'; // Reset class
-
-        let message = '';
-        let colorClass = '';
-
-        if (cadence < 160) {
-            message = "<strong>Your cadence is too low.</strong> A cadence lower than 160 steps per minute (SPM) often indicates overstriding, which can increase impact forces and elevate the risk of injuries such as shin splints or knee pain. To improve:<ul>" +
-                    "<li><strong>Increase stride frequency</strong>: Focus on taking shorter, quicker steps to reduce impact forces.</li>" +
-                    "<li><strong>Strengthen key muscles</strong>: Target the core, glutes, and hip flexors to improve stability and control.</li>" +
-                    "<li><strong>Incorporate dynamic stretching</strong>: Improve flexibility in hip flexors, hamstrings, and calves.</li>" +
-                    "<li><strong>Use cadence drills</strong>: Practice running at 170-180 SPM using a metronome or cadence app.</li></ul>";
-            colorClass = 'red';
-        } else if (cadence > 190) {
-            message = "<strong>Your cadence is too high.</strong> A cadence above 190 SPM may suggest a short, inefficient stride that can lead to excessive muscular fatigue. To improve:<ul>" +
-                    "<li><strong>Increase stride length</strong>: Focus on lengthening your stride rather than just increasing step rate.</li>" +
-                    "<li><strong>Strengthen key muscles</strong>: Target the core, glutes, and hip flexors to improve stability and control.</li>" +
-                    "<li><strong>Incorporate dynamic stretching</strong>: Enhance flexibility for stride efficiency.</li>" +
-                    "<li><strong>Practice interval training</strong>: Include intervals at 170-180 SPM to gradually adjust your rhythm.</li></ul>";
-            colorClass = 'red';
-        } else if (cadence >= 170 && cadence <= 180) {
-            message = "<strong>Your cadence is optimal!</strong> Your current cadence of " + cadence.toFixed(1) + " SPM falls within the ideal range of 170-180 steps per minute, which is associated with efficient running form and reduced injury risk.";
-            colorClass = 'green';
-        } else {
-            message = "<strong>Your cadence is approaching suboptimal levels.</strong> Your current cadence of " + cadence.toFixed(1) + " SPM is close to the edges of the ideal range (170-180 SPM). Consider minor adjustments to your running form to optimize efficiency and reduce injury risk.";
-            colorClass = 'yellow';
-        }
-
-        messageElement.innerHTML = message;
-        messageElement.classList.add(colorClass);
+    // --- Function to create a prosup image element ---
+    function createProSupElement(prosupData) {
+        const prosupDiv = document.createElement('div');
+        prosupDiv.classList.add('prosup-panel');
+        const img = document.createElement('img');
+        img.src = prosupData.url;
+        img.alt = "Foot pressure analysis from " + formatRawTimestamp(prosupData.rawTimestamp);
+        img.onerror = function() {
+            img.alt = "Image failed to load";
+            img.style.height = "150px";
+            img.style.backgroundColor = "#f8f9fa";
+            img.style.border = "1px dashed #ccc";
+        };
+        prosupDiv.appendChild(img);
+        return prosupDiv;
     }
 
-    // Fetch and display supination/pronation images
-    async function fetchSupinationImages() {
-        const repoOwner = 'PressureSole';
-        const repoName = 'srdesign';
-        const folderPath = 'prosupvisual';
+    // --- Main function to load and group runs by timestamp ---
+    async function loadGaitMechanicsRuns() {
+        // Fetch cadence and prosup data in parallel.
+        const [cadenceData, prosupData] = await Promise.all([fetchCadenceData(), fetchProSupData()]);
+        // Group by raw timestamp.
+        const runsByTimestamp = {};
+        // Always add cadence data, even if prosup is missing.
+        cadenceData.forEach(item => {
+            const ts = item.rawTimestamp;
+            if (!runsByTimestamp[ts]) runsByTimestamp[ts] = { cadence: null, prosup: null };
+            runsByTimestamp[ts].cadence = item;
+        });
+        // Add prosup data.
+        prosupData.forEach(item => {
+            const ts = item.rawTimestamp;
+            if (!runsByTimestamp[ts]) runsByTimestamp[ts] = { cadence: null, prosup: null };
+            runsByTimestamp[ts].prosup = item;
+        });
+        // Convert groups to an array and sort by timestamp (newest first).
+        const runGroups = Object.keys(runsByTimestamp).map(ts => ({
+            rawTimestamp: ts,
+            ...runsByTimestamp[ts]
+        }));
+        runGroups.sort((a, b) => parseRawTimestamp(b.rawTimestamp) - parseRawTimestamp(a.rawTimestamp));
+        // Get container.
+        const container = document.getElementById('run-groups-container');
+        container.innerHTML = '';
+        // For each run group, create a flex container with header and two panels.
+        runGroups.forEach(group => {
+            const groupDiv = document.createElement('div');
+            groupDiv.classList.add('run-group');
+            // Header with formatted timestamp.
+            const header = document.createElement('div');
+            header.classList.add('run-group-header');
+            header.textContent = formatRawTimestamp(group.rawTimestamp);
+            groupDiv.appendChild(header);
+            // Content container (flex)
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('run-group-content');
 
-        const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
-
-        try {
-            const response = await fetch(url);
+            // LEFT PANEL: Cadence with header
+            const leftDiv = document.createElement('div');
+            leftDiv.style.flex = '1';
+            leftDiv.style.margin = '0 10px';
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+            // Create and append the header for Cadence.
+            const cadenceHeader = document.createElement('h2');
+            cadenceHeader.classList.add('panel-header');
+            cadenceHeader.textContent = "Cadence";
+            leftDiv.appendChild(cadenceHeader);
+            
+            // Append cadence panel or placeholder.
+            if (group.cadence) {
+                const cadenceEl = createCadenceScaleElement(group.cadence.fileName, group.cadence.cadenceValues);
+                leftDiv.appendChild(cadenceEl);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.classList.add('cadence-panel');
+                placeholder.textContent = "No cadence data available.";
+                leftDiv.appendChild(placeholder);
             }
-            
-            const files = await response.json();
+            contentDiv.appendChild(leftDiv);
 
-            // Filter out non-image files (e.g., .png files)
-            const imageFiles = files.filter(file => file.name.endsWith(".png"));
+            // RIGHT PANEL: Pronation / Supination with header
+            const rightDiv = document.createElement('div');
+            rightDiv.style.flex = '1';
+            rightDiv.style.margin = '0 10px';
 
-            if (imageFiles.length === 0) {
-                document.getElementById('image-container').innerHTML = 
-                    '<div class="no-data-message">No pronation/supination data available yet. Please go for a run to collect data.</div>';
-                return;
+            // Create and append the header for Pronation / Supination.
+            const prosupHeader = document.createElement('h2');
+            prosupHeader.classList.add('panel-header');
+            prosupHeader.textContent = "Pronation / Supination";
+            rightDiv.appendChild(prosupHeader);            
+
+            // Append prosup panel or placeholder.
+            if (group.prosup) {
+                const prosupEl = createProSupElement(group.prosup);
+                rightDiv.appendChild(prosupEl);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.classList.add('prosup-panel');
+                placeholder.textContent = "No supination/pronation image available.";
+                rightDiv.appendChild(placeholder);
             }
+            contentDiv.appendChild(rightDiv);
 
-            // Process and sort the images by timestamp (newest first)
-            const imageData = imageFiles.map(file => {
-                // Extract timestamp from the filename
-                const filename = file.name;
-                const parts = filename.split('_');
-                
-                // Safety check for filename format
-                if (parts.length < 4) return { 
-                    filename, 
-                    timestamp: new Date(0), // Default to epoch start
-                    url: file.download_url 
-                };
-                
-                const timestampStr = parts[2] + "_" + parts[3];
-                // Convert timestamp string to Date object
-                const timestamp = new Date(timestampStr.replace(/-/g, '/').replace(/_/g, ' '));
-
-                const formattedTimestamp = timestamp.toLocaleString('en-US', {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-                });
-
-                return {
-                    filename: filename,
-                    timestamp: formattedTimestamp,
-                    url: file.download_url
-                };
-            });
-
-            // Sort images by timestamp (newest first)
-            imageData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            // Display images and their timestamps
-            displayImages(imageData);
-        } catch (error) {
-            console.error('Error fetching supination/pronation images:', error);
-            document.getElementById('image-container').innerHTML = 
-                '<div class="error-message">Unable to load pronation/supination data. Please try again later.</div>';
-        }
-    }
-
-    // Function to display images
-    function displayImages(images) {
-        const container = document.getElementById('image-container');
-        container.innerHTML = ''; // Clear any existing content
-
-        // Loop through each image and create the HTML for it
-        images.forEach(image => {
-            const imageElement = document.createElement('div');
-            imageElement.classList.add('image-item');
-
-            const timestamp = document.createElement('p');
-            timestamp.classList.add('timestamp');
-            timestamp.textContent = image.timestamp;
-
-            const img = document.createElement('img');
-            img.src = image.url;  // Image URL
-            img.alt = "Foot pressure analysis from " + image.timestamp; // Better alt text
-            img.classList.add('image');
-            
-            // Add loading state
-            img.loading = "lazy";
-            
-            // Handle image loading errors
-            img.onerror = function() {
-                img.src = ""; // Remove broken image icon
-                img.alt = "Image failed to load";
-                img.style.height = "150px";
-                img.style.display = "flex";
-                img.style.alignItems = "center";
-                img.style.justifyContent = "center";
-                img.style.backgroundColor = "#f8f9fa";
-                img.style.border = "1px dashed #ccc";
-                
-                const errorMsg = document.createElement('div');
-                errorMsg.textContent = "Image could not be loaded";
-                errorMsg.style.color = "#666";
-                imageElement.appendChild(errorMsg);
-            };
-
-            // Append timestamp and image to the container
-            imageElement.appendChild(timestamp);
-            imageElement.appendChild(img);
-            container.appendChild(imageElement);
+            // Append content container to the group.
+            groupDiv.appendChild(contentDiv);
+            container.appendChild(groupDiv);
         });
     }
 
-    // Initialize both data types when the page loads
+    // Initialize on DOMContentLoaded.
     document.addEventListener('DOMContentLoaded', function() {
-        fetchCadenceData();
-        fetchSupinationImages();
+        loadGaitMechanicsRuns();
     });
 </script>
 
@@ -1825,7 +1811,7 @@
         </div>
 
         <!-- Run History container -->
-        <div class="run-history-container" style="display: none; max-width: 1000px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <!-- <div class="run-history-container" style="display: none; max-width: 1000px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
             <h1 style="text-align: center; margin-bottom: 20px;">Run History</h1>
             <table style="width: 100%; border-collapse: collapse;">
               <thead>
@@ -1837,9 +1823,9 @@
                   <th style="padding: 10px; text-align: left;">Fatigue</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody>-->
                 <!-- For now, there is only one run row -->
-                <tr>
+                <!--<tr>
                   <td style="padding: 10px;">--</td>
                   <td style="padding: 10px;">--</td>
                   <td id="run-stress" style="padding: 10px;">--</td>
@@ -1849,7 +1835,7 @@
               </tbody>
             </table>
         </div>
-    </div>
+    </div>-->
 
     <!-- FAQs tab --------------------------------------------------------------------- -->
     <div id="faqs" class="content">
@@ -1919,7 +1905,7 @@
                 pageToShow.classList.add('active');
 
                 // If this is one of the pages that depend on authentication, check auth.
-                if (['visualizations', 'scores'].includes(pageId)) { // add back 'gait-mechanics'
+                if (['visualizations', 'gait-mechanics', 'scores'].includes(pageId)) { // add back 'gait-mechanics'
                     checkAuth(pageId);
                 }
                 // If the home page is being shown, update the home button
@@ -2597,7 +2583,6 @@
                 document.getElementById('display-first-name').value = profileData.firstName;
                 document.getElementById('display-last-name').value = profileData.lastName;
                 document.getElementById('display-weight').value = profileData.weight;
-                document.getElementById('display-gender').value = profileData.gender;
                 document.getElementById('your-profile').style.display = 'block';
 
                 // After setting up the profile fields:
@@ -2616,7 +2601,6 @@
                 const firstName = document.getElementById('first-name').value.trim();
                 const lastName = document.getElementById('last-name').value.trim();
                 const weight = document.getElementById('weight').value.trim();
-                const gender = document.getElementById('gender').value.trim();
                 if (!username || !password || !firstName || !lastName || !weight) {
                 alert("Please fill out all fields.");
                 return;
@@ -2631,7 +2615,6 @@
                 firstName: firstName,
                 lastName: lastName,
                 weight: weight,
-                gender: gender
                 };
                 localStorage.setItem('profile_' + username, JSON.stringify(profileData));
 
@@ -2646,7 +2629,6 @@
                 document.getElementById('display-first-name').value = firstName;
                 document.getElementById('display-last-name').value = lastName;
                 document.getElementById('display-weight').value = weight;
-                document.getElementById('display-gender').value = gender;
                 document.getElementById('your-profile').style.display = 'block';
 
                 // After setting up the profile fields:
@@ -2665,7 +2647,6 @@
                 const firstNameInput = document.getElementById('display-first-name');
                 const lastNameInput = document.getElementById('display-last-name');
                 const weightInput = document.getElementById('display-weight');
-                const genderSelect = document.getElementById('display-gender');
                 const profileToggleIcon = document.getElementById('profile-toggle-password');
 
                 if (this.innerText === "Edit Profile") {
@@ -2675,7 +2656,6 @@
                     firstNameInput.removeAttribute('readonly');
                     lastNameInput.removeAttribute('readonly');
                     weightInput.removeAttribute('readonly');
-                    genderSelect.disabled = false;
 
                     // Force the eye icon to show so the user can toggle password visibility
                     profileToggleIcon.style.display = "inline-block";
@@ -2689,8 +2669,7 @@
                     const firstName = firstNameInput.value.trim();
                     const lastName = lastNameInput.value.trim();
                     const weight = weightInput.value.trim();
-                    const gender = genderSelect.value;
-                    if (!username || !password || !firstName || !lastName || !weight || !gender) {
+                    if (!username || !password || !firstName || !lastName || !weight) {
                         alert("Please fill out all fields before saving.");
                         return;
                     }
@@ -2700,7 +2679,6 @@
                         firstName: firstName,
                         lastName: lastName,
                         weight: weight,
-                        gender: gender
                     };
                     localStorage.setItem('profile_' + username, JSON.stringify(profileData));
 
@@ -2710,7 +2688,6 @@
                     firstNameInput.setAttribute('readonly', true);
                     lastNameInput.setAttribute('readonly', true);
                     weightInput.setAttribute('readonly', true);
-                    genderSelect.disabled = true;
 
                     passwordInput.type = "password";
                     
