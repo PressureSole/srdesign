@@ -165,7 +165,7 @@
 
         .runstats-timestamp-header {
             text-align: center;
-            font-size: 15px;
+            font-size: 16px;
             color: #000;
             margin-bottom: 20px;
             width: 100%;
@@ -209,12 +209,13 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             margin: 0 20px 10px 20px; /* Top: 0, Right: 20px, Bottom: 10px, Left: 20px */
             padding: 20px;
+            width: calc(100% - 100px); /* Adjust width to account for left/right margins */
         }
 
         /* Header with the formatted timestamp */
         .visualization-header { /* FOR TIMESTAMP */
             text-align: left;
-            font-size: 15px;
+            font-size: 16px;
             color: #000;
             margin-bottom: 0px;
             width: 100%;
@@ -357,7 +358,7 @@
             display: flex;
             flex-direction: column; /* Stacks items vertically */
             align-items: center;
-            width: 100%;
+            /*width: 100%;*/
             margin-top: 20px;
         }
 
@@ -365,7 +366,7 @@
         .scoreBox {
             display: flex;
             flex-direction: column;
-            width: calc(100% - 100px); /* Adjust width to account for left/right margins */
+            width: calc(100% - 120px); /* Adjust width to account for left/right margins */
             margin: 0 20px 10px 20px; /* Top: 0, Right: 20px, Bottom: 10px, Left: 20px */
             padding: 20px;
             background-color: white;
@@ -376,7 +377,7 @@
         /* Header in the top row, left-justified */
         .score-header {
             text-align: left;
-            font-size: 15px;
+            font-size: 16px;
             color: #000;
             margin-bottom: 20px;
             width: 100%;
@@ -528,14 +529,30 @@
             width: 90%;         /* Expand wider than the score item; adjust as needed */
             max-width: 500px;    /* Cap the width so it doesn't get too wide on a moderately large screen */
             background-color: #eaeaea;
-            color: #333;
-            border: 1px solid #ccc;
-            padding: 10px;
+            /*color: #333;
+            border: 1px solid #ccc;*/
+            /*padding: 10px;*/
             border-radius: 8px;
             font-size: 16px;
             display: none;       /* Hidden by default */
             z-index: 10;
+
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 5px solid;
+            line-height: 1.5;
         }
+
+        /* Details box 
+        .details {
+            margin-top: 15px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 5px solid;
+            border-radius: 6px;
+            line-height: 1.5;
+        }*/
         
         .details-placeholder {
             height: 0;
@@ -1049,7 +1066,7 @@
 
 <style>
     /* General styles */
-    .gait-container {
+    /* .gait-container {
         border: 1px solid #ccc;
         margin: 20px auto;
         padding: 15px;
@@ -1087,7 +1104,7 @@
     }
 
     /* Graph container styles */
-    .graph-container {
+    /*.graph-container {
         width: 100%;
         min-height: 200px;
         background-color: #f9f9f9;
@@ -1151,28 +1168,41 @@
     
     /* Detail toggle button */
     .detail-toggle {
-        margin-top: 5px;
-        padding: 6px 12px;
-        font-size: 14px;
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
+        background-color: #eaeaea;
+        color: #333;
         border: none;
-        border-radius: 5px;
-        transition: background-color 0.2s;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
     }
     
     .detail-toggle:hover {
-        background-color: #0056b3;
+        background-color: #ccc;
     }
+
+    /*.details-btn {
+            background-color: #eaeaea;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        ccc*/
     
-    /* Details box */
+    /* Gait Mech Details box */
     .details {
-        margin-top: 15px;
+        margin-top: 10px;
         background-color: #f9f9f9;
         padding: 15px;
-        border-left: 4px solid #007BFF;
-        border-radius: 6px;
+        border-left: 5px solid; /*#007BFF*/
+        border-radius: 8px;
         line-height: 1.5;
     }
     
@@ -1185,7 +1215,7 @@
     }
     
     /* Image items */
-    .image-item {
+    /*.image-item {
         margin-bottom: 30px;
         background-color: white;
         padding: 15px;
@@ -1204,26 +1234,36 @@
         border-radius: 6px;
         display: block;
         margin: 0 auto;
-    }
+    }*/
 
     .run-group {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        /*border: 1px solid #ddd;*/
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 0 40px 10px 40px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        width: calc(100% - 100px); /* Adjust width to account for left/right margins */
     }
     
     .run-group-header {
         font-size: 16px;
-        margin-bottom: 15px;
-        color: #555;
+        margin-bottom: 0px;
+        color: #000;
+        text-align: left;
+        width: 100%;
     }
     
     .run-group-content {
         display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;         /* Prevent the panels from wrapping to a new line */
+        justify-content: space-between; /* Distribute any extra space evenly */
+    }
+
+        .run-group-content > div {
+        width: calc(50% - 10px);    /* Each panel gets 50% minus half the gap */
+        margin: 0;
+        box-sizing: border-box;
     }
     
     .cadence-panel, .prosup-panel {
@@ -1244,15 +1284,16 @@
         margin-bottom: 10px;
     }
     
-    .cadence-panel h3 {
+    .cadence-panel h3, .prosup-panel h3 {
         margin-top: 0;
         margin-bottom: 15px;
-        color: #555;
-        font-size: 14px;
+        color: #000;
+        font-size: 18px;
+        font-weight: bold;
     }
     
     .cadence-panel canvas {
-        border: 1px solid #ddd;
+        /*border: 1px solid #ddd;*/
         border-radius: 4px;
     }
     
@@ -1286,8 +1327,28 @@
         const [datePart, timePart] = rawTs.split('_');
         const formattedTime = timePart.replace(/-/g, ':');
         const dateObj = new Date(datePart + ' ' + formattedTime);
-        return dateObj.toLocaleString();
+        const options = {  // Define options here
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+        return `<i class="fas fa-running"></i> ${dateObj.toLocaleString('en-US', options)}`;
     }
+
+    /*function toggleDetails(detailsId, btn) {
+        const details = document.getElementById(detailsId);
+        if (details.style.display === "none" || details.style.display === "") {
+            details.style.display = "block";
+            btn.textContent = "Close";
+        } else {
+            details.style.display = "none";
+            btn.textContent = "Details";
+        }
+    }*/
 
     // --- Helper to parse a raw timestamp into a Date object ---
     function parseRawTimestamp(rawTs) {
@@ -1360,81 +1421,183 @@
         }
     }
 
-    // --- Function to draw a cadence scale canvas ---
-    // Returns a DOM element (a div containing a title and canvas)
+    // New function to create a horizontal, non-linear cadence scale element.
+    // New function to create a horizontal, non-linear cadence scale element.
     function createCadenceScaleElement(fileName, cadenceValues) {
+        // New function to create a horizontal, non-linear cadence scale element.
         // Calculate average cadence for this file.
         const avgForFile = cadenceValues.reduce((sum, val) => sum + val, 0) / cadenceValues.length;
-        const scaleDiv = document.createElement('div');
-        scaleDiv.classList.add('cadence-panel');
         
+        // Determine the score color and details message based on the average cadence.
+        let scoreColor, detailsMessage;
+        if (avgForFile < 160) {
+            scoreColor = "red";
+            detailsMessage = "Low Red text";
+        } else if (avgForFile >= 170 && avgForFile <= 180) {
+            scoreColor = "green";
+            detailsMessage = "Green text";
+        } else if (avgForFile > 190) {
+            scoreColor = "red";
+            detailsMessage = "High Red text";
+        } else {
+            scoreColor = "yellow";
+            detailsMessage = "Yellow text";
+        }
+        const cadScoreValue = avgForFile.toFixed(1);
 
-        // Create a canvas for the scale.
+        // Main container for the cadence panel (single column).
+        const containerDiv = document.createElement('div');
+        containerDiv.classList.add('cadence-panel');
+        containerDiv.style.display = 'block'; // Single column layout.
+
+        // Create the canvas.
         const canvas = document.createElement('canvas');
-        canvas.width = 60;
-        canvas.height = 400;
-        scaleDiv.appendChild(canvas);
-        
+        canvas.style.width = "100%";
+        // Define dimensions. The meter will span 90% of its container via CSS adjustments.
+        // For this example, we're using a fixed width of 600px.
+        const meterWidth = 600;            // Total width of the meter (in pixels)
+        const meterHeight = 40;            // Height of the colored meter bar
+        const triangleHeight = 15;         // Height allocated for the triangle indicator
+        const totalCanvasHeight = meterHeight + triangleHeight + 10; // Extra space for ticks
+        canvas.width = meterWidth;
+        canvas.height = totalCanvasHeight;
+        containerDiv.appendChild(canvas);
+
         const ctx = canvas.getContext('2d');
-        const scaleMax = 380;
-        
-        // Create a vertical linear gradient (from bottom to top)
-        const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-        // Lower side: remain red until 165, then transition from red to yellow between 165 and 170.
+
+        // The meter is divided into 5 equal visual segments.
+        const segmentVisualWidth = meterWidth / 5;
+
+        // Use your gradient stops with smooth blending.
+        const gradient = ctx.createLinearGradient(0, 0, meterWidth, 0);
         gradient.addColorStop(0, "red");
-        gradient.addColorStop(165 / scaleMax, "red");       // Constant red until 165
-        gradient.addColorStop(170 / scaleMax, "yellow");      // Transition to yellow by 170
-        // Middle: from 170 to 180, the color is green.
-        gradient.addColorStop(180 / scaleMax, "green");
-        // Upper side: transition from green to yellow between 180 and 185.
-        gradient.addColorStop(185 / scaleMax, "yellow");
-        // Finally, red from 185 to the top (380).
+        gradient.addColorStop(0.10, "red");
+        gradient.addColorStop(0.20, "yellow");
+        gradient.addColorStop(0.37, "yellow");
+        gradient.addColorStop(0.42, "green");
+        gradient.addColorStop(0.58, "green");
+        gradient.addColorStop(0.63, "yellow");
+        gradient.addColorStop(0.80, "yellow");
+        gradient.addColorStop(0.90, "red");
         gradient.addColorStop(1, "red");
-        
-        // Fill the canvas with the gradient.
+
+        // Draw the horizontal meter.
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw a border.
-        ctx.strokeStyle = '#ddd';
+        ctx.fillRect(0, 0, meterWidth, meterHeight);
+        // Draw a border around the meter.
+        ctx.strokeStyle = "#ddd";
         ctx.lineWidth = 1;
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw scale markers.
-        ctx.fillStyle = '#333';
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'right';
-        for (let i = 0; i <= scaleMax; i += 50) {
-            const y = canvas.height - (i / scaleMax * canvas.height);
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(10, y);
-            ctx.stroke();
-            ctx.fillText(i.toString(), 35, y + 4);
+        ctx.strokeRect(0, 0, meterWidth, meterHeight);
+
+        // Function for non-linear mapping of a cadence value to an x-position.
+        function mapCadenceToX(value) {
+            // Clamp the value between 0 and 380.
+            value = Math.min(Math.max(value, 0), 380);
+            if (value <= 160) {
+                return (value / 160) * segmentVisualWidth;
+            } else if (value <= 170) {
+                return segmentVisualWidth + ((value - 160) / 10) * segmentVisualWidth;
+            } else if (value <= 180) {
+                return 2 * segmentVisualWidth + ((value - 170) / 10) * segmentVisualWidth;
+            } else if (value <= 190) {
+                return 3 * segmentVisualWidth + ((value - 180) / 10) * segmentVisualWidth;
+            } else {
+                return 4 * segmentVisualWidth + ((value - 190) / 190) * segmentVisualWidth;
+            }
         }
-        
-        // Draw the average cadence indicator.
-        if (avgForFile > 0) {
-            const valueY = canvas.height - (avgForFile / scaleMax * canvas.height);
+
+        // Draw scale markers (ticks) and their values (in light grey) at: 160, 170, 180, 190.
+        const markerValues = [160, 170, 180, 190];
+        ctx.fillStyle = "#333"; // Light grey for markers and text. aaa
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 1;
+        markerValues.forEach(val => {
+            const x = mapCadenceToX(val);
+            // Draw a tick mark at the bottom edge of the meter.
             ctx.beginPath();
-            ctx.moveTo(0, valueY);
-            ctx.lineTo(canvas.width, valueY);
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
+            ctx.moveTo(x, meterHeight);
+            ctx.lineTo(x, meterHeight + 5);
             ctx.stroke();
-            ctx.fillStyle = '#333';
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(avgForFile.toFixed(1), canvas.width / 2, valueY - 10);
-        }
-        
-        return scaleDiv;
+            // Draw the value text below the tick.
+            ctx.font = "12px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(val.toString(), x, meterHeight + 18);
+        });
+
+        // Draw the average cadence indicator as a triangle beneath the meter.
+        const avgX = mapCadenceToX(avgForFile);
+        const triangleWidth = 12; // Width of the triangle's base.
+        const triangleTipY = meterHeight; // Tip touches the bottom of the meter.
+        const triangleBaseY = meterHeight + triangleHeight; // Base of the triangle.
+        ctx.fillStyle = "#000"; // Color for the triangle.
+        ctx.beginPath();
+        ctx.moveTo(avgX, triangleTipY); // Tip of the triangle.
+        ctx.lineTo(avgX - triangleWidth / 2, triangleBaseY);
+        ctx.lineTo(avgX + triangleWidth / 2, triangleBaseY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Create a container for the header and details button.
+        const textContainer = document.createElement('div');
+        textContainer.style.textAlign = 'center';
+        textContainer.style.marginTop = '10px';
+
+        // Create header displaying the actual cadence score value with color styling.
+        const cadScoreHeader = document.createElement('h3');
+        cadScoreHeader.innerHTML = "Your Cadence: <span style='color:" + scoreColor + "; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>" + cadScoreValue + "</span>";
+        cadScoreHeader.style.marginBottom = '5px';
+        textContainer.appendChild(cadScoreHeader);
+
+        // Create the "Details" button (assuming similar formatting as the scores page).
+        const detailsButton = document.createElement('button');
+        detailsButton.textContent = "Details";
+        detailsButton.classList.add("detail-toggle");
+        textContainer.appendChild(detailsButton);
+
+        // Create a container for the details text, initially hidden.
+        const detailsContainer = document.createElement('div');
+        detailsContainer.classList.add("details");
+        detailsContainer.style.display = "none";
+        detailsContainer.style.textAlign = "left";
+        detailsContainer.style.marginTop = "10px";
+
+        // Set the side border color to match the score color.
+        detailsContainer.style.borderLeft = "5px solid " + scoreColor;
+        detailsContainer.style.paddingLeft = "10px";
+        detailsContainer.textContent = detailsMessage;
+        textContainer.appendChild(detailsContainer);
+
+        detailsContainer.textContent = detailsMessage;
+        textContainer.appendChild(detailsContainer);
+
+        // Add click event listener to toggle the details container and update button text.
+        detailsButton.addEventListener('click', function(){
+            if (detailsContainer.style.display === "none" || detailsContainer.style.display === "") {
+                detailsContainer.style.display = "block";
+                detailsButton.textContent = "Close";
+            } else {
+                detailsContainer.style.display = "none";
+                detailsButton.textContent = "Details";
+            }
+        });
+
+        containerDiv.appendChild(textContainer);
+
+        return containerDiv;
     }
 
     // --- Function to create a prosup image element ---
     function createProSupElement(prosupData) {
-        const prosupDiv = document.createElement('div');
-        prosupDiv.classList.add('prosup-panel');
+        // Main container for the prosup panel split into two columns.
+        const containerDiv = document.createElement('div');
+        containerDiv.classList.add('prosup-panel');
+        containerDiv.style.display = 'flex';
+        containerDiv.style.gap = '20px';
+
+        // LEFT COLUMN: ProSup Image
+        const leftCol = document.createElement('div');
+        leftCol.style.flex = '1';
+
         const img = document.createElement('img');
         img.src = prosupData.url;
         img.alt = "Foot pressure analysis from " + formatRawTimestamp(prosupData.rawTimestamp);
@@ -1444,8 +1607,99 @@
             img.style.backgroundColor = "#f8f9fa";
             img.style.border = "1px dashed #ccc";
         };
-        prosupDiv.appendChild(img);
-        return prosupDiv;
+        leftCol.appendChild(img);
+
+        // RIGHT COLUMN: Controls for Pronation and Supination.
+        const rightCol = document.createElement('div');
+        rightCol.style.flex = '1';
+        rightCol.style.display = 'flex';
+        rightCol.style.flexDirection = 'column';
+        rightCol.style.justifyContent = 'center';
+        rightCol.style.gap = '20px'; // Add gap between the two controls
+
+        // --- Pronation Controls ---
+        const pronationContainer = document.createElement('div');
+        pronationContainer.style.display = 'flex';
+        pronationContainer.style.flexDirection = 'column';
+        pronationContainer.style.alignItems = 'center';
+        
+        const pronationHeader = document.createElement('h3');
+        pronationHeader.textContent = "Pronation: Excessive inner foot loading";
+        pronationHeader.style.marginBottom = "5px";
+        pronationContainer.appendChild(pronationHeader);
+        
+        const pronationBtn = document.createElement('button');
+        pronationBtn.classList.add("detail-toggle");
+        pronationBtn.textContent = "Pronation";
+        pronationContainer.appendChild(pronationBtn);
+        
+        const pronationDetails = document.createElement('div');
+        pronationDetails.classList.add("details");
+        pronationDetails.style.display = "none";
+        pronationDetails.style.textAlign = "left";
+        pronationDetails.style.marginTop = "10px";
+        pronationDetails.style.borderLeft = "5px solid black";
+        pronationDetails.style.paddingLeft = "10px";
+        pronationDetails.textContent = "Pro text";
+        pronationContainer.appendChild(pronationDetails);
+        
+        // Attach event listener to toggle pronation details.
+        pronationBtn.addEventListener('click', function() {
+            if (pronationDetails.style.display === "none" || pronationDetails.style.display === "") {
+                pronationDetails.style.display = "block";
+                pronationBtn.textContent = "Close";
+            } else {
+                pronationDetails.style.display = "none";
+                pronationBtn.textContent = "Pronation";
+            }
+        });
+
+        // --- Supination Controls ---
+        const supinationContainer = document.createElement('div');
+        supinationContainer.style.display = 'flex';
+        supinationContainer.style.flexDirection = 'column';
+        supinationContainer.style.alignItems = 'center';
+        
+        const supinationHeader = document.createElement('h3');
+        supinationHeader.textContent = "Supination: Excessive outer foot loading";
+        supinationHeader.style.marginBottom = "5px";
+        supinationContainer.appendChild(supinationHeader);
+        
+        const supinationBtn = document.createElement('button');
+        supinationBtn.classList.add("detail-toggle");
+        supinationBtn.textContent = "Supination";
+        supinationContainer.appendChild(supinationBtn);
+        
+        const supinationDetails = document.createElement('div');
+        supinationDetails.classList.add("details");
+        supinationDetails.style.display = "none";
+        supinationDetails.style.textAlign = "left";
+        supinationDetails.style.marginTop = "10px";
+        supinationDetails.style.borderLeft = "5px solid black";
+        supinationDetails.style.paddingLeft = "10px";
+        supinationDetails.textContent = "Sup text";
+        supinationContainer.appendChild(supinationDetails);
+        
+        // Attach event listener to toggle supination details.
+        supinationBtn.addEventListener('click', function() {
+            if (supinationDetails.style.display === "none" || supinationDetails.style.display === "") {
+                supinationDetails.style.display = "block";
+                supinationBtn.textContent = "Close";
+            } else {
+                supinationDetails.style.display = "none";
+                supinationBtn.textContent = "Supination";
+            }
+        });
+        
+        // Append both control containers to the right column.
+        rightCol.appendChild(pronationContainer);
+        rightCol.appendChild(supinationContainer);
+
+        // Append left and right columns to the main container.
+        containerDiv.appendChild(leftCol);
+        containerDiv.appendChild(rightCol);
+
+        return containerDiv;
     }
 
     // --- Main function to load and group runs by timestamp ---
@@ -1482,7 +1736,7 @@
             // Header with formatted timestamp.
             const header = document.createElement('div');
             header.classList.add('run-group-header');
-            header.textContent = formatRawTimestamp(group.rawTimestamp);
+            header.innerHTML = formatRawTimestamp(group.rawTimestamp);
             groupDiv.appendChild(header);
             // Content container (flex)
             const contentDiv = document.createElement('div');
@@ -1490,7 +1744,7 @@
 
             // LEFT PANEL: Cadence with header
             const leftDiv = document.createElement('div');
-            leftDiv.style.flex = '1';
+            leftDiv.style.flex = '1 1 50%';
             leftDiv.style.margin = '0 10px';
             
             // Create and append the header for Cadence.
@@ -1513,7 +1767,7 @@
 
             // RIGHT PANEL: Pronation / Supination with header
             const rightDiv = document.createElement('div');
-            rightDiv.style.flex = '1';
+            rightDiv.style.flex = '1 1 50%';
             rightDiv.style.margin = '0 10px';
 
             // Create and append the header for Pronation / Supination.
@@ -1834,8 +2088,8 @@
                 </tr>
               </tbody>
             </table>
-        </div>
-    </div>-->
+        </div>-->
+    </div>
 
     <!-- FAQs tab --------------------------------------------------------------------- -->
     <div id="faqs" class="content">
@@ -2000,7 +2254,7 @@
                         <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="${getColorForScore(score, categoryClass)}" stroke-width="10" stroke-dasharray="${perimeter}" stroke-dashoffset="${dashoffset}" stroke-linecap="round" />
                     </g>
                 </svg>
-                <div class="number">${score}</div>`;
+                <div class="number">${parseFloat(score).toFixed(2)}</div>`;
             circleDiv.appendChild(circleContent);
             scoreItem.appendChild(circleDiv);
             return scoreItem;
@@ -2020,6 +2274,16 @@
             const detailsBox = document.createElement('div');
             detailsBox.classList.add('details-box');
             detailsBox.style.display = 'none'; // hidden by default
+            detailsBox.style.textAlign = "left"; // new
+            detailsBox.style.marginTop = "10px"; // new
+
+            // Retrieve the score circle and its color.
+            const scoreCircle = scoreItem.querySelector('.score-circle');
+            const scoreColor = scoreCircle.getAttribute('data-color') || "green";
+
+            // Set the side border color to match the score color.
+            detailsBox.style.borderLeft = "5px solid " + scoreColor;
+            detailsBox.style.paddingLeft = "10px";
             
             // Append the details button and details box to the score item.
             scoreItem.appendChild(detailsBtn);
@@ -2108,7 +2372,12 @@
             // Update the Home page's Stress display.
             const homeStressEl = document.getElementById('home-stress').querySelector('span');
             if (homeStressEl) {
-                homeStressEl.textContent = totalStress.toFixed(2);
+                let stressStr = totalStress.toFixed(2); // e.g., "7.94"
+                // If the string is longer than 5 characters, trim it.
+                if (stressStr.length > 5) {
+                    stressStr = stressStr.substring(0, 5);
+                }
+                homeStressEl.textContent = stressStr;
             }
             
             console.log("updateFinalStressScores: Total_Stress =", totalStress);
@@ -2330,8 +2599,9 @@
 
             // Update the home page items:
             // For stress and fatigue, lower is better.
-            homeStress.querySelector('span').textContent = stressScore;
+            homeStress.querySelector('span').textContent = parseFloat(stressScore).toFixed(2);
             homeStress.querySelector('span').style.color = getColorForLowerBetter(stressScore);
+            
 
             homeFatigueLeft.querySelector('span').textContent = fatigueLeft;
             homeFatigueLeft.querySelector('span').style.color = getColorForLowerBetter(fatigueLeft);
