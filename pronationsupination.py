@@ -74,14 +74,14 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     ax.axvline(x=np.mean(left_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
 
     # Sensor locations
-    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s = 50)
+    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s = 200)
 
     # Normalize time for colormap
     norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
     # Plot COP trajectories with colormap
     sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', s=50)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.')
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', , s=50)
 
     # Add colorbar with larger font size
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
