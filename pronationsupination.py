@@ -63,7 +63,7 @@ import numpy as np
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    fig, ax = plt.subplots(figsize=(12, 12))  # Increased figure size
+    fig, ax = plt.subplots(figsize=(10, 10))  # Increased figure size
 
     # Plot foot outlines
     ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-')
@@ -74,14 +74,15 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     ax.axvline(x=np.mean(left_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
 
     # Sensor locations
-    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s = 200)
+    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s=100, marker='o', alpha=0.7)
 
     # Normalize time for colormap
     norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
     # Plot COP trajectories with colormap
-    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', s=50)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', s=50)
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, alpha=0.8)
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, alpha=0.8)
+
 
     # Add colorbar with larger font size
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
