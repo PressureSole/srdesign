@@ -63,7 +63,7 @@ import numpy as np
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    fig, ax = plt.subplots(figsize=(12, 12))
+    fig, ax = plt.subplots(figsize=(12, 12))  # Increased figure size
 
     # Plot foot outlines
     ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-')
@@ -83,11 +83,12 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.')
     sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.')
 
-    # Add colorbar
+    # Add colorbar with larger font size
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
-    cbar.set_label('Run Progress (%)', fontsize=14)
+    cbar.set_label('Run Progress (%)', fontsize=16)  # Bigger label
     cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
+    cbar.ax.tick_params(labelsize=14)  # Bigger tick labels
 
     # Clean up plot
     ax.set_xticks([])
@@ -97,7 +98,7 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
 
     # Save plot
     output_path = os.path.join(output_folder, f'{label}_cop_plot.png')
-    plt.savefig(output_path, bbox_inches='tight', pad_inches=0, dpi=300)
+    plt.savefig(output_path, bbox_inches='tight', pad_inches=0.1, dpi=300)
     plt.close()
 
 
