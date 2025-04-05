@@ -85,7 +85,7 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
 
 
         # Add colorbar with percentage formatting
-    cbar = plt.colorbar(right_cop, ax=ax, pad=0.01)
+    cbar = plt.colorbar(r_cop_x, ax=ax, pad=0.01)
     cbar.set_label('Run Progress (%)', fontsize=12)
     
     # Set custom ticks for the colorbar at 0%, 25%, 50%, 75%, and 100%
