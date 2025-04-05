@@ -81,7 +81,7 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
 
     # Plot COP trajectories with colormap
     sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', s=50)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', , s=50)
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', s=50)
 
     # Add colorbar with larger font size
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
