@@ -63,7 +63,7 @@ import numpy as np
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(12, 12))
 
     # Plot foot outlines
     ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-')
@@ -85,7 +85,7 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
 
     # Add colorbar
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
-    cbar.set_label('Run Progress (%)', fontsize=12)
+    cbar.set_label('Run Progress (%)', fontsize=14)
     cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
 
