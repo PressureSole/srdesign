@@ -59,7 +59,7 @@ def calculate_cop_from_sensors(sensor_data, sensor_coords):
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    plt.figure(figsize=(8, 10))
+    plt.figure(figsize=(8, 8))
 
     # Plot foot outline
     plt.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-', label='Right Foot Outline')
@@ -83,13 +83,19 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     plt.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Left) {label}')
     plt.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Right) {label}')
 
-    # Add a colorbar to represent time
-    cbar = plt.colorbar()
-    cbar.set_label('Time (Red most recent)')
+
+        # Add colorbar with percentage formatting
+    cbar = plt.colorbar(right_cop, ax=ax, pad=0.01)
+    cbar.set_label('Run Progress (%)', fontsize=12)
+    
+    # Set custom ticks for the colorbar at 0%, 25%, 50%, 75%, and 100%
+    cbar.set_ticks([0, 25, 50, 75, 100])
+    cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
+    
     plt.xticks([])
     plt.yticks([])
-    plt.xlabel('X Position (mm)')
-    plt.ylabel('Y Position (mm)')
+    #plt.xlabel('X Position (mm)')
+   # plt.ylabel('Y Position (mm)')
     #plt.title(f'Center of Pressure Visualization for {label}')
     plt.axis('equal')
     
