@@ -86,10 +86,10 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
 
     # Add colorbar with larger font size
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
-    cbar.set_label('Run Progress (%)', fontsize=16)  # Bigger label
+    cbar.set_label('Run Progress (%)', fontsize=20)  # Bigger label
     cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
-    cbar.ax.tick_params(labelsize=14)  # Bigger tick labels
+    cbar.ax.tick_params(labelsize=20)  # Bigger tick labels
 
     # Clean up plot
     ax.set_xticks([])
