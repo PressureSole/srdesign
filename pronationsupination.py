@@ -74,7 +74,7 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     ax.axvline(x=np.mean(left_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
 
     # Sensor locations
-    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black')
+    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s = 20)
 
     # Normalize time for colormap
     norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
