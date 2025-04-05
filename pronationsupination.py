@@ -57,52 +57,49 @@ def calculate_cop_from_sensors(sensor_data, sensor_coords):
     cop_y = np.sum(sensor_data * sensor_coords[:, 1], axis=1) / (force + 1e-6)
     return cop_x, cop_y
 
+import matplotlib.pyplot as plt
+import os
+import numpy as np
+
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    plt.figure(figsize=(8, 8))
+    fig, ax = plt.subplots(figsize=(10, 10))
 
-    # Plot foot outline
-    plt.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-', label='Right Foot Outline')
-    plt.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-', label='Left Foot Outline')
+    # Plot foot outlines
+    ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-')
+    ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-')
 
-    # Calculate center X positions for right and left feet
-    center_right_x = np.mean(smooth_foot_outline[:, 0])
-    center_left_x = np.mean(left_foot_outline[:, 0])
+    # Vertical lines for foot centers
+    ax.axvline(x=np.mean(smooth_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
+    ax.axvline(x=np.mean(left_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
 
-    # Plot vertical lines at the center of each foot
-    plt.axvline(x=center_right_x, color='gray', linestyle='--', alpha=0.8)
-    plt.axvline(x=center_left_x, color='gray', linestyle='--', alpha=0.8)
+    # Sensor locations
+    ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black')
 
-    # Plot sensor locations
-    plt.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', label='Sensor Locations')
-
-    # Normalize the time to range from 0 to 1
+    # Normalize time for colormap
     norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
-    # Plot COP with color mapped to time
-    plt.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Left) {label}')
-    plt.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.', label=f'COP Trajectory (Right) {label}')
+    # Plot COP trajectories with colormap
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='.')
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='.')
 
-
-        # Add colorbar with percentage formatting
-    cbar = plt.colorbar(pad=0.01)
+    # Add colorbar
+    cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
     cbar.set_label('Run Progress (%)', fontsize=12)
-    
-    # Set custom ticks for the colorbar at 0%, 25%, 50%, 75%, and 100%
-    cbar.set_ticks([0, 25, 50, 75, 100])
+    cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
-    
-    plt.xticks([])
-    plt.yticks([])
-    #plt.xlabel('X Position (mm)')
-   # plt.ylabel('Y Position (mm)')
-    #plt.title(f'Center of Pressure Visualization for {label}')
-    plt.axis('equal')
-    
-    # Save plot to prosupvisual folder
+
+    # Clean up plot
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_aspect('equal')
+    plt.tight_layout(pad=0)
+
+    # Save plot
     output_path = os.path.join(output_folder, f'{label}_cop_plot.png')
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight', pad_inches=0, dpi=300)
     plt.close()
+
 
 # Main analysis
 def main(file_path, output_folder):
