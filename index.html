@@ -159,7 +159,7 @@
 
         .stats-box h2 {
             font-size: 24px;
-            color: #333;
+            color: #000;
             margin-bottom: 10px;
         }
 
@@ -175,7 +175,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 18px;
-            color: #555;
+            color: #000;
         }
 
         .stat-item {
@@ -391,7 +391,7 @@
             align-items: center;*/
             margin-top: 20px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);  /* Create 4 equal-width columns */
+            grid-template-columns: repeat(3, 1fr);  /* Create 4 equal-width columns */
             gap: 20px;       /* Adjust gap between score items as needed */
             width: 100%;
             box-sizing: border-box;
@@ -745,11 +745,8 @@
                         <div class="stat-item" id="home-symmetry">
                             <span>0</span> Symmetry
                         </div>
-                        <div class="stat-item" id="home-fatigue-left">
-                            <span>0</span> Fatigue (Left)
-                        </div>
-                        <div class="stat-item" id="home-fatigue-right">
-                            <span>0</span> Fatigue (Right)
+                        <div class="stat-item" id="home-fatigue">
+                            <span>0</span> Fatigue
                         </div>
                     </div>
                 </div>
@@ -1432,16 +1429,16 @@
         let scoreColor, detailsMessage;
         if (avgForFile < 160) {
             scoreColor = "red";
-            detailsMessage = '<strong>Your cadence is too low.</strong> To improve:<ul><li>Increase stride frequency: Focus on taking shorter, quicker steps to reduce impact forces.</li><li>Strengthen key muscles: Target the core, glutes, and hip flexors to improve stability and control.</li><li>Incorporate dynamic stretching: Improve flexibility in hip flexors, hamstrings, and calves.</li></ul>';
+            detailsMessage = '<strong>Your cadence is too low.</strong> To improve:<ul><li><strong>Increase stride frequency:</strong> Focus on taking shorter, quicker steps to reduce impact forces.</li><li><strong>Strengthen key muscles:</strong> Target the core, glutes, and hip flexors to improve stability and control.</li><li><strong>Incorporate dynamic stretching:</strong> Improve flexibility in hip flexors, hamstrings, and calves.</li></ul>';
         } else if (avgForFile >= 170 && avgForFile <= 180) {
             scoreColor = "green";
             detailsMessage = `<strong>Your cadence is optimal!</strong> Your current cadence of <strong>${avgForFile}</strong> SPM falls within the ideal range of 170-180 steps per minute, which is associated with efficient running form and reduced injury risk.`;
         } else if (avgForFile > 190) {
             scoreColor = "red";
-            detailsMessage = '<strong>Your cadence is too high.</strong> To improve:<ul><li>Increase stride length: Focus on lengthening your stride rather than just increasing step rate.</li><li>Strengthen key muscles: Target the core, glutes, and hip flexors to improve stability and control.</li><li>Incorporate dynamic stretching: Enhance flexibility for stride efficiency./li></ul>';
+            detailsMessage = '<strong>Your cadence is too high.</strong> To improve:<ul><li><strong>Increase stride length:</strong> Focus on lengthening your stride rather than just increasing step rate.</li><li><strong>Strengthen key muscles:</strong> Target the core, glutes, and hip flexors to improve stability and control.</li><li><strong>Incorporate dynamic stretching:</strong> Target hip flexor, glute, quad, and hamstring flexiblity for stride efficiency.</li></ul>';
         } else {
             scoreColor = "yellow";
-            detailsMessage = "Yellow text";
+            detailsMessage = `<strong>Your cadence is approaching suboptimal levels.</strong> Your current cadence of <strong>${avgForFile}</strong> SPM is close to the edges of the ideal range (170-180 SPM). Consider minor adjustments to your running form to optimize efficiency and reduce injury risk.`;
         }
         const cadScoreValue = avgForFile.toFixed(1);
 
@@ -1631,7 +1628,7 @@
         // Pronation button
         const pronationBtn = document.createElement('button');
         pronationBtn.classList.add("detail-toggle");
-        pronationBtn.textContent = "Pronation";
+        pronationBtn.textContent = "Details";
         pronationContainer.appendChild(pronationBtn);
         
         // Pronation details container
@@ -1652,7 +1649,7 @@
                 pronationBtn.textContent = "Close";
             } else {
                 pronationDetails.style.display = "none";
-                pronationBtn.textContent = "Pronation";
+                pronationBtn.textContent = "Details";
             }
         });
 
@@ -1672,7 +1669,7 @@
         // Supination button
         const supinationBtn = document.createElement('button');
         supinationBtn.classList.add("detail-toggle");
-        supinationBtn.textContent = "Supination";
+        supinationBtn.textContent = "Details";
         supinationContainer.appendChild(supinationBtn);
         
         // Supination details container
@@ -1693,7 +1690,7 @@
                 supinationBtn.textContent = "Close";
             } else {
                 supinationDetails.style.display = "none";
-                supinationBtn.textContent = "Supination";
+                supinationBtn.textContent = "Details";
             }
         });
         
@@ -1780,7 +1777,7 @@
             // Create and append the header for Pronation / Supination.
             const prosupHeader = document.createElement('h2');
             prosupHeader.classList.add('panel-header');
-            prosupHeader.textContent = "Pronation / Supination";
+            prosupHeader.textContent = "Foot Loading";
             rightDiv.appendChild(prosupHeader);            
 
             // Append prosup panel or placeholder.
@@ -2147,6 +2144,7 @@
                             To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. 
                             For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.</div>
                     </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2197,13 +2195,11 @@
 
         // Auto Score Load -----------------------------------------------------------------
 
-        // Global variable to hold the raw scores loaded from file
+        // Global variable to hold the raw scores loaded from file (only three values now)
         let rawScores = {
-            R_Stress: 0,
-            L_Stress: 0,
-            Symmetry_Score: 0,
-            Right_Fatigue: 0,
-            Left_Fatigue: 0
+            "Overall Stress Score": 0,
+            "Overall Symmetry Score": 0,
+            "Overall Fatigue": 0
         };
 
         // Helper: Convert a timestamp string ("YYYY-MM-DD_HH-MM-SS") to a formatted header string.
@@ -2268,65 +2264,82 @@
         }
 
         // Updated helper: Wraps a score circle with a details button and details box, and attaches the click event.
-        function createScoreItem(label, score, categoryClass) {
+        function createScoreItem(label, score, categoryClass, analysisText = null) {
             // Create the score circle element using your existing function.
             const scoreItem = createScoreCircle(label, score, categoryClass);
-            
-            // Create the details button.
+
+            // Create the Details button and details box.
             const detailsBtn = document.createElement('button');
             detailsBtn.classList.add('details-btn');
             detailsBtn.textContent = 'Details';
-            
-            // Create the details box.
+
             const detailsBox = document.createElement('div');
             detailsBox.classList.add('details-box');
-            detailsBox.style.display = 'none'; // hidden by default
-            detailsBox.style.textAlign = "left"; // new
-            detailsBox.style.marginTop = "10px"; // new
+            detailsBox.style.display = 'none';
+            detailsBox.style.textAlign = "left";
+            detailsBox.style.marginTop = "10px";
 
-            // Retrieve the score circle and its color.
+            // Retrieve the score circle's color.
             const scoreCircle = scoreItem.querySelector('.score-circle');
             const scoreColor = scoreCircle.getAttribute('data-color') || "green";
 
-            // Set the side border color to match the score color.
+            // Set the side border to match the score color.
             detailsBox.style.borderLeft = "5px solid " + scoreColor;
             detailsBox.style.paddingLeft = "10px";
-            
-            // Append the details button and details box to the score item.
+
             scoreItem.appendChild(detailsBtn);
             scoreItem.appendChild(detailsBox);
-            
-            // Attach the event listener that shows/hides the details.
+
+            // Attach the event listener for the Details button.
             detailsBtn.addEventListener('click', function() {
-                // Retrieve the score circle and its current color (set as data-color)
-                const scoreCircle = scoreItem.querySelector('.score-circle');
-                const scoreColor = scoreCircle.getAttribute('data-color') || "green";
-                
-                // Determine the category based on the class on the score circle.
                 let category = "";
                 if (scoreCircle.classList.contains('stress')) {
                     category = "stress";
                 } else if (scoreCircle.classList.contains('symmetry')) {
                     category = "symmetry";
-                } else if (scoreCircle.classList.contains('fatigue-left')) {
-                    category = "fatigueLeft";
-                } else if (scoreCircle.classList.contains('fatigue-right')) {
-                    category = "fatigueRight";
+                } else if (scoreCircle.classList.contains('fatigue')) {
+                    category = "fatigue";
                 }
-                
-                // Toggle the display of the details box.
+
                 if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
-                    // Display the appropriate response.
                     detailsBox.textContent = responses[category][scoreColor];
                     detailsBox.style.display = 'block';
                     detailsBtn.textContent = 'Close';
                 } else {
-                    // Hide the details.
                     detailsBox.style.display = 'none';
                     detailsBtn.textContent = 'Details';
                 }
             });
-            
+
+            // For fatigue, add an Analysis button if analysisText is provided.
+            if (categoryClass === 'fatigue' && analysisText) {
+                const analysisBtn = document.createElement('button');
+                analysisBtn.classList.add('details-btn');
+                analysisBtn.textContent = 'Analysis';
+
+                const analysisBox = document.createElement('div');
+                analysisBox.classList.add('details-box');
+                analysisBox.style.display = 'none';
+                analysisBox.style.textAlign = "left";
+                analysisBox.style.marginTop = "10px";
+                analysisBox.style.borderLeft = "5px solid " + scoreColor;
+                analysisBox.style.paddingLeft = "10px";
+                analysisBox.textContent = analysisText;
+
+                scoreItem.appendChild(analysisBtn);
+                scoreItem.appendChild(analysisBox);
+
+                analysisBtn.addEventListener('click', function() {
+                    if (analysisBox.style.display === 'none' || analysisBox.style.display === '') {
+                        analysisBox.style.display = 'block';
+                        analysisBtn.textContent = 'Close';
+                    } else {
+                        analysisBox.style.display = 'none';
+                        analysisBtn.textContent = 'Analysis';
+                    }
+                });
+            }
+
             return scoreItem;
         }
 
@@ -2352,48 +2365,27 @@
         // This is used to update the home run stats box.
         // This function assumes that rawScores has been updated from the most recent file.
         function updateFinalStressScores() {
-            // Retrieve the user's weight from the profile display (or storage)
-            const profile = getUserProfile();
-            if (!profile || !profile.weight) {
-                console.error("User profile or weight not available; cannot compute Total_Stress.");
-                return;
-            }
-            // Convert weight (in lbs) to kg then to Newtons.
-            const weightKg = Number(profile.weight) * 0.45359237;
-            const bodyweight_newtons = weightKg * 9.81;
-            
-            // Calculate the stress contributions from the raw scores.
-            const R_Stress_final = rawScores.R_Stress / bodyweight_newtons;
-            const L_Stress_final = rawScores.L_Stress / bodyweight_newtons;
-            const totalStress = Math.min((R_Stress_final + L_Stress_final) / 2, 100);
-            
-            // Update the global scoreValues array:
-            // [0] = Total_Stress, [1] = Symmetry_Score, [2] = Left_Fatigue, [3] = Right_Fatigue
+            const totalStress = rawScores["Overall Stress Score"] || 0;
             scoreValues = [
                 totalStress,
-                rawScores.Symmetry_Score || 0,
-                rawScores.Left_Fatigue || 0,
-                rawScores.Right_Fatigue || 0
+                rawScores["Overall Symmetry Score"] || 0,
+                rawScores["Overall Fatigue"] || 0
             ];
-            
-            // Update the Home page's Stress display.
             const homeStressEl = document.getElementById('home-stress').querySelector('span');
             if (homeStressEl) {
-                let stressStr = totalStress.toFixed(2); // e.g., "7.94"
-                // If the string is longer than 5 characters, trim it.
+                let stressStr = totalStress.toFixed(2);
                 if (stressStr.length > 5) {
                     stressStr = stressStr.substring(0, 5);
                 }
                 homeStressEl.textContent = stressStr;
             }
-            
             console.log("updateFinalStressScores: Total_Stress =", totalStress);
         }
 
         // MANUAL values. TEMPORARY FUNCTION FOR AUDREY --------------------------------------
-        /* function insertTestScoreBox() {
-            // Your test values: [Stress, Symmetry, Fatigue (Left), Fatigue (Right)]
-            const testScores = [55, 91, 9, 5];
+        function insertTestScoreBox() {
+            // Your test values: [Stress, Symmetry, Fatigue]
+            const testScores = [42, 81, 24];
 
             // Create the container for the score box.
             const containerDiv = document.createElement('div');
@@ -2413,8 +2405,7 @@
             // Category classes should match those used in your code: 'stress', 'symmetry', 'fatigue-left', 'fatigue-right'.
             circlesDiv.appendChild(createScoreItem('Stress', testScores[0], 'stress'));
             circlesDiv.appendChild(createScoreItem('Symmetry', testScores[1], 'symmetry'));
-            circlesDiv.appendChild(createScoreItem('Fatigue (Left)', testScores[2], 'fatigue-left'));
-            circlesDiv.appendChild(createScoreItem('Fatigue (Right)', testScores[3], 'fatigue-right'));
+            circlesDiv.appendChild(createScoreItem('Fatigue', testScores[2], 'fatigue'));
 
             containerDiv.appendChild(circlesDiv);
 
@@ -2422,7 +2413,8 @@
             const scoresContainer = document.getElementById('scoresContainer');
             scoresContainer.innerHTML = ''; // Clear any previous content.
             scoresContainer.appendChild(containerDiv);
-        }*/
+        }
+
         // --- Build/Rebuild the Scores Page ---
         // When a user is logged in, we want to use our recalculated Total_Stress from scoreValues[0].
         // Otherwise, we fall back to using the raw average from the file.
@@ -2430,13 +2422,13 @@
             console.log("loadAllScores triggered");
 
             // MANUAL test score insertion. REMOVE ONCE AUDREY DONE
-            /*const testMode = true;
+            const testMode = true;
             if (testMode) {
                 const scoresContainer = document.getElementById('scoresContainer');
                 scoresContainer.innerHTML = '';
                 insertTestScoreBox();
                 return;
-            }*/
+            }
 
             try {
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
@@ -2490,28 +2482,43 @@
                         continue;
                     }
                     const text = await fileResponse.text();
-                    const lines = text.split('\n').filter(line => line.trim() !== '');
+                    /*const lines = text.split('\n').filter(line => line.trim() !== '');
                     let newScores = {};
                     lines.forEach(line => {
                         const parts = line.split(':');
                         if (parts.length >= 2) {
                             newScores[parts[0].trim()] = parseFloat(parts[1].trim());
                         }
-                    });
+                    });*/
+
+                    const lines = text.split('\n').filter(line => line.trim() !== '');
+                    let newScores = {};
+                    let analysisText = null;
+                    if (lines.length >= 3) {
+                        // Parse the first three lines for scores.
+                        // Expected keys: "Overall Stress Score", "Overall Symmetry Score", "Overall Fatigue"
+                        newScores["Overall Stress Score"] = parseFloat(lines[0].split(':')[1].trim());
+                        newScores["Overall Symmetry Score"] = parseFloat(lines[1].split(':')[1].trim());
+                        newScores["Overall Fatigue"] = parseFloat(lines[2].split(':')[1].trim());
+                        
+                        // If exactly two extra sentences are present, concatenate them as analysis.
+                        if (lines.length === 5) {
+                            analysisText = lines[3].trim() + " " + lines[4].trim();
+                        }
+                    }
 
                     // For the *most recent* file, update global rawScores for the home page
                     if (isFirst) {
                         rawScores = {
-                            R_Stress: newScores["R_Stress"] || 0,
-                            L_Stress: newScores["L_Stress"] || 0,
-                            Symmetry_Score: newScores["Symmetry_Score"] || 0,
-                            Right_Fatigue: newScores["Right_Fatigue"] || 0,
-                            Left_Fatigue: newScores["Left_Fatigue"] || 0
+                            "Overall Stress Score": newScores["Overall Stress Score"] || 0,
+                            "Overall Symmetry Score": newScores["Overall Symmetry Score"] || 0,
+                            "Overall Fatigue": newScores["Overall Fatigue"] || 0
                         };
                         latestTimestamp = file.name.slice("scores_".length, -".txt".length);
                         isFirst = false;
                     }
 
+                    // Build the DOM elements for this file
                     // Build the DOM elements for this file
                     const containerDiv = document.createElement('div');
                     containerDiv.classList.add('scoreBox');
@@ -2526,37 +2533,18 @@
                     const circlesDiv = document.createElement('div');
                     circlesDiv.classList.add('scores-container');
 
-                    // Compute stress for THIS file's data
-                    let stressValue = 0;
-                    if (localStorage.getItem('currentUser')) {
-                        const weightNewtons = getUserWeightNewtons();
-                        if (weightNewtons) {
-                            const R = newScores["R_Stress"] || 0;
-                            const L = newScores["L_Stress"] || 0;
-                            const R_Stress_final = R / weightNewtons;
-                            const L_Stress_final = L / weightNewtons;
-                            stressValue = Math.min((R_Stress_final + L_Stress_final) / 2, 100);
-                        } else {
-                            stressValue = ((newScores["R_Stress"]||0)+(newScores["L_Stress"]||0))/2;
-                        }
-                    } else {
-                        // Not logged in: raw average
-                        stressValue = ((newScores["R_Stress"]||0)+(newScores["L_Stress"]||0))/2;
-                    }
-
-                    circlesDiv.appendChild(createScoreItem('Stress', stressValue, 'stress'));
+                    // Only one Stress score is displayed now.
                     circlesDiv.appendChild(
-                        createScoreItem('Symmetry', newScores["Symmetry_Score"]||0, 'symmetry')
+                        createScoreItem('Stress', newScores["Overall Stress Score"] || 0, 'stress')
                     );
                     circlesDiv.appendChild(
-                        createScoreItem('Fatigue (Left)', newScores["Left_Fatigue"]||0, 'fatigue-left')
+                        createScoreItem('Symmetry', newScores["Overall Symmetry Score"] || 0, 'symmetry')
                     );
                     circlesDiv.appendChild(
-                        createScoreItem('Fatigue (Right)', newScores["Right_Fatigue"]||0, 'fatigue-right')
+                        createScoreItem('Fatigue', newScores["Overall Fatigue"] || 0, 'fatigue', analysisText)
                     );
 
                     containerDiv.appendChild(circlesDiv);
-                    // Append so the first file remains on top, older ones go below
                     scoresMainContainer.appendChild(containerDiv);
                 }
             } catch (error) {
@@ -2591,84 +2579,54 @@
         
         function updateHomeRunStats(timestampPart) {
             const homeTimestampCst = document.getElementById('home-timestamp');
-            // Check if a user is logged in
             if (!localStorage.getItem('currentUser')) {
-                // User is not logged in: set default values
                 homeTimestampCst.innerHTML = `<i class="fas fa-running"></i> –––`;
                 document.getElementById('home-stress').querySelector('span').textContent = "0";
                 document.getElementById('home-symmetry').querySelector('span').textContent = "0";
-                document.getElementById('home-fatigue-left').querySelector('span').textContent = "0";
-                document.getElementById('home-fatigue-right').querySelector('span').textContent = "0";
-                return; // exit the function without doing any further updates
+                document.getElementById('home-fatigue').querySelector('span').textContent = "0";
+                return;
             }
             
-            // If a timestamp is provided, use it.
             if (timestampPart) {
                 homeTimestampCst.innerHTML = formatTimestampFromFilename(timestampPart);
             } else if (latestTimestamp) {
-                // If no parameter but we have a stored timestamp, use that.
                 homeTimestampCst.innerHTML = formatTimestampFromFilename(latestTimestamp);
             } else {
-                // Fallback placeholder if no timestamp is available.
                 homeTimestampCst.innerHTML = `<i class="fas fa-running"></i> –––`;
             }
-
-            // Get the stat items from the home page.
+            
             const homeStress = document.getElementById('home-stress');
             const homeSymmetry = document.getElementById('home-symmetry');
-            const homeFatigueLeft = document.getElementById('home-fatigue-left');
-            const homeFatigueRight = document.getElementById('home-fatigue-right');
-
-            // Helper functions for color logic:
+            const homeFatigue = document.getElementById('home-fatigue');
+            
             function getColorForLowerBetter(score) {
-                if (score <= 29) {
-                    return 'green';
-                } else if (score <= 69) {
-                    return 'yellow';
-                } else {
-                    return 'red';
-                }
+                if (score <= 29) return 'green';
+                else if (score <= 69) return 'yellow';
+                else return 'red';
             }
             function getColorForHigherBetter(score) {
-                if (score >= 70) {
-                    return 'green';
-                } else if (score >= 30) {
-                    return 'yellow';
-                } else {
-                    return 'red';
-                }
+                if (score >= 70) return 'green';
+                else if (score >= 30) return 'yellow';
+                else return 'red';
             }
-
-            // Extract the scores from your scoreValues array.
-            // In your code, scoreValues is defined as [stressScore, symmetryScore, fatigueScore].
-            // Since you want the order Stress, Fatigue, Symmetry on the home page, note the difference.
+            
             const stressScore = scoreValues[0];
             const symmetryScore = scoreValues[1];
-            const fatigueLeft = scoreValues[2];
-            const fatigueRight = scoreValues[3];
-
-            // Update the home page items:
-            // For stress and fatigue, lower is better.
+            const fatigueScore = scoreValues[2];
+            
             homeStress.querySelector('span').textContent = parseFloat(stressScore).toFixed(2);
             homeStress.querySelector('span').style.color = getColorForLowerBetter(stressScore);
             
-
-            homeFatigueLeft.querySelector('span').textContent = fatigueLeft;
-            homeFatigueLeft.querySelector('span').style.color = getColorForLowerBetter(fatigueLeft);
-
-            homeFatigueRight.querySelector('span').textContent = fatigueRight;
-            homeFatigueRight.querySelector('span').style.color = getColorForLowerBetter(fatigueRight);
-
-            // For symmetry, higher is better.
-            homeSymmetry.querySelector('span').textContent = symmetryScore;
+            homeSymmetry.querySelector('span').textContent = parseFloat(symmetryScore).toFixed(2);
             homeSymmetry.querySelector('span').style.color = getColorForHigherBetter(symmetryScore);
-
+            
+            homeFatigue.querySelector('span').textContent = parseFloat(fatigueScore).toFixed(2);
+            homeFatigue.querySelector('span').style.color = getColorForLowerBetter(fatigueScore);
+            
             homeStress.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
             homeSymmetry.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
-            homeFatigueLeft.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
-            homeFatigueRight.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
+            homeFatigue.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
             
-            // Update the new timestamp element if a timestamp is provided.
             if (timestampPart) {
                 const homeTimestampEl = document.getElementById('home-timestamp');
                 homeTimestampEl.innerHTML = formatTimestampFromFilename(timestampPart);
@@ -2681,11 +2639,10 @@
         // Temporary default test values
         let stressScore = 0;
         let symmetryScore = 0;
-        let fatigueLeft = 0;
-        let fatigueRight = 0;
+        let fatigueScore = 0;
         
         // Array of scores in order: Stress, Symmetry, Fatigue
-        let scoreValues = [stressScore, symmetryScore, fatigueLeft, fatigueRight];
+        let scoreValues = [stressScore, symmetryScore, fatigueScore];
 
         function updateScoreCircles() {
             const circles = document.querySelectorAll('.score-circle');
@@ -2751,16 +2708,11 @@
                 yellow: "Your symmetry score suggests some imbalance between your left and right sides. This could be due to muscle imbalances, fatigue, or slight inefficiencies in your stride. While not a major concern yet, it’s worth paying attention to any discomfort or overuse on one side. Strengthening weaker muscles, focusing on even foot strikes, and incorporating single-leg exercises may help improve your balance over time.",
                 red: "Significant asymmetry detected! A major imbalance in your running form could lead to uneven stress on your joints and muscles, increasing the risk of injury. Possible causes include past injuries, muscle weaknesses, or poor movement patterns. Consider consulting a specialist or incorporating targeted strength and mobility work to correct imbalances and enhance your running efficiency."
             },
-            fatigueLeft: {
+            fatigue: {
                 green: "Your fatigue levels are low, meaning your feet are handling the demands of your run well. This suggests that your muscles and biomechanics are efficiently managing workload without excessive strain. Keep up your current training routine and recovery practices to maintain endurance and prevent overuse injuries.",
                 yellow: "Moderate fatigue detected. This means your feet are starting to show signs of stress, which could lead to decreased efficiency and increased risk of discomfort over longer distances. Consider incorporating proper warm-ups, strength training, and post-run recovery techniques like stretching or massage to help manage fatigue and sustain performance.",
                 red: "High fatigue levels detected! Your feet are likely experiencing significant strain, which could negatively impact your running form and increase injury risk. This may be due to overtraining, insufficient recovery, or inefficient biomechanics. It’s a good idea to assess your training load, prioritize rest, and focus on strengthening your feet and lower legs to improve endurance and reduce strain over time."
             },
-            fatigueRight: {
-                green: "Your fatigue levels are low, meaning your feet are handling the demands of your run well. This suggests that your muscles and biomechanics are efficiently managing workload without excessive strain. Keep up your current training routine and recovery practices to maintain endurance and prevent overuse injuries.",
-                yellow: "Moderate fatigue detected. This means your feet are starting to show signs of stress, which could lead to decreased efficiency and increased risk of discomfort over longer distances. Consider incorporating proper warm-ups, strength training, and post-run recovery techniques like stretching or massage to help manage fatigue and sustain performance.",
-                red: "High fatigue levels detected! Your feet are likely experiencing significant strain, which could negatively impact your running form and increase injury risk. This may be due to overtraining, insufficient recovery, or inefficient biomechanics. It’s a good idea to assess your training load, prioritize rest, and focus on strengthening your feet and lower legs to improve endurance and reduce strain over time."
-            }
         };
 
         document.querySelectorAll('.details-btn').forEach(button => {
@@ -2777,12 +2729,10 @@
                     category = "stress";
                 } else if (scoreCircle.classList.contains('symmetry')) {
                     category = "symmetry";
-                } else if (scoreCircle.classList.contains('fatigue-left')) {
-                    category = "fatigueLeft";
-                } else if (scoreCircle.classList.contains('fatigue-right')) {
-                    category = "fatigueRight";
-                }
-                
+                } else if (scoreCircle.classList.contains('fatigue')) {
+                    category = "fatigue";
+                }  // <-- Added missing closing brace
+
                 // Toggle the details box visibility and update button text
                 if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
                     // Show details and update the button label to "Close"
@@ -2798,20 +2748,18 @@
         });
 
         // TEMPORARY function to prompt for new SCORES
-        function testScoreInput() {
+        /*function testScoreInput() {
             let newStress = prompt("Enter Stress score (0-100):", stressScore);
             let newSymmetry = prompt("Enter Symmetry score (0-100):", symmetryScore);
-            let newFatigueLeft = prompt("Enter Fatigue (Left) score (0-100):", fatigueLeft);
-            let newFatigueRight = prompt("Enter Fatigue score (Right) (0-100):", fatigueRight);
-            scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigueLeft), Number(newFatigueRight)];
+            let newFatigue = prompt("Enter Fatigue score (0-100):", fatigueScore);
+            scoreValues = [Number(newStress), Number(newSymmetry), Number(newFatigue)];
             
-            // Store the run scores in localStorage so they persist.
             localStorage.setItem('runScores', JSON.stringify(scoreValues));
 
             updateScoreCircles();
-            updateHomeRunStats(); // Update the home page "Your Last Run" box
-            updateRunHistory();   // Update the Run History table with new scores
-        }
+            updateHomeRunStats();
+            updateRunHistory();
+        }*/
 
         // Initial update
         //updateScoreCircles();
@@ -2916,33 +2864,42 @@
             // Sign Up functionality
             document.getElementById('signup-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
+                
                 const username = document.getElementById('signup-username').value.trim();
                 const password = document.getElementById('signup-password').value.trim();
                 const firstName = document.getElementById('first-name').value.trim();
                 const lastName = document.getElementById('last-name').value.trim();
                 const weight = document.getElementById('weight').value.trim();
+                
                 if (!username || !password || !firstName || !lastName || !weight) {
-                alert("Please fill out all fields.");
-                return;
+                    alert("Please fill out all fields.");
+                    return;
                 }
+                
                 if (localStorage.getItem('profile_' + username)) {
-                alert("This username already exists. Please choose a different username or log in.");
-                return;
+                    alert("This username already exists. Please choose a different username or log in.");
+                    return;
                 }
+
+                // Create the profile data object
                 const profileData = {
-                username: username,
-                password: password,
-                firstName: firstName,
-                lastName: lastName,
-                weight: weight,
+                    username: username,
+                    password: password,
+                    firstName: firstName,
+                    lastName: lastName,
+                    weight: weight,
                 };
+                
+                // Save the profile data to localStorage
                 localStorage.setItem('profile_' + username, JSON.stringify(profileData));
 
-                // Set the currentUser flag.
+                // Set the currentUser flag in localStorage
                 localStorage.setItem('currentUser', username);
+
                 // Immediately update the UI on the affected pages
                 ['visualizations', 'gait-mechanics', 'scores'].forEach(checkAuth);
 
+                // Update profile fields in the UI
                 document.getElementById('signup-login-container').style.display = 'none';
                 document.getElementById('display-username').value = username;
                 document.getElementById('display-password').value = password;
@@ -2951,14 +2908,94 @@
                 document.getElementById('display-weight').value = weight;
                 document.getElementById('your-profile').style.display = 'block';
 
-                // After setting up the profile fields:
-
+                // After setting up the profile fields, call the following functions
                 await loadAllScores();           // Rebuild the scores page (wait for it to complete).
                 updateFinalStressScores();       // Recalculate Total_Stress and update scoreValues.
                 updateHomeRunStats();            // Update the home page stats.
                 //updateScoreCircles();            // Update any score circle visuals.
                 updateHomeProfileButton();       // Update the home button appearance.
+
+                // Call the function to export the profile as text (for automatic download)
+                exportProfileAsText();
             });
+
+            document.getElementById('signup-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const username = document.getElementById('signup-username').value.trim();
+                const password = document.getElementById('signup-password').value.trim();
+                const firstName = document.getElementById('first-name').value.trim();
+                const lastName = document.getElementById('last-name').value.trim();
+                const weight = document.getElementById('weight').value.trim();
+
+                if (!username || !password || !firstName || !lastName || !weight) {
+                    alert("Please fill out all fields.");
+                    return;
+                }
+
+                if (localStorage.getItem('profile_' + username)) {
+                    alert("This username already exists. Please choose a different username or log in.");
+                    return;
+                }
+
+                const profileData = {
+                    username: username,
+                    password: password,
+                    firstName: firstName,
+                    lastName: lastName,
+                    weight: weight,
+                };
+
+                // Save profile data to localStorage
+                localStorage.setItem('profile_' + username, JSON.stringify(profileData));
+
+                // Set the currentUser flag
+                localStorage.setItem('currentUser', username);
+
+                // Immediate UI updates
+                document.getElementById('signup-login-container').style.display = 'none';
+                document.getElementById('display-username').value = username;
+                document.getElementById('display-password').value = password;
+                document.getElementById('display-first-name').value = firstName;
+                document.getElementById('display-last-name').value = lastName;
+                document.getElementById('display-weight').value = weight;
+                document.getElementById('your-profile').style.display = 'block';
+
+                // After setting up the profile fields, update scores, stats, etc.
+                await loadAllScores(); // Rebuild the scores page (wait for it to complete).
+                updateFinalStressScores(); // Recalculate Total_Stress and update scoreValues.
+                updateHomeRunStats(); // Update the home page stats.
+
+                // Export profile as text after the profile is saved
+                exportProfileAsText();  // This triggers the export function
+            });
+
+            // Export profile as text function
+            function exportProfileAsText() {
+                const currentUser = localStorage.getItem("currentUser");
+                if (!currentUser) return alert("No user logged in.");
+
+                const profileJSON = localStorage.getItem("profile_" + currentUser);
+                if (!profileJSON) return alert("Profile data not found.");
+
+                const profile = JSON.parse(profileJSON);
+
+                // Format the profile as plain text
+                const profileText = `Name: ${profile.firstName} ${profile.lastName}\nWeight: ${profile.weight} lbs`;
+
+                // Create a Blob and trigger a download
+                const blob = new Blob([profileText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "user_profile.txt"; // <- downloaded filename
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+
             
             // Toggle between Edit and Save Profile modes on the "Your Profile" page
             document.getElementById('edit-profile-btn').addEventListener('click', function() {
