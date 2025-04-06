@@ -1434,8 +1434,8 @@
             scoreColor = "red";
             detailsMessage = '<strong>Your cadence is too low.</strong> To improve:<ul><li>Increase stride frequency: Focus on taking shorter, quicker steps to reduce impact forces.</li><li>Strengthen key muscles: Target the core, glutes, and hip flexors to improve stability and control.</li><li>Incorporate dynamic stretching: Improve flexibility in hip flexors, hamstrings, and calves.</li></ul>';
         } else if (avgForFile >= 170 && avgForFile <= 180) {
-            scoreColor = "<strong>Your cadence is too low.</strong> Your current cadence is <strong>${cadScoreValue}</strong> SPM. To improve:";
-            detailsMessage = "Green text";
+            scoreColor = "green";
+            detailsMessage = `<strong>Your cadence is optimal!</strong> Your current cadence of <strong>${avgForFile}</strong> SPM falls within the ideal range of 170-180 steps per minute, which is associated with efficient running form and reduced injury risk.`;
         } else if (avgForFile > 190) {
             scoreColor = "red";
             detailsMessage = '<strong>Your cadence is too high.</strong> To improve:<ul><li>Increase stride length: Focus on lengthening your stride rather than just increasing step rate.</li><li>Strengthen key muscles: Target the core, glutes, and hip flexors to improve stability and control.</li><li>Incorporate dynamic stretching: Enhance flexibility for stride efficiency./li></ul>';
