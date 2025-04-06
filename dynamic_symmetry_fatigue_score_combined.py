@@ -236,6 +236,13 @@ def main(file_path, output_folder):
             upload_file_to_github(local_path, github_path)
         else:
             print(f"File not found: {local_path}")
+            
+def process_all_files(input_folder, output_folder):
+    for file_name in os.listdir(input_folder):
+        if file_name.endswith('.csv') or file_name.endswith('.zip'):
+            file_path = os.path.join(input_folder, file_name)
+            print(f"Processing file: {file_path}")
+            main(file_path, output_folder)
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    process_all_files(input_folder, output_folder)
