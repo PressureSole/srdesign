@@ -2257,7 +2257,7 @@
                         <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="${getColorForScore(score, categoryClass)}" stroke-width="10" stroke-dasharray="${perimeter}" stroke-dashoffset="${dashoffset}" stroke-linecap="round" />
                     </g>
                 </svg>
-                <div class="number">${parseFloat(score).toFixed(0)}</div>`;
+                <div class="number">${parseFloat(score).toFixed(2)}</div>`;
             circleDiv.appendChild(circleContent);
             scoreItem.appendChild(circleDiv);
             return scoreItem;
@@ -2302,7 +2302,7 @@
                 }
 
                 if (detailsBox.style.display === 'none' || detailsBox.style.display === '') {
-                    detailsBox.textContent = responses[category][scoreColor];
+                    detailsBox.innerHTML = responses[category][scoreColor];
                     detailsBox.style.display = 'block';
                     detailsBtn.textContent = 'Close';
                 } else {
@@ -2383,9 +2383,9 @@
         }
 
         // MANUAL values. TEMPORARY FUNCTION FOR AUDREY --------------------------------------
-        function insertTestScoreBox() {
+        /*function insertTestScoreBox() {
             // Your test values: [Stress, Symmetry, Fatigue]
-            const testScores = [33, 8, 24];
+            const testScores = [40, 91, 11];
 
             // Create the container for the score box.
             const containerDiv = document.createElement('div');
@@ -2413,7 +2413,7 @@
             const scoresContainer = document.getElementById('scoresContainer');
             scoresContainer.innerHTML = ''; // Clear any previous content.
             scoresContainer.appendChild(containerDiv);
-        }
+        }*/
 
         // --- Build/Rebuild the Scores Page ---
         // When a user is logged in, we want to use our recalculated Total_Stress from scoreValues[0].
@@ -2422,13 +2422,13 @@
             console.log("loadAllScores triggered");
 
             // MANUAL test score insertion. REMOVE ONCE AUDREY DONE
-            const testMode = true;
+            /*const testMode = true;
             if (testMode) {
                 const scoresContainer = document.getElementById('scoresContainer');
                 scoresContainer.innerHTML = '';
                 insertTestScoreBox();
                 return;
-            }
+            }*/
 
             try {
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
@@ -2699,19 +2699,33 @@
         // Mapping of detailed responses for each category and color
         const responses = {
             stress: {
-                green: "Great job! Your stress levels are low, meaning the impact on your feet is well-distributed and not excessive. This suggests that your running form and footwear are effectively managing ground forces, reducing the risk of overuse injuries. Keep up the good work, and continue practicing proper foot strike and posture to maintain this balance!",
-                yellow: "Your stress levels are moderate, indicating that some areas of your feet may be experiencing increased pressure during your run. This could be due to factors such as uneven weight distribution, fatigue, or slight inefficiencies in form. Consider checking your footwear, focusing on even foot strikes, and incorporating strength or mobility exercises to improve impact absorption.",
-                red: "High stress levels detected! This means that certain areas of your feet are absorbing excessive impact, which could increase the risk of discomfort or injury over time. Possible causes include improper form, worn-out shoes, or excessive training intensity. You may want to reassess your footwear, adjust your stride mechanics, or incorporate recovery strategies to reduce strain on your feet."
+                green: `\<strong>Great job! Your stress levels are low</strong>, meaning the impact on your feet is well-distributed and not excessive. This suggests that your running form and footwear are effectively managing ground forces, reducing the risk of overuse injuries. Keep up the good work, and continue practicing proper foot strike and posture to maintain this balance!`,
+                yellow: `\<strong>Your stress levels are moderate</strong>, indicating that some areas of your feet may be experiencing increased pressure during your run. Consider:
+                <ul><li><strong>Checking your footwear</strong> for insufficient cushioning, poor arch support, incorrect fit, or worn out shoes.</li>
+                    <li>Focusing on <strong>even foot strikes</strong>.</li>
+                    <li><strong>Incorporating strength and mobility exercises</strong> targeting the lower leg and ankle into your training to improve impact absorption.</li></ul>`,
+                red: `\<strong>High stress levels detected!</strong> This means that certain areas of your feet are absorbing excessive impact, which could increase the risk of discomfort or injury over time. Consider:
+                <ul><li><strong>Reducing your training intensity and incorporating more recovery exercises</strong> to reduce consistent strain on your feet.</li>
+                    <li><strong>Referring to the visualizations page</strong> to ensure you are running symmetrically and maintaining good form throughout your run.</li>
+                    <li><strong>Checking your footwear</strong> for insufficient cushioning, poor arch support, incorrect fit, or worn out shoes.</li></ul>`
             },
             symmetry: {
-                green: "Excellent symmetry! Your left and right sides are well-balanced, meaning your foot strike and weight distribution are even. This helps improve efficiency, reduce strain on one side of your body, and lower the risk of compensatory injuries. Keep maintaining strong biomechanics and balanced strength training to preserve this symmetry!",
-                yellow: "Your symmetry score suggests some imbalance between your left and right sides. This could be due to muscle imbalances, fatigue, or slight inefficiencies in your stride. While not a major concern yet, it’s worth paying attention to any discomfort or overuse on one side. Strengthening weaker muscles, focusing on even foot strikes, and incorporating single-leg exercises may help improve your balance over time.",
-                red: "Significant asymmetry detected! A major imbalance in your running form could lead to uneven stress on your joints and muscles, increasing the risk of injury. Possible causes include past injuries, muscle weaknesses, or poor movement patterns. Consider consulting a specialist or incorporating targeted strength and mobility work to correct imbalances and enhance your running efficiency."
+                green: `\<strong>Excellent symmetry!</strong> Your left and right sides are well-balanced, meaning your foot strike and weight distribution are even. This helps improve efficiency and lower the risk of compensatory injuries.`,
+                yellow: `\<strong>There seems to be some asymmetry between your left and right sides.</strong> This could be due to muscle imbalances, fatigue, or slight inefficiencies in your stride. Refer to the fatigue score and visualizations for further insight on asymmetry. To improve your balance over time, consider:
+                <ul><li>Focusing on<strong> even foot strikes</strong></li>
+                    <li><strong>Strengthening weaker muscles</strong> by incorporating single-leg exercises.</li></ul>`,
+                red: `\<strong> Significant asymmetry detected!</strong> A major imbalance in your running form could lead to uneven stress on your joints and muscles, increasing the risk of injury. Refer to the fatigue score feedback and visualizations to see where the discrepancies in force loading exist. Consider:
+                <ul><li><strong>Possible causes</strong> including past injuries, muscle weaknesses, and/or poor movement patterns. Adjust training load accordingly.</li>
+                    <li><strong>Incorporate targeted strength and mobility work</strong> to correct imbalances over shorter runs to improve efficiency.</li></ul>`
             },
             fatigue: {
-                green: "Your fatigue levels are low, meaning your feet are handling the demands of your run well. This suggests that your muscles and biomechanics are efficiently managing workload without excessive strain. Keep up your current training routine and recovery practices to maintain endurance and prevent overuse injuries.",
-                yellow: "Moderate fatigue detected. This means your feet are starting to show signs of stress, which could lead to decreased efficiency and increased risk of discomfort over longer distances. Consider incorporating proper warm-ups, strength training, and post-run recovery techniques like stretching or massage to help manage fatigue and sustain performance.",
-                red: "High fatigue levels detected! Your feet are likely experiencing significant strain, which could negatively impact your running form and increase injury risk. This may be due to overtraining, insufficient recovery, or inefficient biomechanics. It’s a good idea to assess your training load, prioritize rest, and focus on strengthening your feet and lower legs to improve endurance and reduce strain over time."
+                green: `\<strong>Your fatigue levels are low</strong>, meaning you maintained proper form throughout the duration of your run.`,
+                yellow: `\<strong> Moderate fatigue detected</strong>. Your form started to slightly degrade over time. Consider:
+                <ul><li><strong>Incorporating proper warm-ups</strong> to increase blood flow to muscles and increase flexibility and range of motion prior to your run.</li>
+                    <li><strong>Strength training to improve muscle endurance</strong> in the leg, ankles, and feet to prevent muscle imbalances.</li></ul>`,
+                red: `\<strong> High fatigue levels detected!</strong> Your form significantly degraded over the course of your run. This may be due to overtraining, insufficient recovery, or inefficient biomechanics. It’s a good idea to:
+                <ul><li><strong>Assess your training load</strong> and prioritize rest.</li>
+                    <li><strong>Focus on strengthening your lower legs and feet</strong> to improve endurance and reduce strain over time.</li></ul>`
             },
         };
 
