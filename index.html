@@ -1432,13 +1432,13 @@
         let scoreColor, detailsMessage;
         if (avgForFile < 160) {
             scoreColor = "red";
-            detailsMessage = "Low Red text";
+            detailsMessage = '<strong>Your cadence is too low.</strong> To improve:<ul><li>Increase stride frequency: Focus on taking shorter, quicker steps to reduce impact forces.</li><li>Strengthen key muscles: Target the core, glutes, and hip flexors to improve stability and control.</li><li>Incorporate dynamic stretching: Improve flexibility in hip flexors, hamstrings, and calves.</li></ul>';
         } else if (avgForFile >= 170 && avgForFile <= 180) {
-            scoreColor = "green";
+            scoreColor = "<strong>Your cadence is too low.</strong> Your current cadence is <strong>${cadScoreValue}</strong> SPM. To improve:";
             detailsMessage = "Green text";
         } else if (avgForFile > 190) {
             scoreColor = "red";
-            detailsMessage = "High Red text";
+            detailsMessage = '<strong>Your cadence is too high.</strong> To improve:<ul><li>Increase stride length: Focus on lengthening your stride rather than just increasing step rate.</li><li>Strengthen key muscles: Target the core, glutes, and hip flexors to improve stability and control.</li><li>Incorporate dynamic stretching: Enhance flexibility for stride efficiency./li></ul>';
         } else {
             scoreColor = "yellow";
             detailsMessage = "Yellow text";
@@ -1456,8 +1456,8 @@
         // Define dimensions. The meter will span 90% of its container via CSS adjustments.
         // For this example, we're using a fixed width of 600px.
         const meterWidth = 600;            // Total width of the meter (in pixels)
-        const meterHeight = 40;            // Height of the colored meter bar
-        const triangleHeight = 15;         // Height allocated for the triangle indicator
+        const meterHeight = 100;            // Height of the colored meter bar
+        const triangleHeight = 30;         // Height allocated for the triangle indicator
         const totalCanvasHeight = meterHeight + triangleHeight + 10; // Extra space for ticks
         canvas.width = meterWidth;
         canvas.height = totalCanvasHeight;
@@ -1519,9 +1519,9 @@
             ctx.lineTo(x, meterHeight + 5);
             ctx.stroke();
             // Draw the value text below the tick.
-            ctx.font = "12px Arial";
+            ctx.font = "20px Arial";
             ctx.textAlign = "center";
-            ctx.fillText(val.toString(), x, meterHeight + 18);
+            ctx.fillText(val.toString(), x, meterHeight + 25);
         });
 
         // Draw the average cadence indicator as a triangle beneath the meter.
@@ -1560,15 +1560,12 @@
         detailsContainer.style.display = "none";
         detailsContainer.style.textAlign = "left";
         detailsContainer.style.margin = "10px auto 0 auto";
-        detailsContainer.style.width = "75%";
+        detailsContainer.style.width = "100%";
 
         // Set the side border color to match the score color.
         detailsContainer.style.borderLeft = "5px solid " + scoreColor;
         detailsContainer.style.paddingLeft = "10px";
-        detailsContainer.textContent = detailsMessage;
-        textContainer.appendChild(detailsContainer);
-
-        detailsContainer.textContent = detailsMessage;
+        detailsContainer.innerHTML = detailsMessage;
         textContainer.appendChild(detailsContainer);
 
         // Add click event listener to toggle the details container and update button text.
@@ -1620,7 +1617,7 @@
 
         // --- Top Container: Pronation ---
         const pronationContainer = document.createElement('div');
-        pronationContainer.style.height = "50%";
+        pronationContainer.style.flex = "1 1 auto";  // Allows it to grow as needed
         pronationContainer.style.display = 'flex';
         pronationContainer.style.flexDirection = 'column';
         pronationContainer.style.alignItems = 'center';
@@ -1645,7 +1642,7 @@
         pronationDetails.style.marginTop = "10px";
         pronationDetails.style.borderLeft = "5px solid black";
         pronationDetails.style.paddingLeft = "10px";
-        pronationDetails.textContent = "Pro text";
+        pronationDetails.innerHTML = 'To address \<strong>overpronation</strong>, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control.';
         pronationContainer.appendChild(pronationDetails);
         
         // Toggle functionality for pronation button
@@ -1661,7 +1658,7 @@
 
         // --- Bottom Container: Supination ---
         const supinationContainer = document.createElement('div');
-        supinationContainer.style.height = "50%";
+        supinationContainer.style.flex = "1 1 auto"; // Similarly for the bottom container
         supinationContainer.style.display = 'flex';
         supinationContainer.style.flexDirection = 'column';
         supinationContainer.style.alignItems = 'center';
@@ -1686,7 +1683,7 @@
         supinationDetails.style.marginTop = "10px";
         supinationDetails.style.borderLeft = "5px solid black";
         supinationDetails.style.paddingLeft = "10px";
-        supinationDetails.textContent = "Sup text";
+        supinationDetails.innerHTML = "To address \<strong>supination</strong>, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.";
         supinationContainer.appendChild(supinationDetails);
         
         // Toggle functionality for supination button
@@ -1754,7 +1751,7 @@
 
             // LEFT PANEL: Cadence with header
             const leftDiv = document.createElement('div');
-            leftDiv.style.flex = '1 1 50%';
+            leftDiv.style.flex = '1 1 33.33%';
             leftDiv.style.margin = '0 10px';
             
             // Create and append the header for Cadence.
@@ -1777,7 +1774,7 @@
 
             // RIGHT PANEL: Pronation / Supination with header
             const rightDiv = document.createElement('div');
-            rightDiv.style.flex = '1 1 50%';
+            rightDiv.style.flex = '1 1 66.67%';
             rightDiv.style.margin = '0 10px';
 
             // Create and append the header for Pronation / Supination.
@@ -2139,7 +2136,7 @@
                     </div>
                     <div class="faq-box">
                         <h3>What do "first period", "second period", and "third period" refer to under "fatigue" on the visualizations page? </h3>
-                        <div class="faq-answer">The purpose of the fatique visualization is to display the changes in forcing throughout a run. "First period" refers to the distribution of forcing for the first third of the run (33%). "Second period" refers to the distrubiton of forcing for the second third of the runn (33%-66%) and so on.</div>
+                        <div class="faq-answer">The purpose of the fatigue visualization is to display the changes in forcing throughout a run. "First period" refers to the distribution of forcing for the first third of the run (33%). "Second period" refers to the distribution of forcing for the second third of the runn (33%-66%) and so on.</div>
                     </div>
                     <div class="faq-box">
                         <h3>How do I interpret the pronation/supination visualization in the Gait Mechanics tab?</h3>
@@ -2393,11 +2390,54 @@
             console.log("updateFinalStressScores: Total_Stress =", totalStress);
         }
 
+        // MANUAL values. TEMPORARY FUNCTION FOR AUDREY --------------------------------------
+        /* function insertTestScoreBox() {
+            // Your test values: [Stress, Symmetry, Fatigue (Left), Fatigue (Right)]
+            const testScores = [55, 91, 9, 5];
+
+            // Create the container for the score box.
+            const containerDiv = document.createElement('div');
+            containerDiv.classList.add('scoreBox');
+
+            // Create a header for the test run.
+            const headerDiv = document.createElement('div');
+            headerDiv.classList.add('score-header');
+            headerDiv.innerHTML = `<i class="fas fa-running"></i> Test Run`;
+            containerDiv.appendChild(headerDiv);
+
+            // Create the container for the score circles.
+            const circlesDiv = document.createElement('div');
+            circlesDiv.classList.add('scores-container');
+
+            // Use the existing createScoreItem function to build each score item.
+            // Category classes should match those used in your code: 'stress', 'symmetry', 'fatigue-left', 'fatigue-right'.
+            circlesDiv.appendChild(createScoreItem('Stress', testScores[0], 'stress'));
+            circlesDiv.appendChild(createScoreItem('Symmetry', testScores[1], 'symmetry'));
+            circlesDiv.appendChild(createScoreItem('Fatigue (Left)', testScores[2], 'fatigue-left'));
+            circlesDiv.appendChild(createScoreItem('Fatigue (Right)', testScores[3], 'fatigue-right'));
+
+            containerDiv.appendChild(circlesDiv);
+
+            // Insert the test score box into your Scores page container.
+            const scoresContainer = document.getElementById('scoresContainer');
+            scoresContainer.innerHTML = ''; // Clear any previous content.
+            scoresContainer.appendChild(containerDiv);
+        }*/
         // --- Build/Rebuild the Scores Page ---
         // When a user is logged in, we want to use our recalculated Total_Stress from scoreValues[0].
         // Otherwise, we fall back to using the raw average from the file.
         async function loadAllScores() {
             console.log("loadAllScores triggered");
+
+            // MANUAL test score insertion. REMOVE ONCE AUDREY DONE
+            /*const testMode = true;
+            if (testMode) {
+                const scoresContainer = document.getElementById('scoresContainer');
+                scoresContainer.innerHTML = '';
+                insertTestScoreBox();
+                return;
+            }*/
+
             try {
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
                 const response = await fetch(repoUrl);
