@@ -1,0 +1,5 @@
+Overall Stress Score: 30
+Overall Symmetry Score: 70
+Overall Fatigue: 12
+The right foot strike pattern deviated significantly from your baseline during the run, initiating at 80.0% of the total run and indicating a shift toward more heel striking. 
+The left foot strike pattern deviated significantly from your baseline during the run, initiating at 70.0% of the total run and indicating a shift toward more forefoot striking 
