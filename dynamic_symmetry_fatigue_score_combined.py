@@ -1,3 +1,4 @@
+import zipfile
 import os
 import time
 import glob
@@ -156,25 +157,29 @@ def upload_file_to_github(file_path, github_path):
 
 # Main execution: process each CSV file in the runData folder
 def main():
-    run_files = glob.glob("runData/Run_Data_*.csv")
+    run_files = glob.glob("runData/Run_Data_*.zip")
     if not run_files:
-        print("No run data CSV files found in runData folder.")
+        print("No run data ZIP files found in runData folder.")
         exit(1)
     
     for run_file in run_files:
         print(f"\nProcessing file: {run_file}")
         try:
-            data = pd.read_csv(run_file)
+            with zipfile.ZipFile(run_file, 'r') as z:
+                csv_files = [f for f in z.namelist() if f.endswith('.csv')]
+                if not csv_files:
+                    raise Exception("No CSV file found inside ZIP.")
+                data = pd.read_csv(z.open(csv_files[0]))
         except Exception as e:
             print(f"Error reading {run_file}: {e}")
             continue
         
-        # Extract data columns
+        # Extract data columns and continue processing as before...
         timestamps = data["Time"].values
         sensor_pressures = [data[f"Sensor_{i+1}"].values for i in range(22)]
         
         # Extract file timestamp from filename using regex
-        m = re.search(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv", run_file)
+        m = re.search(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.zip", run_file)
         if m:
             file_timestamp = m.group(1)
         else:
