@@ -72,7 +72,7 @@ def calculate_cop_from_sensors(sensor_data, sensor_coords):
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    fig, ax = plt.subplots(figsize=(10, 10))  # Increased figure size
+    fig, ax = plt.subplots(figsize=(10, 10))
 
     # Plot foot outlines
     ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-', lw=2)
@@ -85,30 +85,30 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     # Sensor locations
     ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s=100, marker='o', alpha=0.7)
 
-    # Normalize time for colormap; handle case where all times are equal
+    # Normalize time for colormap; if all values are equal, use ones.
     if np.max(time) == np.min(time):
         norm_time = np.ones_like(time)
     else:
         norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
-    # Plot COP trajectories with colormap and add black edge for visibility
-    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, edgecolors='black', linewidths=1, alpha=0.9)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, edgecolors='black', linewidths=1, alpha=0.9)
+    # Plot COP trajectories with colormap, forcing full scale from 0 to 1, and increase marker size
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=200,
+                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=200,
+                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
 
-    # Add colorbar with larger font size
+    # Add colorbar with custom ticks and labels
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
     cbar.set_label('Run Progress (%)', fontsize=20)
-    cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
+    cbar.set_ticks([0, 0.25, 0.5, 0.75, 1])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
     cbar.ax.tick_params(labelsize=20)
 
-    # Clean up plot
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_aspect('equal')
     plt.tight_layout(pad=0)
 
-    # Save plot
     output_path = os.path.join(output_folder, f'{label}_cop_plot.png')
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0.1, dpi=300)
     plt.close()
@@ -118,18 +118,13 @@ def main(file_path, output_folder):
     data = load_data(file_path)
     if data is None:
         return
-    # Ensure 'Time' column is numeric (assuming it already is in this dataset)
+    # Convert "Time" to numeric in case it isn't already
     time_vals = pd.to_numeric(data['Time'], errors='coerce').values
-    # Sensor data from CSV (Sensor_1 to Sensor_22)
     sensor_data = data.iloc[:, 1:23].values
     right_sensor_data = sensor_data[:, :11]
     left_sensor_data = sensor_data[:, 11:]
-
-    # Calculate COP from sensor data using appropriate sensor coordinate subsets
     l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:])
     r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11])
-
-    # Get the file name without extension for labeling
     label = os.path.splitext(os.path.basename(file_path))[0]
     plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time_vals, label, output_folder)
 
