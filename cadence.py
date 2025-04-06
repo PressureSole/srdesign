@@ -51,11 +51,13 @@ def load_data(file_path):
 def calculate_cadence(df):
     try:
         time_column = df.columns[0]
-        # Convert the time column to numeric (coerce errors to NaN)
-        df[time_column] = pd.to_numeric(df[time_column], errors='coerce')
-        if df[time_column].isnull().any():
-            raise Exception("Time column contains invalid values after conversion.")
-
+        # Convert the time column to numeric (strip spaces first) and drop rows with NaN values
+        df[time_column] = pd.to_numeric(df[time_column].astype(str).str.strip(), errors='coerce')
+        if df[time_column].isnull().all():
+            raise Exception("Time column contains no valid numeric values.")
+        df = df.dropna(subset=[time_column])
+        
+        # Define sensor columns based on your file structure
         right_foot_sensors = df.columns[1:12]  # First 11 columns
         left_foot_sensors = df.columns[12:23]   # Next 11 columns
 
@@ -72,11 +74,11 @@ def calculate_cadence(df):
         left_peaks, _ = find_peaks(df["Left_Smoothed"], height=14, distance=10)
         right_peaks, _ = find_peaks(df["Right_Smoothed"], height=14, distance=10)
 
-        # Compute total time (in seconds)
+        # Compute total time in seconds from first to last valid entry
         total_time = df[time_column].iloc[-1] - df[time_column].iloc[0]
-        if pd.isnull(total_time) or total_time == 0:
+        if total_time <= 0:
             raise Exception("Invalid total time calculated.")
-
+        
         # Compute cadence (steps per minute)
         left_cadence = (len(left_peaks) * 60) / total_time
         right_cadence = (len(right_peaks) * 60) / total_time
@@ -87,7 +89,7 @@ def calculate_cadence(df):
     except Exception as e:
         print(f"Error calculating cadence: {e}")
         return None
-
+        
 # Upload .txt files to GitHub
 def upload_to_github(output_folder):
     for file_name in os.listdir(output_folder):
