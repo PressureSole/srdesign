@@ -64,10 +64,16 @@ left_foot_outline = smooth_foot_outline.copy()
 left_foot_outline[:, 0] *= -1
 
 # Calculate Center of Pressure (COP) using sensor data
-def calculate_cop_from_sensors(sensor_data, sensor_coords):
+def calculate_cop_from_sensors(sensor_data, sensor_coords, force_threshold=0.1):
     force = np.sum(sensor_data, axis=1)
-    cop_x = np.sum(sensor_data * sensor_coords[:, 0], axis=1) / (force + 1e-6)
-    cop_y = np.sum(sensor_data * sensor_coords[:, 1], axis=1) / (force + 1e-6)
+    # Create arrays initialized with NaN
+    cop_x = np.full(force.shape, np.nan)
+    cop_y = np.full(force.shape, np.nan)
+    # Compute COP only for rows with force above the threshold
+    valid = force > force_threshold
+    if np.any(valid):
+        cop_x[valid] = np.sum(sensor_data[valid] * sensor_coords[:, 0], axis=1) / (force[valid] + 1e-6)
+        cop_y[valid] = np.sum(sensor_data[valid] * sensor_coords[:, 1], axis=1) / (force[valid] + 1e-6)
     return cop_x, cop_y
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
@@ -118,15 +124,30 @@ def main(file_path, output_folder):
     data = load_data(file_path)
     if data is None:
         return
-    # Convert "Time" to numeric in case it isn't already
+    # Convert "Time" to numeric (in case there are string issues)
     time_vals = pd.to_numeric(data['Time'], errors='coerce').values
     sensor_data = data.iloc[:, 1:23].values
     right_sensor_data = sensor_data[:, :11]
     left_sensor_data = sensor_data[:, 11:]
-    l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:])
-    r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11])
+    
+    # Calculate COP for left and right foot (using a force threshold)
+    l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:], force_threshold=0.1)
+    r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11], force_threshold=0.1)
+    
+    # Filter out rows where COP could not be computed (NaNs)
+    valid_left = ~np.isnan(l_cop_x) & ~np.isnan(l_cop_y)
+    valid_right = ~np.isnan(r_cop_x) & ~np.isnan(r_cop_y)
+    
+    l_cop_x_plot = l_cop_x[valid_left]
+    l_cop_y_plot = l_cop_y[valid_left]
+    r_cop_x_plot = r_cop_x[valid_right]
+    r_cop_y_plot = r_cop_y[valid_right]
+    
+    # For the colormap, use the time values corresponding to valid left COP data
+    plot_time = time_vals[valid_left] if np.any(valid_left) else time_vals
+    
     label = os.path.splitext(os.path.basename(file_path))[0]
-    plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time_vals, label, output_folder)
+    plot_cop_on_foot(l_cop_x_plot, l_cop_y_plot, r_cop_x_plot, r_cop_y_plot, plot_time, label, output_folder)
 
 # Upload image to GitHub
 def upload_to_github(output_folder):
