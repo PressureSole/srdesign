@@ -26,7 +26,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 input_folder = os.path.join(script_dir, 'runData')
 output_folder = os.path.join(script_dir, 'prosupvisual')
 
-# Load the data
+# Load the data from CSV or ZIP
 def load_data(file_path):
     try:
         if file_path.endswith('.zip'):
@@ -43,13 +43,13 @@ def load_data(file_path):
         print(f"Error loading {file_path}: {e}")
         return None
 
-# Sensor coordinates (already provided by you)
+# Sensor coordinates (already provided)
 sensor_coords = np.array([
     [5, 3], [7.5, 3], [5, 7.5], [7.5, 7.5], [5, 12], [7.5, 12], [8, 15.5], [5.9, 16.4], [3.2, 17.7], [6.5, 18.9], [4.2, 20.4],
     [-5, 3], [-7.5, 3], [-5, 7.5], [-7.5, 7.5], [-5, 12], [-7.5, 12], [-8, 15.5], [-5.9, 16.4], [-3.2, 17.7], [-6.5, 18.9], [-4.2, 20.4]
 ])
 
-# Foot outline coordinates (already provided by you)
+# Foot outline coordinates (already provided)
 foot_outline = np.array([
     [6, 0.4], [3.3, 2.2], [3.7, 7], [3, 10.8], [2.2, 15.7], [2.3, 19.8],
     [4, 23.6], [7, 22], [8.5, 19.2], [9.2, 15.2], [9, 11.5], [8.5, 6.6],
@@ -70,17 +70,13 @@ def calculate_cop_from_sensors(sensor_data, sensor_coords):
     cop_y = np.sum(sensor_data * sensor_coords[:, 1], axis=1) / (force + 1e-6)
     return cop_x, cop_y
 
-import matplotlib.pyplot as plt
-import os
-import numpy as np
-
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
     fig, ax = plt.subplots(figsize=(10, 10))  # Increased figure size
 
     # Plot foot outlines
-    ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-')
-    ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-')
+    ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-', lw=2)
+    ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-', lw=2)
 
     # Vertical lines for foot centers
     ax.axvline(x=np.mean(smooth_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
@@ -89,20 +85,22 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     # Sensor locations
     ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s=100, marker='o', alpha=0.7)
 
-    # Normalize time for colormap
-    norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
+    # Normalize time for colormap; handle case where all times are equal
+    if np.max(time) == np.min(time):
+        norm_time = np.ones_like(time)
+    else:
+        norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
-    # Plot COP trajectories with colormap
-    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, alpha=0.8)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, alpha=0.8)
-
+    # Plot COP trajectories with colormap and add black edge for visibility
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, edgecolors='black', linewidths=1, alpha=0.9)
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, edgecolors='black', linewidths=1, alpha=0.9)
 
     # Add colorbar with larger font size
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
-    cbar.set_label('Run Progress (%)', fontsize=20)  # Bigger label
+    cbar.set_label('Run Progress (%)', fontsize=20)
     cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
-    cbar.ax.tick_params(labelsize=20)  # Bigger tick labels
+    cbar.ax.tick_params(labelsize=20)
 
     # Clean up plot
     ax.set_xticks([])
@@ -115,72 +113,25 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0.1, dpi=300)
     plt.close()
 
-
 # Main analysis
 def main(file_path, output_folder):
     data = load_data(file_path)
     if data is None:
         return
-    # Convert the "Time" column to numeric
-    data['Time'] = pd.to_numeric(data['Time'], errors='coerce')
-    if data['Time'].isnull().any():
-        print("Warning: Some time values could not be converted and will be dropped.")
-    data = data.dropna(subset=['Time'])
-    
-    timestamps = data['Time'].values
-    sensor_pressures = [data[f"Sensor_{i+1}"].values for i in range(22)]
-    
-    # Extract file timestamp from filename (supports .csv or .zip)
-    m = re.search(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.(csv|zip)", file_path)
-    if m:
-        file_timestamp = m.group(1)
-    else:
-        file_timestamp = "unknown"
-    
-    # Compute full run pressure (average over all rows)
-    full_data = np.mean(sensor_pressures, axis=1)
-    
-    # Define output prefix for symmetry plots
-    sym_prefix = f"{file_timestamp}_symmetry"
-    generate_plots(full_data, method='griddata', output_prefix=sym_prefix)
-    
-    # Divide the run into thirds using timestamps from the file
-    run_duration = timestamps[-1] - timestamps[0]
-    if run_duration <= 0:
-        print("Invalid run duration")
-        return
-    third_duration = run_duration / 3
-    thirds = [
-        (timestamps[0], timestamps[0] + third_duration),
-        (timestamps[0] + third_duration, timestamps[0] + 2 * third_duration),
-        (timestamps[0] + 2 * third_duration, timestamps[-1])
-    ]
-    
-    # Generate fatigue plots for each third of the run
-    for i, (start_time, end_time) in enumerate(thirds):
-        pressure_values = get_pressure_data_for_third(timestamps, sensor_pressures, start_time, end_time)
-        print(f"Third {i+1} pressure values: {pressure_values}")
-        fatigue_prefix = f"{file_timestamp}_fatigue{i+1}"
-        generate_plots(pressure_values, method='rbf', output_prefix=fatigue_prefix)
-    
-    # Prepare to upload images with an upload timestamp appended
-    upload_timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
-    images = [
-        (f"{sym_prefix}_gradient.png", f"images/{sym_prefix}_gradient_{upload_timestamp}.png"),
-        (f"{sym_prefix}_section.png", f"images/{sym_prefix}_section_{upload_timestamp}.png"),
-        (f"{file_timestamp}_fatigue1_gradient.png", f"images/{file_timestamp}_fatigue1_gradient_{upload_timestamp}.png"),
-        (f"{file_timestamp}_fatigue1_section.png", f"images/{file_timestamp}_fatigue1_section_{upload_timestamp}.png"),
-        (f"{file_timestamp}_fatigue2_gradient.png", f"images/{file_timestamp}_fatigue2_gradient_{upload_timestamp}.png"),
-        (f"{file_timestamp}_fatigue2_section.png", f"images/{file_timestamp}_fatigue2_section_{upload_timestamp}.png"),
-        (f"{file_timestamp}_fatigue3_gradient.png", f"images/{file_timestamp}_fatigue3_gradient_{upload_timestamp}.png"),
-        (f"{file_timestamp}_fatigue3_section.png", f"images/{file_timestamp}_fatigue3_section_{upload_timestamp}.png")
-    ]
-    
-    for local_path, github_path in images:
-        if os.path.exists(local_path):
-            upload_file_to_github(local_path, github_path)
-        else:
-            print(f"File not found: {local_path}")
+    # Ensure 'Time' column is numeric (assuming it already is in this dataset)
+    time_vals = pd.to_numeric(data['Time'], errors='coerce').values
+    # Sensor data from CSV (Sensor_1 to Sensor_22)
+    sensor_data = data.iloc[:, 1:23].values
+    right_sensor_data = sensor_data[:, :11]
+    left_sensor_data = sensor_data[:, 11:]
+
+    # Calculate COP from sensor data using appropriate sensor coordinate subsets
+    l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:])
+    r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11])
+
+    # Get the file name without extension for labeling
+    label = os.path.splitext(os.path.basename(file_path))[0]
+    plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time_vals, label, output_folder)
 
 # Upload image to GitHub
 def upload_to_github(output_folder):
@@ -189,16 +140,12 @@ def upload_to_github(output_folder):
             file_path = os.path.join(output_folder, file_name)
             with open(file_path, 'rb') as f:
                 content = f.read()
-            
-            # Define the path in the GitHub repo
             github_path = f'prosupvisual/{file_name}'
-            
-            # Try to get the existing file to update it
             try:
                 existing_file = repo.get_contents(github_path)
                 repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
                 print(f"Updated {file_name} on GitHub.")
-            except:
+            except Exception as e:
                 repo.create_file(github_path, f"Add {file_name}", content)
                 print(f"Uploaded {file_name} to GitHub.")
 
@@ -206,13 +153,10 @@ def upload_to_github(output_folder):
 def process_all_files(input_folder, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-
     for file_name in os.listdir(input_folder):
         if file_name.endswith('.csv') or file_name.endswith('.zip'):
             file_path = os.path.join(input_folder, file_name)
             main(file_path, output_folder)
-
-    # Upload all generated plots to GitHub
     upload_to_github(output_folder)
 
 # Run the script on all files in runData
