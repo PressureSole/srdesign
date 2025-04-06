@@ -5,6 +5,7 @@ import pandas as pd
 import os
 from scipy.interpolate import splprep, splev
 from github import Github
+from github import GithubException
 
 # GitHub repository and token
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Set the GitHub Personal Access Token as an environment variable
@@ -149,7 +150,6 @@ def main(file_path, output_folder):
     label = os.path.splitext(os.path.basename(file_path))[0]
     plot_cop_on_foot(l_cop_x_plot, l_cop_y_plot, r_cop_x_plot, r_cop_y_plot, plot_time, label, output_folder)
 
-# Upload image to GitHub
 def upload_to_github(output_folder):
     for file_name in os.listdir(output_folder):
         if file_name.endswith('.png'):
@@ -158,12 +158,30 @@ def upload_to_github(output_folder):
                 content = f.read()
             github_path = f'prosupvisual/{file_name}'
             try:
+                # Try to get the existing file.
                 existing_file = repo.get_contents(github_path)
-                repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
-                print(f"Updated {file_name} on GitHub.")
-            except Exception as e:
-                repo.create_file(github_path, f"Add {file_name}", content)
-                print(f"Uploaded {file_name} to GitHub.")
+                try:
+                    # Attempt to update using the SHA from the existing file.
+                    repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
+                    print(f"Updated {file_name} on GitHub.")
+                except GithubException as update_err:
+                    # If conflict error, re-read the file to get the latest SHA and retry.
+                    if update_err.status == 409:
+                        existing_file = repo.get_contents(github_path)
+                        repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
+                        print(f"Updated {file_name} on GitHub after conflict resolution.")
+                    else:
+                        raise update_err
+            except GithubException as e:
+                # If file is not found, create it.
+                if e.status == 404:
+                    try:
+                        repo.create_file(github_path, f"Add {file_name}", content)
+                        print(f"Uploaded {file_name} to GitHub.")
+                    except GithubException as ce:
+                        print(f"Failed to create file {file_name}: {ce}")
+                else:
+                    print(f"Failed to upload {file_name}: {e}")
 
 # Process all files in the runData folder
 def process_all_files(input_folder, output_folder):
