@@ -1,3 +1,4 @@
+import zipfile
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -27,8 +28,20 @@ output_folder = os.path.join(script_dir, 'prosupvisual')
 
 # Load the data
 def load_data(file_path):
-    data = pd.read_csv(file_path)
-    return data
+    try:
+        if file_path.endswith('.zip'):
+            with zipfile.ZipFile(file_path, 'r') as z:
+                csv_files = [f for f in z.namelist() if f.endswith('.csv')]
+                if not csv_files:
+                    raise Exception("No CSV file found in the ZIP archive.")
+                data = pd.read_csv(z.open(csv_files[0]))
+                return data
+        else:
+            data = pd.read_csv(file_path)
+            return data
+    except Exception as e:
+        print(f"Error loading {file_path}: {e}")
+        return None
 
 # Sensor coordinates (already provided by you)
 sensor_coords = np.array([
@@ -147,7 +160,7 @@ def process_all_files(input_folder, output_folder):
         os.makedirs(output_folder)
 
     for file_name in os.listdir(input_folder):
-        if file_name.endswith('.csv'):
+        if file_name.endswith('.csv') or file_name.endswith('.zip'):
             file_path = os.path.join(input_folder, file_name)
             main(file_path, output_folder)
 
