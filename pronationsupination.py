@@ -99,11 +99,11 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
         norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
     # Plot COP trajectories with colormap, forcing full scale from 0 to 1, and increase marker size
-    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=200,
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=100,
                      edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=200,
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=100,
                      edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
-
+    
     # Add colorbar with custom ticks and labels
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
     cbar.set_label('Run Progress (%)', fontsize=20)
