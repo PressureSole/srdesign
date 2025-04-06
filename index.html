@@ -1440,7 +1440,7 @@
             scoreColor = "yellow";
             detailsMessage = `<strong>Your cadence is approaching suboptimal levels.</strong> Your current cadence of <strong>${avgForFile}</strong> SPM is close to the edges of the ideal range (170-180 SPM). Consider minor adjustments to your running form to optimize efficiency and reduce injury risk.`;
         }
-        const cadScoreValue = avgForFile.toFixed(1);
+        const cadScoreValue = avgForFile.toFixed(0);
 
         // Main container for the cadence panel (single column).
         const containerDiv = document.createElement('div');
@@ -2257,7 +2257,7 @@
                         <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="${getColorForScore(score, categoryClass)}" stroke-width="10" stroke-dasharray="${perimeter}" stroke-dashoffset="${dashoffset}" stroke-linecap="round" />
                     </g>
                 </svg>
-                <div class="number">${parseFloat(score).toFixed(2)}</div>`;
+                <div class="number">${parseFloat(score).toFixed(0)}</div>`;
             circleDiv.appendChild(circleContent);
             scoreItem.appendChild(circleDiv);
             return scoreItem;
@@ -2373,9 +2373,9 @@
             ];
             const homeStressEl = document.getElementById('home-stress').querySelector('span');
             if (homeStressEl) {
-                let stressStr = totalStress.toFixed(2);
-                if (stressStr.length > 5) {
-                    stressStr = stressStr.substring(0, 5);
+                let stressStr = totalStress.toFixed(0);
+                if (stressStr.length > 4) {
+                    stressStr = stressStr.substring(0, 4);
                 }
                 homeStressEl.textContent = stressStr;
             }
@@ -2383,9 +2383,9 @@
         }
 
         // MANUAL values. TEMPORARY FUNCTION FOR AUDREY --------------------------------------
-        /*function insertTestScoreBox() {
+        function insertTestScoreBox() {
             // Your test values: [Stress, Symmetry, Fatigue]
-            const testScores = [40, 91, 11];
+            const testScores = [33, 8, 24];
 
             // Create the container for the score box.
             const containerDiv = document.createElement('div');
@@ -2413,7 +2413,7 @@
             const scoresContainer = document.getElementById('scoresContainer');
             scoresContainer.innerHTML = ''; // Clear any previous content.
             scoresContainer.appendChild(containerDiv);
-        }*/
+        }
 
         // --- Build/Rebuild the Scores Page ---
         // When a user is logged in, we want to use our recalculated Total_Stress from scoreValues[0].
@@ -2422,13 +2422,13 @@
             console.log("loadAllScores triggered");
 
             // MANUAL test score insertion. REMOVE ONCE AUDREY DONE
-            /*const testMode = true;
+            const testMode = true;
             if (testMode) {
                 const scoresContainer = document.getElementById('scoresContainer');
                 scoresContainer.innerHTML = '';
                 insertTestScoreBox();
                 return;
-            }*/
+            }
 
             try {
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
@@ -2614,13 +2614,13 @@
             const symmetryScore = scoreValues[1];
             const fatigueScore = scoreValues[2];
             
-            homeStress.querySelector('span').textContent = parseFloat(stressScore).toFixed(2);
+            homeStress.querySelector('span').textContent = parseFloat(stressScore).toFixed(0);
             homeStress.querySelector('span').style.color = getColorForLowerBetter(stressScore);
             
-            homeSymmetry.querySelector('span').textContent = parseFloat(symmetryScore).toFixed(2);
+            homeSymmetry.querySelector('span').textContent = parseFloat(symmetryScore).toFixed(0);
             homeSymmetry.querySelector('span').style.color = getColorForHigherBetter(symmetryScore);
             
-            homeFatigue.querySelector('span').textContent = parseFloat(fatigueScore).toFixed(2);
+            homeFatigue.querySelector('span').textContent = parseFloat(fatigueScore).toFixed(0);
             homeFatigue.querySelector('span').style.color = getColorForLowerBetter(fatigueScore);
             
             homeStress.querySelector('span').style.textShadow = "1px 1px 2px rgba(0,0,0,0.5)";
