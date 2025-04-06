@@ -3,7 +3,7 @@ name: Run Pronation Supination Analysis
 on:
   push:
     paths:
-      - 'runData/*.csv'  # Trigger only when new CSV files are added to runData
+      - 'runData/*.zip'  # Trigger only when new zip files are added to runData
   workflow_dispatch: 
   
 jobs:

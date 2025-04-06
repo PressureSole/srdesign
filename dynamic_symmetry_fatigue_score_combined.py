@@ -1,3 +1,4 @@
+import zipfile
 import os
 import time
 import glob
@@ -15,6 +16,13 @@ from io import BytesIO
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Set the GitHub Personal Access Token as an environment variable
 REPO_NAME = "PressureSole/srdesign"
 
+# Get the absolute path of the current script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define input and output folders relative to the script's location
+input_folder = os.path.join(script_dir, 'runData')
+output_folder = os.path.join(script_dir, 'images')
+
 # Ensure GitHub connection
 try:
     g = Github(GITHUB_TOKEN)
@@ -23,12 +31,28 @@ try:
 except Exception as e:
     print(f"GitHub connection error: {e}")
 
+def load_data(file_path):
+    try:
+        if file_path.endswith('.zip'):
+            with zipfile.ZipFile(file_path, 'r') as z:
+                csv_files = [f for f in z.namelist() if f.endswith('.csv')]
+                if not csv_files:
+                    raise Exception("No CSV file found in the ZIP archive.")
+                data = pd.read_csv(z.open(csv_files[0]))
+                return data
+        else:
+            data = pd.read_csv(file_path)
+            return data
+    except Exception as e:
+        print(f"Error loading {file_path}: {e}")
+        return None
+
 # SENSOR SETUP & FOOT OUTLINE (remains unchanged)
 # -----------------------------------------------
 # Sensor coordinates
 sensor_coords = np.array([
-    [5.9, 16.4], [5,7.5],[7.5,7.5],[5,3],[7.5,3],[5,12],[7.5,12],[3.2,17.7],[8,15.5],[6.5,18.9],[4.2,20.4],
-    [-5,7.5],[-5,3],[-7.5,3],[-7.5,7.5],[-5,12],[-7.5,12],[-8,15.5],[-6.5,18.9],[-5.9, 16.4],[-4.2,20.4],[-3.2,17.7]
+    [5, 3], [7.5, 3], [5, 7.5], [7.5, 7.5], [5, 12], [7.5, 12], [8, 15.5], [5.9, 16.4], [3.2, 17.7], [6.5, 18.9], [4.2, 20.4],
+    [-5, 3], [-7.5, 3], [-5, 7.5], [-7.5, 7.5], [-5, 12], [-7.5, 12], [-8, 15.5], [-5.9, 16.4], [-3.2, 17.7], [-6.5, 18.9], [-4.2, 20.4]
 ])
 
 # Foot outline
@@ -155,72 +179,77 @@ def upload_file_to_github(file_path, github_path):
         print(f"Error uploading {file_path}: {e}")
 
 # Main execution: process each CSV file in the runData folder
-def main():
-    run_files = glob.glob("runData/Run_Data_*.csv")
-    if not run_files:
-        print("No run data CSV files found in runData folder.")
-        exit(1)
+def main(file_path, output_folder):
+    data = load_data(file_path)
+    if data is None:
+        return
+    # Convert the "Time" column to numeric
+    data['Time'] = pd.to_numeric(data['Time'], errors='coerce')
+    if data['Time'].isnull().any():
+        print("Warning: Some time values could not be converted and will be dropped.")
+    data = data.dropna(subset=['Time'])
     
-    for run_file in run_files:
-        print(f"\nProcessing file: {run_file}")
-        try:
-            data = pd.read_csv(run_file)
-        except Exception as e:
-            print(f"Error reading {run_file}: {e}")
-            continue
-        
-        # Extract data columns
-        timestamps = data["Time"].values
-        sensor_pressures = [data[f"Sensor_{i+1}"].values for i in range(22)]
-        
-        # Extract file timestamp from filename using regex
-        m = re.search(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv", run_file)
-        if m:
-            file_timestamp = m.group(1)
+    timestamps = data['Time'].values
+    sensor_pressures = [data[f"Sensor_{i+1}"].values for i in range(22)]
+    
+    # Extract file timestamp from filename (supports .csv or .zip)
+    m = re.search(r"Run_Data_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.(csv|zip)", file_path)
+    if m:
+        file_timestamp = m.group(1)
+    else:
+        file_timestamp = "unknown"
+    
+    # Compute full run pressure (average over all rows)
+    full_data = np.mean(sensor_pressures, axis=1)
+    
+    # Define output prefix for symmetry plots
+    sym_prefix = f"{file_timestamp}_symmetry"
+    generate_plots(full_data, method='griddata', output_prefix=sym_prefix)
+    
+    # Divide the run into thirds using timestamps from the file
+    run_duration = timestamps[-1] - timestamps[0]
+    if run_duration <= 0:
+        print("Invalid run duration")
+        return
+    third_duration = run_duration / 3
+    thirds = [
+        (timestamps[0], timestamps[0] + third_duration),
+        (timestamps[0] + third_duration, timestamps[0] + 2 * third_duration),
+        (timestamps[0] + 2 * third_duration, timestamps[-1])
+    ]
+    
+    # Generate fatigue plots for each third of the run
+    for i, (start_time, end_time) in enumerate(thirds):
+        pressure_values = get_pressure_data_for_third(timestamps, sensor_pressures, start_time, end_time)
+        print(f"Third {i+1} pressure values: {pressure_values}")
+        fatigue_prefix = f"{file_timestamp}_fatigue{i+1}"
+        generate_plots(pressure_values, method='rbf', output_prefix=fatigue_prefix)
+    
+    # Prepare to upload images with an upload timestamp appended
+    upload_timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    images = [
+        (f"{sym_prefix}_gradient.png", f"images/{sym_prefix}_gradient_{upload_timestamp}.png"),
+        (f"{sym_prefix}_section.png", f"images/{sym_prefix}_section_{upload_timestamp}.png"),
+        (f"{file_timestamp}_fatigue1_gradient.png", f"images/{file_timestamp}_fatigue1_gradient_{upload_timestamp}.png"),
+        (f"{file_timestamp}_fatigue1_section.png", f"images/{file_timestamp}_fatigue1_section_{upload_timestamp}.png"),
+        (f"{file_timestamp}_fatigue2_gradient.png", f"images/{file_timestamp}_fatigue2_gradient_{upload_timestamp}.png"),
+        (f"{file_timestamp}_fatigue2_section.png", f"images/{file_timestamp}_fatigue2_section_{upload_timestamp}.png"),
+        (f"{file_timestamp}_fatigue3_gradient.png", f"images/{file_timestamp}_fatigue3_gradient_{upload_timestamp}.png"),
+        (f"{file_timestamp}_fatigue3_section.png", f"images/{file_timestamp}_fatigue3_section_{upload_timestamp}.png")
+    ]
+    
+    for local_path, github_path in images:
+        if os.path.exists(local_path):
+            upload_file_to_github(local_path, github_path)
         else:
-            file_timestamp = "unknown"
-        
-        # Compute full run pressure (average over all rows)
-        full_data = np.mean(sensor_pressures, axis=1)
-        
-        # Define output prefix for symmetry plots
-        sym_prefix = f"{file_timestamp}_symmetry"
-        generate_plots(full_data, method='griddata', output_prefix=sym_prefix)
-        
-        # Divide the run into thirds using timestamps from the file
-        run_duration = timestamps[-1] - timestamps[0]
-        third_duration = run_duration / 3
-        thirds = [
-            (timestamps[0], timestamps[0] + third_duration),
-            (timestamps[0] + third_duration, timestamps[0] + 2 * third_duration),
-            (timestamps[0] + 2 * third_duration, timestamps[-1])
-        ]
-        
-        # Generate fatigue plots for each third of the run
-        for i, (start_time, end_time) in enumerate(thirds):
-            pressure_values = get_pressure_data_for_third(timestamps, sensor_pressures, start_time, end_time)
-            fatigue_prefix = f"{file_timestamp}_fatigue{i+1}"
-            print(f"Third {i+1} pressure values: {pressure_values}")
-            generate_plots(pressure_values, method='rbf', output_prefix=fatigue_prefix)
-        
-        # Prepare to upload images with an upload timestamp appended
-        upload_timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
-        images = [
-            (f"{sym_prefix}_gradient.png", f"images/{sym_prefix}_gradient_{upload_timestamp}.png"),
-            (f"{sym_prefix}_section.png", f"images/{sym_prefix}_section_{upload_timestamp}.png"),
-            (f"{file_timestamp}_fatigue1_gradient.png", f"images/{file_timestamp}_fatigue1_gradient_{upload_timestamp}.png"),
-            (f"{file_timestamp}_fatigue1_section.png", f"images/{file_timestamp}_fatigue1_section_{upload_timestamp}.png"),
-            (f"{file_timestamp}_fatigue2_gradient.png", f"images/{file_timestamp}_fatigue2_gradient_{upload_timestamp}.png"),
-            (f"{file_timestamp}_fatigue2_section.png", f"images/{file_timestamp}_fatigue2_section_{upload_timestamp}.png"),
-            (f"{file_timestamp}_fatigue3_gradient.png", f"images/{file_timestamp}_fatigue3_gradient_{upload_timestamp}.png"),
-            (f"{file_timestamp}_fatigue3_section.png", f"images/{file_timestamp}_fatigue3_section_{upload_timestamp}.png")
-        ]
-    
-        for local_path, github_path in images:
-            if os.path.exists(local_path):
-                upload_file_to_github(local_path, github_path)
-            else:
-                print(f"File not found: {local_path}")
+            print(f"File not found: {local_path}")
+            
+def process_all_files(input_folder, output_folder):
+    for file_name in os.listdir(input_folder):
+        if file_name.endswith('.csv') or file_name.endswith('.zip'):
+            file_path = os.path.join(input_folder, file_name)
+            print(f"Processing file: {file_path}")
+            main(file_path, output_folder)
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    process_all_files(input_folder, output_folder)

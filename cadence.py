@@ -1,3 +1,5 @@
+import zipfile
+from io import StringIO
 import numpy as np
 import pandas as pd
 import os
@@ -29,8 +31,18 @@ os.makedirs(output_folder, exist_ok=True)
 # Load data function
 def load_data(file_path):
     try:
-        data = pd.read_csv(file_path)
-        return data
+        if file_path.endswith('.zip'):
+            with zipfile.ZipFile(file_path, 'r') as z:
+                # Get the first CSV file in the archive
+                csv_files = [f for f in z.namelist() if f.endswith('.csv')]
+                if not csv_files:
+                    raise Exception("No CSV file found in the ZIP archive.")
+                with z.open(csv_files[0]) as f:
+                    data = pd.read_csv(f)
+                    return data
+        else:
+            data = pd.read_csv(file_path)
+            return data
     except Exception as e:
         print(f"Error loading {file_path}: {e}")
         return None
@@ -39,8 +51,15 @@ def load_data(file_path):
 def calculate_cadence(df):
     try:
         time_column = df.columns[0]
+        # Convert the time column to numeric (strip spaces first) and drop rows with NaN values
+        df[time_column] = pd.to_numeric(df[time_column].astype(str).str.strip(), errors='coerce')
+        if df[time_column].isnull().all():
+            raise Exception("Time column contains no valid numeric values.")
+        df = df.dropna(subset=[time_column])
+        
+        # Define sensor columns based on your file structure
         right_foot_sensors = df.columns[1:12]  # First 11 columns
-        left_foot_sensors = df.columns[12:23]  # Next 11 columns
+        left_foot_sensors = df.columns[12:23]   # Next 11 columns
 
         df["Left_Total_Pressure"] = df[left_foot_sensors].sum(axis=1)
         df["Right_Total_Pressure"] = df[right_foot_sensors].sum(axis=1)
@@ -55,9 +74,11 @@ def calculate_cadence(df):
         left_peaks, _ = find_peaks(df["Left_Smoothed"], height=14, distance=10)
         right_peaks, _ = find_peaks(df["Right_Smoothed"], height=14, distance=10)
 
-        # Compute total time
-        total_time = df[time_column].iloc[-1] - df[time_column].iloc[0]  # In seconds
-
+        # Compute total time in seconds from first to last valid entry
+        total_time = df[time_column].iloc[-1] - df[time_column].iloc[0]
+        if total_time <= 0:
+            raise Exception("Invalid total time calculated.")
+        
         # Compute cadence (steps per minute)
         left_cadence = (len(left_peaks) * 60) / total_time
         right_cadence = (len(right_peaks) * 60) / total_time
@@ -68,7 +89,7 @@ def calculate_cadence(df):
     except Exception as e:
         print(f"Error calculating cadence: {e}")
         return None
-
+        
 # Upload .txt files to GitHub
 def upload_to_github(output_folder):
     for file_name in os.listdir(output_folder):
@@ -93,7 +114,7 @@ def upload_to_github(output_folder):
 # Process files in input folder
 def process_all_files(input_folder, output_folder):
     for file_name in os.listdir(input_folder):
-        if file_name.endswith('.csv'):
+        if file_name.endswith('.zip'):
             file_path = os.path.join(input_folder, file_name)
             data = load_data(file_path)
             if data is not None:
@@ -102,7 +123,6 @@ def process_all_files(input_folder, output_folder):
                     output_file = os.path.join(output_folder, f"{os.path.splitext(file_name)[0]}.txt")
                     with open(output_file, 'w') as f:
                         f.write(str(cadence))
-
     # Upload results to GitHub
     upload_to_github(output_folder)
 

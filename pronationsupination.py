@@ -1,9 +1,11 @@
+import zipfile
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from scipy.interpolate import splprep, splev
 from github import Github
+from github import GithubException
 
 # GitHub repository and token
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Set the GitHub Personal Access Token as an environment variable
@@ -25,18 +27,30 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 input_folder = os.path.join(script_dir, 'runData')
 output_folder = os.path.join(script_dir, 'prosupvisual')
 
-# Load the data
+# Load the data from CSV or ZIP
 def load_data(file_path):
-    data = pd.read_csv(file_path)
-    return data
+    try:
+        if file_path.endswith('.zip'):
+            with zipfile.ZipFile(file_path, 'r') as z:
+                csv_files = [f for f in z.namelist() if f.endswith('.csv')]
+                if not csv_files:
+                    raise Exception("No CSV file found in the ZIP archive.")
+                data = pd.read_csv(z.open(csv_files[0]))
+                return data
+        else:
+            data = pd.read_csv(file_path)
+            return data
+    except Exception as e:
+        print(f"Error loading {file_path}: {e}")
+        return None
 
-# Sensor coordinates (already provided by you)
+# Sensor coordinates (already provided)
 sensor_coords = np.array([
-    [5.9, 16.4], [5, 7.5], [7.5, 7.5], [5, 3], [7.5, 3], [5, 12], [7.5, 12], [3.2, 17.7], [8, 15.5], [6.5, 18.9], [4.2, 20.4],
-    [-5.9, 16.4], [-5, 7.5], [-7.5, 7.5], [-5, 3], [-7.5, 3], [-5, 12], [-7.5, 12], [-3.2, 17.7], [-8, 15.5], [-6.5, 18.9], [-4.2, 20.4]
+    [5, 3], [7.5, 3], [5, 7.5], [7.5, 7.5], [5, 12], [7.5, 12], [8, 15.5], [5.9, 16.4], [3.2, 17.7], [6.5, 18.9], [4.2, 20.4],
+    [-5, 3], [-7.5, 3], [-5, 7.5], [-7.5, 7.5], [-5, 12], [-7.5, 12], [-8, 15.5], [-5.9, 16.4], [-3.2, 17.7], [-6.5, 18.9], [-4.2, 20.4]
 ])
 
-# Foot outline coordinates (already provided by you)
+# Foot outline coordinates (already provided)
 foot_outline = np.array([
     [6, 0.4], [3.3, 2.2], [3.7, 7], [3, 10.8], [2.2, 15.7], [2.3, 19.8],
     [4, 23.6], [7, 22], [8.5, 19.2], [9.2, 15.2], [9, 11.5], [8.5, 6.6],
@@ -51,23 +65,25 @@ left_foot_outline = smooth_foot_outline.copy()
 left_foot_outline[:, 0] *= -1
 
 # Calculate Center of Pressure (COP) using sensor data
-def calculate_cop_from_sensors(sensor_data, sensor_coords):
+def calculate_cop_from_sensors(sensor_data, sensor_coords, force_threshold=0.1):
     force = np.sum(sensor_data, axis=1)
-    cop_x = np.sum(sensor_data * sensor_coords[:, 0], axis=1) / (force + 1e-6)
-    cop_y = np.sum(sensor_data * sensor_coords[:, 1], axis=1) / (force + 1e-6)
+    # Create arrays initialized with NaN
+    cop_x = np.full(force.shape, np.nan)
+    cop_y = np.full(force.shape, np.nan)
+    # Compute COP only for rows with force above the threshold
+    valid = force > force_threshold
+    if np.any(valid):
+        cop_x[valid] = np.sum(sensor_data[valid] * sensor_coords[:, 0], axis=1) / (force[valid] + 1e-6)
+        cop_y[valid] = np.sum(sensor_data[valid] * sensor_coords[:, 1], axis=1) / (force[valid] + 1e-6)
     return cop_x, cop_y
-
-import matplotlib.pyplot as plt
-import os
-import numpy as np
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
 def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
-    fig, ax = plt.subplots(figsize=(10, 10))  # Increased figure size
+    fig, ax = plt.subplots(figsize=(10, 10))
 
     # Plot foot outlines
-    ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-')
-    ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-')
+    ax.plot(smooth_foot_outline[:, 0], smooth_foot_outline[:, 1], 'k-', lw=2)
+    ax.plot(left_foot_outline[:, 0], left_foot_outline[:, 1], 'k-', lw=2)
 
     # Vertical lines for foot centers
     ax.axvline(x=np.mean(smooth_foot_outline[:, 0]), color='gray', linestyle='--', alpha=0.8)
@@ -76,82 +92,105 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     # Sensor locations
     ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s=100, marker='o', alpha=0.7)
 
-    # Normalize time for colormap
-    norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
+    # Normalize time for colormap; if all values are equal, use ones.
+    if np.max(time) == np.min(time):
+        norm_time = np.ones_like(time)
+    else:
+        norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
 
-    # Plot COP trajectories with colormap
-    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, alpha=0.8)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=150, alpha=0.8)
-
-
-    # Add colorbar with larger font size
+    # Plot COP trajectories with colormap, forcing full scale from 0 to 1, and increase marker size
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=100,
+                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=100,
+                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
+    
+    # Add colorbar with custom ticks and labels
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
-    cbar.set_label('Run Progress (%)', fontsize=20)  # Bigger label
-    cbar.set_ticks([0.0, 0.25, 0.5, 0.75, 1.0])
+    cbar.set_label('Run Progress (%)', fontsize=20)
+    cbar.set_ticks([0, 0.25, 0.5, 0.75, 1])
     cbar.set_ticklabels(['0%', '25%', '50%', '75%', '100%'])
-    cbar.ax.tick_params(labelsize=20)  # Bigger tick labels
+    cbar.ax.tick_params(labelsize=20)
 
-    # Clean up plot
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_aspect('equal')
     plt.tight_layout(pad=0)
 
-    # Save plot
     output_path = os.path.join(output_folder, f'{label}_cop_plot.png')
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0.1, dpi=300)
     plt.close()
 
-
 # Main analysis
 def main(file_path, output_folder):
     data = load_data(file_path)
-    time = data['Time'].values
-
-    # Sensor data from CSV (Sensor_1 to Sensor_22)
+    if data is None:
+        return
+    # Convert "Time" to numeric (in case there are string issues)
+    time_vals = pd.to_numeric(data['Time'], errors='coerce').values
     sensor_data = data.iloc[:, 1:23].values
     right_sensor_data = sensor_data[:, :11]
     left_sensor_data = sensor_data[:, 11:]
-
-    # Calculate and plot COP from sensor data
-    l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:])
-    r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11])
-
-    # Get the file name without extension for labeling
+    
+    # Calculate COP for left and right foot (using a force threshold)
+    l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:], force_threshold=0.1)
+    r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11], force_threshold=0.1)
+    
+    # Filter out rows where COP could not be computed (NaNs)
+    valid_left = ~np.isnan(l_cop_x) & ~np.isnan(l_cop_y)
+    valid_right = ~np.isnan(r_cop_x) & ~np.isnan(r_cop_y)
+    
+    l_cop_x_plot = l_cop_x[valid_left]
+    l_cop_y_plot = l_cop_y[valid_left]
+    r_cop_x_plot = r_cop_x[valid_right]
+    r_cop_y_plot = r_cop_y[valid_right]
+    
+    # For the colormap, use the time values corresponding to valid left COP data
+    plot_time = time_vals[valid_left] if np.any(valid_left) else time_vals
+    
     label = os.path.splitext(os.path.basename(file_path))[0]
-    plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder)
+    plot_cop_on_foot(l_cop_x_plot, l_cop_y_plot, r_cop_x_plot, r_cop_y_plot, plot_time, label, output_folder)
 
-# Upload image to GitHub
 def upload_to_github(output_folder):
     for file_name in os.listdir(output_folder):
         if file_name.endswith('.png'):
             file_path = os.path.join(output_folder, file_name)
             with open(file_path, 'rb') as f:
                 content = f.read()
-            
-            # Define the path in the GitHub repo
             github_path = f'prosupvisual/{file_name}'
-            
-            # Try to get the existing file to update it
             try:
+                # Try to get the existing file.
                 existing_file = repo.get_contents(github_path)
-                repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
-                print(f"Updated {file_name} on GitHub.")
-            except:
-                repo.create_file(github_path, f"Add {file_name}", content)
-                print(f"Uploaded {file_name} to GitHub.")
+                try:
+                    # Attempt to update using the SHA from the existing file.
+                    repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
+                    print(f"Updated {file_name} on GitHub.")
+                except GithubException as update_err:
+                    # If conflict error, re-read the file to get the latest SHA and retry.
+                    if update_err.status == 409:
+                        existing_file = repo.get_contents(github_path)
+                        repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
+                        print(f"Updated {file_name} on GitHub after conflict resolution.")
+                    else:
+                        raise update_err
+            except GithubException as e:
+                # If file is not found, create it.
+                if e.status == 404:
+                    try:
+                        repo.create_file(github_path, f"Add {file_name}", content)
+                        print(f"Uploaded {file_name} to GitHub.")
+                    except GithubException as ce:
+                        print(f"Failed to create file {file_name}: {ce}")
+                else:
+                    print(f"Failed to upload {file_name}: {e}")
 
 # Process all files in the runData folder
 def process_all_files(input_folder, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-
     for file_name in os.listdir(input_folder):
-        if file_name.endswith('.csv'):
+        if file_name.endswith('.csv') or file_name.endswith('.zip'):
             file_path = os.path.join(input_folder, file_name)
             main(file_path, output_folder)
-
-    # Upload all generated plots to GitHub
     upload_to_github(output_folder)
 
 # Run the script on all files in runData
