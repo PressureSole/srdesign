@@ -51,8 +51,13 @@ def load_data(file_path):
 def calculate_cadence(df):
     try:
         time_column = df.columns[0]
+        # Convert the time column to numeric (coerce errors to NaN)
+        df[time_column] = pd.to_numeric(df[time_column], errors='coerce')
+        if df[time_column].isnull().any():
+            raise Exception("Time column contains invalid values after conversion.")
+
         right_foot_sensors = df.columns[1:12]  # First 11 columns
-        left_foot_sensors = df.columns[12:23]  # Next 11 columns
+        left_foot_sensors = df.columns[12:23]   # Next 11 columns
 
         df["Left_Total_Pressure"] = df[left_foot_sensors].sum(axis=1)
         df["Right_Total_Pressure"] = df[right_foot_sensors].sum(axis=1)
@@ -67,8 +72,10 @@ def calculate_cadence(df):
         left_peaks, _ = find_peaks(df["Left_Smoothed"], height=14, distance=10)
         right_peaks, _ = find_peaks(df["Right_Smoothed"], height=14, distance=10)
 
-        # Compute total time
-        total_time = df[time_column].iloc[-1] - df[time_column].iloc[0]  # In seconds
+        # Compute total time (in seconds)
+        total_time = df[time_column].iloc[-1] - df[time_column].iloc[0]
+        if pd.isnull(total_time) or total_time == 0:
+            raise Exception("Invalid total time calculated.")
 
         # Compute cadence (steps per minute)
         left_cadence = (len(left_peaks) * 60) / total_time
