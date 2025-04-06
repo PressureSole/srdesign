@@ -100,9 +100,9 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
 
     # Plot COP trajectories with colormap, forcing full scale from 0 to 1, and increase marker size
     sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=67,
-                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
+                     edgecolors='none', linewidths=1, alpha=0.9, vmin=0, vmax=1)
     sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=67,
-                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
+                     edgecolors='none', linewidths=1, alpha=0.9, vmin=0, vmax=1)
     
     # Add colorbar with custom ticks and labels
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
