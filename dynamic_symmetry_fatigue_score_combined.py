@@ -16,6 +16,13 @@ from io import BytesIO
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Set the GitHub Personal Access Token as an environment variable
 REPO_NAME = "PressureSole/srdesign"
 
+# Get the absolute path of the current script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define input and output folders relative to the script's location
+input_folder = os.path.join(script_dir, 'runData')
+output_folder = os.path.join(script_dir, 'images')
+
 # Ensure GitHub connection
 try:
     g = Github(GITHUB_TOKEN)
