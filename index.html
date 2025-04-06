@@ -2257,7 +2257,7 @@
                         <circle class="foreground" cx="50" cy="50" r="40" fill="none" stroke="${getColorForScore(score, categoryClass)}" stroke-width="10" stroke-dasharray="${perimeter}" stroke-dashoffset="${dashoffset}" stroke-linecap="round" />
                     </g>
                 </svg>
-                <div class="number">${parseFloat(score).toFixed(2)}</div>`;
+                <div class="number">${parseFloat(score).toFixed(0)}</div>`;
             circleDiv.appendChild(circleContent);
             scoreItem.appendChild(circleDiv);
             return scoreItem;
@@ -2385,7 +2385,7 @@
         // MANUAL values. TEMPORARY FUNCTION FOR AUDREY --------------------------------------
         function insertTestScoreBox() {
             // Your test values: [Stress, Symmetry, Fatigue]
-            const testScores = [42, 81, 24];
+            const testScores = [33, 8, 24];
 
             // Create the container for the score box.
             const containerDiv = document.createElement('div');
