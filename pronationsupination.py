@@ -172,11 +172,10 @@ def upload_to_github(output_folder):
                 # Try to get the existing file.
                 existing_file = repo.get_contents(github_path)
                 try:
-                    # Attempt to update using the SHA from the existing file.
                     repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
                     print(f"Updated {file_name} on GitHub.")
                 except GithubException as update_err:
-                    # If conflict error, re-read the file to get the latest SHA and retry.
+                    # If a conflict occurs (error 409), re-fetch the latest SHA and update again.
                     if update_err.status == 409:
                         existing_file = repo.get_contents(github_path)
                         repo.update_file(github_path, f"Update {file_name}", content, existing_file.sha)
@@ -184,7 +183,7 @@ def upload_to_github(output_folder):
                     else:
                         raise update_err
             except GithubException as e:
-                # If file is not found, create it.
+                # If the file doesn't exist, create it.
                 if e.status == 404:
                     try:
                         repo.create_file(github_path, f"Add {file_name}", content)
