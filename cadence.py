@@ -82,7 +82,7 @@ def calculate_cadence(df):
         # Compute cadence (steps per minute)
         left_cadence = (len(left_peaks) * 60) / total_time
         right_cadence = (len(right_peaks) * 60) / total_time
-        average_cadence = round((left_cadence + right_cadence) / 2)
+        average_cadence = round((left_cadence + right_cadence))
 
         print(f"Average Cadence: {average_cadence} steps/min")
         return average_cadence
