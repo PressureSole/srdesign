@@ -1,0 +1,5 @@
+Overall Stress Score:  4
+Overall Symmetry Score: 80
+Overall Fatigue: 15
+
+
