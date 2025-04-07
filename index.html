@@ -2060,12 +2060,12 @@
             <!-- New Log Out button -->
             <button type="button" id="logout-btn" style="width: 150px; padding: 10px; background-color: grey; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px;">Log Out</button>
             
-            <!-- Show Profiles and Clear Profiles Buttons -->
+            <!-- Show Profiles and Clear Profiles Buttons; TO CLEAR PROFILES (BACK END)
             <div style="margin-top: 20px; text-align: center;">
                 <button id="show-profiles-btn" onclick="showProfiles()" style="padding: 10px 20px; background-color: #2a9d8f; color: white; border: none; border-radius: 5px; cursor: pointer;">Show All Profiles</button>
                 <button id="clear-profiles-btn" onclick="clearProfiles()" style="padding: 10px 20px; background-color: #e76f51; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Clear Profiles</button>
             </div>
-            <div id="profiles-output" style="margin-top: 20px; background: #f7f7f7; padding: 10px; border: 1px solid #ccc;"></div>
+            <div id="profiles-output" style="margin-top: 20px; background: #f7f7f7; padding: 10px; border: 1px solid #ccc;"></div>-->
         </div>
 
         <!-- Run History container -->
@@ -2107,42 +2107,49 @@
                         <div class="faq-answer">PressureSole is a low-cost insole with embedded sensors that provides feedback on your running form. It helps reduce the risk of running-related injuries by giving real-time insights into stress, fatigue, and symmetry during your runs.</div>
                     </div>
                     <div class="faq-box">
-                        <h3>How does PressureSole calculate my Stress, Fatigue, and Symmetry scores?</h3>
-                        <div class="faq-answer">The system analyzes pressure values collected from 11 sensors placed across the insole and PressureSole’s models process this data to provide:<br>
-                            Stress: Overall loading and intensity on your feet.<br>
-                            Fatigue: Signs of declining performance (force output, step rate, contact time).<br>
-                            Symmetry: The balance between your left and right foot pressures. </div>
+                        <h3>What do the PressureSole Stress, Fatigue, and Symmetry scores measure?</h3>
+                        <div class="faq-answer">The system analyzes pressure values collected from the sensors and PressureSole’s models process this data to provide:
+                            <ul>
+                                <li><strong>Stress</strong>: Overall loading and intensity on your feet.</li>
+                                <li><strong>Fatigue</strong>: Signs of declining performance (force output, step rate, contact time).</li>
+                                <li><strong>Symmetry</strong>: The balance between your left and right foot pressures.</li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="faq-box">
-                        <h3>Why did you choose to use 11 sensors instead of more?</h3>
-                        <div class="faq-answer">Through extensive research, we found that 11 strategically placed sensors provide a strong balance between accuracy and cost reduction. This keeps the product affordable without sacrificing meaningful data.</div>
+                        <h3>Is PressureSole only for runners or can others use it?</h3>
+                        <div class="faq-answer">While the primary focus is on amateur runners, PressureSole can be useful for anyone looking to recieve feedback on their risk for injury, including athletes in other sports or individuals undergoing physical therapy.</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>How is the Gait Mechanics Foot Loading graph supposed to be interpreted?</h3>
+                        <div class="faq-answer">A larger tail region to the <strong>inside</strong> of the foot's center line is indicative of possible <strong>pronation</strong>, while a larger tail region to the <strong>outside</strong> of the foot's center line is indicative of possible <strong>supination</strong>.</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>How does PressureSole differ from other running feedback solutions like Loadsol or Nike Run Club App?</h3>
+                        <div class="faq-answer">Unlike Loadsol, which is expensive and mainly used in professional settings, or the Nike Run Club App, which lacks direct pressure data, <strong>PressureSole</strong> offers high accuracy and running feedback at a fraction of the cost and is available to all consumers.</div>
                     </div>
                 </div>
                 <div class="faq-column-right">
                     <div class="faq-box">
                         <h3>How accurate is PressureSole compared to professional devices?</h3>
-                        <div class="faq-answer">PressureSole achieves approximately 80% accuracy when compared to industry-standard devices like the Loadsol, which is sufficient for amateur runners to receive actionable feedback at a much lower cost.</div>
+                        <div class="faq-answer">PressureSole achieves approximately 98% accuracy when compared to industry-standard devices like the Loadsol, which is sufficient for amateur runners to receive actionable feedback at a much lower cost.</div>
                     </div>
                     <div class="faq-box">
-                        <h3>Is PressureSole only for runners or can others use it? </h3>
-                        <div class="faq-answer">While the primary focus is on amateur runners, PressureSole can be useful for anyone looking to recieve feedback on their risk for injury, including athletes in other sports or individuals undergoing physical therapy.</div>
+                        <h3>Why does PressureSole use 11 sensors?</h3>
+                        <div class="faq-answer">PressureSoles’s research found that 11 strategically placed sensors provide a strong balance between accuracy (80% CoP correlation) and cost reduction. This keeps the product affordable without sacrificing meaningful data.</div>
                     </div>
                     <div class="faq-box">
-                        <h3>How is data transmitted from the insole to the web app? </h3>
+                        <h3>What do the 1st, 2nd, and 3rd periods refer to under "fatigue" on the visualizations page?</h3>
+                        <div class="faq-answer">The purpose of the fatigue visualization is to display the changes in forcing throughout a run. The "1st period" refers to the distribution of forcing for the first third of the run. "2nd period" refers to the distribution of forcing for the second third of the runn and so on.</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>What do overpronation and supination mean?</h3>
+                        <div class="faq-answer"><strong>Overpronation</strong> (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment.<br>
+                            <strong>Supination</strong> (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome.</div>
+                    </div>
+                    <div class="faq-box">
+                        <h3>How is data transmitted from the insole to the web app?</h3>
                         <div class="faq-answer">Pressure data is collected via the embedded sensors and transmitted wirelessly to the web app through a Bluetooth-enabled PCB, where it is processed and displayed in real time.</div>
-                    </div>
-                    <div class="faq-box">
-                        <h3>What do "first period", "second period", and "third period" refer to under "fatigue" on the visualizations page? </h3>
-                        <div class="faq-answer">The purpose of the fatigue visualization is to display the changes in forcing throughout a run. "First period" refers to the distribution of forcing for the first third of the run (33%). "Second period" refers to the distribution of forcing for the second third of the runn (33%-66%) and so on.</div>
-                    </div>
-                    <div class="faq-box">
-                        <h3>How do I interpret the pronation/supination visualization in the Gait Mechanics tab?</h3>
-                        <div class="faq-answer">If you see a larger tail region to the inside of the foot's center line, this is indicative of possible pronation. 
-                            If you see a larger tail region to the outside of the foot's center line, this is indicative of possible supination.
-                            Overpronation (excessive inward rolling) can lead to issues like plantar fasciitis, shin splints, and knee pain due to poor shock absorption and misalignment. 
-                            Supination (or underpronation) is when the foot rolls outward, placing excessive stress on the outer edge of the foot and increasing the risk of ankle sprains, stress fractures, and IT band syndrome. 
-                            To address overpronation, runners can benefit from stability or motion-control shoes, along with strengthening the arch, hips, and glutes to improve alignment and control. 
-                            For supination, using cushioned, neutral shoes and incorporating mobility work to increase ankle flexibility can help. Strengthening the calves, ankles, and intrinsic foot muscles can also promote better foot mechanics and reduce the risk of injury.</div>
                     </div>
                 </div>
             </div>
@@ -2383,7 +2390,7 @@
         }
 
         // MANUAL values. TEMPORARY FUNCTION FOR AUDREY --------------------------------------
-        function insertTestScoreBox() {
+        /*function insertTestScoreBox() {
             // Your test values: [Stress, Symmetry, Fatigue]
             const testScores = [33, 8, 24];
 
@@ -2413,7 +2420,7 @@
             const scoresContainer = document.getElementById('scoresContainer');
             scoresContainer.innerHTML = ''; // Clear any previous content.
             scoresContainer.appendChild(containerDiv);
-        }
+        }*/
 
         // --- Build/Rebuild the Scores Page ---
         // When a user is logged in, we want to use our recalculated Total_Stress from scoreValues[0].
@@ -2422,13 +2429,13 @@
             console.log("loadAllScores triggered");
 
             // MANUAL test score insertion. REMOVE ONCE AUDREY DONE
-            const testMode = true;
+            /*const testMode = true;
             if (testMode) {
                 const scoresContainer = document.getElementById('scoresContainer');
                 scoresContainer.innerHTML = '';
                 insertTestScoreBox();
                 return;
-            }
+            }*/
 
             try {
                 const repoUrl = 'https://api.github.com/repos/PressureSole/srdesign/contents/scores';
