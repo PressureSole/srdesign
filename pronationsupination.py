@@ -78,7 +78,7 @@ def calculate_cop_from_sensors(sensor_data, sensor_coords, force_threshold=0.1):
     return cop_x, cop_y
 
 # Plot COP trajectory on foot outline with timestamp-based brightness
-def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_folder):
+def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, left_time, right_time, label, output_folder):
     fig, ax = plt.subplots(figsize=(10, 10))
 
     # Plot foot outlines
@@ -92,19 +92,25 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     # Sensor locations
     ax.scatter(sensor_coords[:, 0], sensor_coords[:, 1], c='black', s=100, marker='o', alpha=0.7)
 
-    # Normalize time for colormap; if all values are equal, use ones.
-    if np.max(time) == np.min(time):
-        norm_time = np.ones_like(time)
+    # Normalize left time for colormap; if constant, use ones
+    if np.max(left_time) == np.min(left_time):
+        norm_time_left = np.ones_like(left_time)
     else:
-        norm_time = (time - np.min(time)) / (np.max(time) - np.min(time))
-
-    # Plot COP trajectories with colormap, forcing full scale from 0 to 1, and increase marker size
-    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=100,
-                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
-    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time, cmap='YlOrRd', marker='o', s=100,
-                     edgecolors='black', linewidths=1, alpha=0.9, vmin=0, vmax=1)
+        norm_time_left = (left_time - np.min(left_time)) / (np.max(left_time) - np.min(left_time))
     
-    # Add colorbar with custom ticks and labels
+    # Normalize right time for colormap
+    if np.max(right_time) == np.min(right_time):
+        norm_time_right = np.ones_like(right_time)
+    else:
+        norm_time_right = (right_time - np.min(right_time)) / (np.max(right_time) - np.min(right_time))
+
+    # Plot COP trajectories with colormap and no edge color, using the proper time arrays
+    sc1 = ax.scatter(l_cop_x, l_cop_y, c=norm_time_left, cmap='YlOrRd', marker='o', s=67,
+                     edgecolors='none', alpha=0.9, vmin=0, vmax=1)
+    sc2 = ax.scatter(r_cop_x, r_cop_y, c=norm_time_right, cmap='YlOrRd', marker='o', s=67,
+                     edgecolors='none', alpha=0.9, vmin=0, vmax=1)
+
+    # Add colorbar with custom ticks and labels (using right-time colormap)
     cbar = fig.colorbar(sc2, ax=ax, pad=0.01)
     cbar.set_label('Run Progress (%)', fontsize=20)
     cbar.set_ticks([0, 0.25, 0.5, 0.75, 1])
@@ -119,23 +125,26 @@ def plot_cop_on_foot(l_cop_x, l_cop_y, r_cop_x, r_cop_y, time, label, output_fol
     output_path = os.path.join(output_folder, f'{label}_cop_plot.png')
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0.1, dpi=300)
     plt.close()
-
+    
 # Main analysis
 def main(file_path, output_folder):
     data = load_data(file_path)
     if data is None:
         return
-    # Convert "Time" to numeric (in case there are string issues)
+    # Convert "Time" to numeric
     time_vals = pd.to_numeric(data['Time'], errors='coerce').values
     sensor_data = data.iloc[:, 1:23].values
     right_sensor_data = sensor_data[:, :11]
     left_sensor_data = sensor_data[:, 11:]
     
-    # Calculate COP for left and right foot (using a force threshold)
+    # Calculate COP using a force threshold to filter out air-phase frames
+    l_cop, _ = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:], force_threshold=0.1)
+    r_cop, _ = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11], force_threshold=0.1)
+    # We need both x and y values so:
     l_cop_x, l_cop_y = calculate_cop_from_sensors(left_sensor_data, sensor_coords[11:], force_threshold=0.1)
     r_cop_x, r_cop_y = calculate_cop_from_sensors(right_sensor_data, sensor_coords[:11], force_threshold=0.1)
     
-    # Filter out rows where COP could not be computed (NaNs)
+    # Filter out invalid (NaN) COP values for left and right separately
     valid_left = ~np.isnan(l_cop_x) & ~np.isnan(l_cop_y)
     valid_right = ~np.isnan(r_cop_x) & ~np.isnan(r_cop_y)
     
@@ -144,11 +153,13 @@ def main(file_path, output_folder):
     r_cop_x_plot = r_cop_x[valid_right]
     r_cop_y_plot = r_cop_y[valid_right]
     
-    # For the colormap, use the time values corresponding to valid left COP data
-    plot_time = time_vals[valid_left] if np.any(valid_left) else time_vals
+    # Compute separate time arrays for left and right using the valid indices
+    plot_time_left = time_vals[valid_left]
+    plot_time_right = time_vals[valid_right]
     
     label = os.path.splitext(os.path.basename(file_path))[0]
-    plot_cop_on_foot(l_cop_x_plot, l_cop_y_plot, r_cop_x_plot, r_cop_y_plot, plot_time, label, output_folder)
+    plot_cop_on_foot(l_cop_x_plot, l_cop_y_plot, r_cop_x_plot, r_cop_y_plot,
+                     plot_time_left, plot_time_right, label, output_folder)
 
 def upload_to_github(output_folder):
     for file_name in os.listdir(output_folder):
